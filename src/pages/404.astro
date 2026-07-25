@@ -1,0 +1,24 @@
+---
+import ButtonLink from '../components/ui/ButtonLink.astro';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="الصفحة غير موجودة"
+  description="الصفحة التي تبحث عنها غير متوفرة في موقع بيوتي كورنر."
+  noindex={true}
+>
+  <section class="py-20 sm:py-28">
+    <div class="page-container flex max-w-2xl flex-col items-center text-center">
+      <p class="text-sm font-bold tracking-[0.08em] text-primary">404</p>
+      <h1 class="text-display mt-3 font-black">الصفحة غير موجودة</h1>
+      <p class="mt-4 text-sm leading-7 text-pretty text-muted sm:text-lg">
+        تعذّر العثور على الصفحة المطلوبة. يمكنك العودة إلى الرئيسية أو تصفح الخدمات والأطباء.
+      </p>
+      <div class="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+        <ButtonLink href="/" class="w-full justify-center sm:w-auto">العودة للرئيسية</ButtonLink>
+        <ButtonLink href="/services" variant="outline" class="w-full justify-center sm:w-auto">تصفح الخدمات</ButtonLink>
+      </div>
+    </div>
+  </section>
+</Layout>

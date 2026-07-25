@@ -1,43 +1,64 @@
-# Astro Starter Kit: Minimal
+# Beauty Corner
+
+Astro website for بيوتي كورنر — dental, dermatology, and laser clinic pages with WhatsApp booking and Schema.org SEO.
+
+## Commands
+
+| Command | Action |
+| --- | --- |
+| `npm install` | Install dependencies |
+| `npm run dev` | Local Astro dev server |
+| `npm run build` | Production build to `./dist` |
+| `npm run preview` | Preview the Astro build locally |
+| `npm run preview:cf` | Preview the Workers build with Wrangler |
+| `npm run deploy` | Build and deploy to Cloudflare Workers |
+| `npm run verify` | Type-check + production build |
+
+## Cloudflare Workers
+
+This project is configured for **static deployment on Cloudflare Workers Assets**.
+
+### Deploy with Wrangler
+
+1. Log in once:
 
 ```sh
-npm create astro@latest -- --template minimal
+npx wrangler login
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+2. Deploy:
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```sh
+npm run deploy
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Or:
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```sh
+npm run build
+npx wrangler deploy
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+Config lives in [`wrangler.jsonc`](./wrangler.jsonc) and points assets at `./dist`.
 
-## 🧞 Commands
+### Deploy with Cloudflare dashboard (Workers Builds)
 
-All commands are run from the root of the project, from a terminal:
+Connect the GitHub repo, then use:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+- **Build command:** `npm run build`
+- **Deploy command:** `npx wrangler deploy`
+- **Root directory:** `/` (repo root)
 
-## 👀 Want to learn more?
+Optional environment variable:
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- `PUBLIC_WHATSAPP_NUMBER` — WhatsApp number in international digits only (no `+`)
+
+See [`.env.example`](./.env.example).
+
+### Notes
+
+- No `@astrojs/cloudflare` adapter is required because the site is fully static.
+- Custom 404 is enabled via `not_found_handling: "404-page"`.
+- Security/cache headers are in [`public/_headers`](./public/_headers).
+
+Docs: [Deploy Astro to Cloudflare](https://docs.astro.build/en/guides/deploy/cloudflare/)
