@@ -1,0 +1,49 @@
+---
+import BookingForm from '../components/contact/BookingForm.astro';
+import { organization } from '../data/organization';
+import {
+  buildBreadcrumbSchema,
+  buildWebPageSchema,
+} from '../lib/schema';
+import Layout from '../layouts/Layout.astro';
+
+const site = Astro.site!;
+const title = 'تواصل معنا';
+const description = 'احجز موعدك في بيوتي كورنر لخدمات الأسنان والجلدية والليزر.';
+---
+
+<Layout
+  title={title}
+  description={description}
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: '/contact',
+      name: title,
+      description,
+      type: 'ContactPage',
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: 'الرئيسية', path: '/' },
+      { name: 'تواصل معنا', path: '/contact' },
+    ]),
+    {
+      '@type': 'ContactPage',
+      '@id': new URL('/contact#contactpage', site).href,
+      name: title,
+      description,
+      url: new URL('/contact', site).href,
+      mainEntity: { '@id': `${site.origin}/#organization` },
+      significantLink: organization.whatsappUrl,
+    },
+  ]}
+>
+  <section class="py-14 sm:py-24">
+    <div class="page-container">
+      <h1 class="text-display font-black">تواصل معنا</h1>
+      <p class="mt-3 max-w-2xl text-sm leading-7 text-pretty text-muted sm:text-lg lg:text-xl lg:leading-8">نحن هنا للإجابة على استفساراتك ومساعدتك في حجز موعدك.</p>
+    </div>
+  </section>
+
+  <BookingForm />
+</Layout>

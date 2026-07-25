@@ -1,0 +1,221 @@
+---
+import { buildWhatsAppUrl, clinicContact } from '../../data/contact';
+import { branches } from '../../data/doctors';
+import { clinicServices } from '../../data/services';
+import AssetIcon from '../ui/AssetIcon.astro';
+import PillLabel from '../ui/PillLabel.astro';
+
+export interface Props {
+  defaultSpecialty?: string;
+  defaultService?: string;
+}
+
+const { defaultSpecialty = '', defaultService = '' } = Astro.props;
+
+const specialties = ['طب وتجميل الأسنان', 'الأمراض الجلدية والتجميل', 'خدمات الليزر'] as const;
+const serviceNames = [...new Set(clinicServices.map((service) => service.title))];
+const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر بيوتي كورنر.');
+const fieldClass =
+  'min-h-12 w-full rounded-[1.25rem] border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-muted/70 focus:border-primary aria-[invalid=true]:border-danger';
+---
+
+<section id="booking" class="bg-surface-soft/60 py-20 sm:py-24" aria-labelledby="booking-heading">
+  <div class="page-container">
+    <div class="grid items-start gap-6 rounded-[2rem] border border-border bg-surface-soft p-4 shadow-[var(--shadow-card)] sm:gap-10 sm:p-8 lg:grid-cols-[0.84fr_1.16fr] lg:gap-14 lg:p-10">
+      <div>
+        <PillLabel text="احجز موعدك" />
+        <h2 id="booking-heading" class="text-display mt-4 font-black text-ink">
+          احجز سريعا الآن
+        </h2>
+        <p class="mt-4 max-w-lg text-sm leading-7 text-pretty text-muted">
+          املأ البيانات ثم أرسل الطلب عبر واتساب لتأكيد الموعد مباشرة مع فريق العيادة.
+        </p>
+
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-success/40 bg-success-soft px-5 text-sm font-bold whitespace-nowrap text-success transition-transform hover:-translate-y-0.5 sm:w-auto"
+        >
+          تواصل معنا عبر واتساب
+          <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+        </a>
+
+        <address class="mt-5 space-y-2 text-sm not-italic text-muted sm:mt-7 sm:space-y-3" aria-label="بيانات التواصل">
+          <p class="flex items-center gap-2 sm:gap-3" dir="ltr">
+            <AssetIcon src="/assets/phone.svg" size="sm" class="shrink-0" />
+            <span>{clinicContact.phoneDisplay}</span>
+          </p>
+          <p class="flex items-center gap-2 sm:gap-3">
+            <AssetIcon src="/assets/clock.svg" size="sm" class="shrink-0" />
+            <span class="leading-5">{clinicContact.hours}</span>
+          </p>
+          <p class="flex items-center gap-2 sm:gap-3">
+            <AssetIcon src="/assets/location.svg" size="sm" class="shrink-0" />
+            <span class="leading-5">{clinicContact.location}</span>
+          </p>
+        </address>
+      </div>
+
+      <form
+        id="booking-form"
+        class="rounded-[2rem] border border-border bg-surface p-4 shadow-[var(--shadow-card)] sm:p-8"
+        novalidate
+      >
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="space-y-1.5">
+            <label for="booking-name" class="block text-xs font-bold">الاسم الكامل</label>
+            <input id="booking-name" name="name" type="text" class={fieldClass} placeholder="مثال: عبدالله محمد" autocomplete="name" minlength="3" required />
+            <p class="hidden text-xs text-danger" data-error-for="booking-name"></p>
+          </div>
+          <div class="space-y-1.5">
+            <label for="booking-phone" class="block text-xs font-bold">رقم الجوال</label>
+            <input id="booking-phone" name="phone" type="tel" dir="ltr" class={fieldClass} placeholder="05XXXXXXXX" autocomplete="tel" inputmode="numeric" pattern="05[0-9]{8}" required />
+            <p class="hidden text-xs text-danger" data-error-for="booking-phone"></p>
+          </div>
+          <div class="space-y-1.5">
+            <label for="booking-specialty" class="block text-xs font-bold">التخصص</label>
+            <select id="booking-specialty" name="specialty" class={fieldClass} required>
+              <option value="">اختر التخصص</option>
+              {specialties.map((specialty) => (
+                <option value={specialty} selected={specialty === defaultSpecialty}>{specialty}</option>
+              ))}
+            </select>
+            <p class="hidden text-xs text-danger" data-error-for="booking-specialty"></p>
+          </div>
+          <div class="space-y-1.5">
+            <label for="booking-service" class="block text-xs font-bold">الخدمة</label>
+            <select id="booking-service" name="service" class={fieldClass} required>
+              <option value="">اختر الخدمة</option>
+              {serviceNames.map((service) => (
+                <option value={service} selected={service === defaultService}>{service}</option>
+              ))}
+            </select>
+            <p class="hidden text-xs text-danger" data-error-for="booking-service"></p>
+          </div>
+          <div class="space-y-1.5">
+            <label for="booking-branch" class="block text-xs font-bold">الفرع</label>
+            <select id="booking-branch" name="branch" class={fieldClass} required>
+              <option value="">اختر الفرع</option>
+              {branches.map((branch) => <option value={branch}>{branch}</option>)}
+            </select>
+            <p class="hidden text-xs text-danger" data-error-for="booking-branch"></p>
+          </div>
+          <div class="space-y-1.5">
+            <label for="booking-date" class="block text-xs font-bold">التاريخ المفضل</label>
+            <input id="booking-date" name="date" type="date" class={fieldClass} required />
+            <p class="hidden text-xs text-danger" data-error-for="booking-date"></p>
+          </div>
+          <div class="space-y-1.5">
+            <label for="booking-time" class="block text-xs font-bold">الوقت المفضل</label>
+            <input id="booking-time" name="time" type="time" class={fieldClass} required />
+            <p class="hidden text-xs text-danger" data-error-for="booking-time"></p>
+          </div>
+          <div class="space-y-1.5 sm:col-span-2">
+            <label for="booking-message" class="block text-xs font-bold">رسالة إضافية (اختياري)</label>
+            <textarea id="booking-message" name="message" rows="4" class={`${fieldClass} resize-y py-3`} placeholder="أي ملاحظات تودّ إخبارنا بها"></textarea>
+          </div>
+        </div>
+
+        <label class="mt-5 flex cursor-pointer items-start gap-3 text-xs leading-5 text-muted">
+          <input id="booking-consent" name="consent" type="checkbox" class="mt-0.5 size-4 accent-primary" required />
+          <span>أوافق على سياسة الخصوصية والتواصل معي لتأكيد الحجز.</span>
+        </label>
+        <p class="mt-1 hidden text-xs text-danger" data-error-for="booking-consent"></p>
+
+        <button type="submit" class="mt-6 inline-flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-full bg-gold-gradient px-7 text-sm font-bold whitespace-nowrap text-ink-button shadow-[var(--shadow-gold)] transition-transform hover:-translate-y-0.5 sm:text-base">
+          إرسال عبر واتساب
+          <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+        </button>
+        <p id="booking-status" class="mt-4 min-h-5 text-center text-sm font-medium" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { buildBookingWhatsAppMessage, buildWhatsAppUrl } from '../../data/contact';
+
+  document.addEventListener('astro:page-load', () => {
+    const bookingForm = document.querySelector<HTMLFormElement>('#booking-form');
+    if (!bookingForm || bookingForm.dataset.bound === 'true') return;
+    bookingForm.dataset.bound = 'true';
+
+    const bookingStatus = document.querySelector<HTMLElement>('#booking-status');
+    const dateInput = document.querySelector<HTMLInputElement>('#booking-date');
+    const requiredFields = [
+      ...bookingForm.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input[required], select[required]'),
+    ];
+
+    if (dateInput) {
+      const now = new Date();
+      const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().split('T')[0];
+      if (localDate) dateInput.min = localDate;
+    }
+
+    const messages: Readonly<Record<string, string>> = {
+      'booking-name': 'يرجى إدخال الاسم الكامل (3 أحرف على الأقل).',
+      'booking-phone': 'يرجى إدخال رقم جوال سعودي بصيغة 05XXXXXXXX.',
+      'booking-specialty': 'يرجى اختيار التخصص.',
+      'booking-service': 'يرجى اختيار الخدمة.',
+      'booking-branch': 'يرجى اختيار الفرع.',
+      'booking-date': 'يرجى اختيار تاريخ متاح.',
+      'booking-time': 'يرجى اختيار الوقت المفضل.',
+      'booking-consent': 'الموافقة مطلوبة للمتابعة.',
+    };
+
+    const showFieldState = (field: HTMLInputElement | HTMLSelectElement) => {
+      const error = document.querySelector<HTMLElement>(`[data-error-for="${field.id}"]`);
+      const isValid = field.checkValidity();
+      field.setAttribute('aria-invalid', String(!isValid));
+      if (error) {
+        error.textContent = isValid ? '' : messages[field.id] ?? 'يرجى مراجعة هذا الحقل.';
+        error.classList.toggle('hidden', isValid);
+      }
+      return isValid;
+    };
+
+    requiredFields.forEach((field) => {
+      field.addEventListener('blur', () => showFieldState(field));
+      field.addEventListener('input', () => {
+        if (field.getAttribute('aria-invalid') === 'true') showFieldState(field);
+      });
+      field.addEventListener('change', () => {
+        if (field.getAttribute('aria-invalid') === 'true') showFieldState(field);
+      });
+    });
+
+    bookingForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const isValid = requiredFields.every(showFieldState);
+
+      if (!isValid) {
+        if (bookingStatus) {
+          bookingStatus.textContent = 'يرجى تصحيح الحقول الموضحة قبل المتابعة.';
+          bookingStatus.className = 'mt-4 min-h-5 text-center text-sm font-medium text-danger';
+        }
+        requiredFields.find((field) => !field.checkValidity())?.focus();
+        return;
+      }
+
+      const data = new FormData(bookingForm);
+      const message = buildBookingWhatsAppMessage({
+        name: String(data.get('name') ?? '').trim(),
+        phone: String(data.get('phone') ?? '').trim(),
+        specialty: String(data.get('specialty') ?? '').trim(),
+        service: String(data.get('service') ?? '').trim(),
+        branch: String(data.get('branch') ?? '').trim(),
+        date: String(data.get('date') ?? '').trim(),
+        time: String(data.get('time') ?? '').trim(),
+        message: String(data.get('message') ?? '').trim(),
+      });
+
+      if (bookingStatus) {
+        bookingStatus.textContent = 'جارٍ فتح واتساب لإرسال طلب الحجز...';
+        bookingStatus.className = 'mt-4 min-h-5 text-center text-sm font-medium text-success';
+      }
+
+      window.open(buildWhatsAppUrl(message), '_blank', 'noopener,noreferrer');
+    });
+  });
+</script>

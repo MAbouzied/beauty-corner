@@ -1,0 +1,87 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import JsonLd from '../components/seo/JsonLd.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
+import SiteHeader from '../components/site/SiteHeader.astro';
+import { organization } from '../data/organization';
+import { buildGraph } from '../lib/schema';
+import '../styles/global.css';
+
+export interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  noindex?: boolean;
+  ogType?: 'website' | 'article' | 'profile';
+  schemas?: Record<string, unknown>[];
+}
+
+const {
+  title,
+  description,
+  image = organization.imagePath,
+  noindex = false,
+  ogType = 'website',
+  schemas = [],
+} = Astro.props;
+
+const site = Astro.site;
+if (!site) throw new Error('Astro site URL must be configured.');
+
+const canonicalUrl = new URL(Astro.url.pathname, site);
+const socialImageUrl = new URL(image, site);
+const fullTitle = `${title} — ${organization.name}`;
+const structuredData = buildGraph(site, schemas);
+---
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#b53874" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={organization.name} />
+    <meta name="application-name" content={organization.alternateName} />
+
+    {noindex ? (
+      <meta name="robots" content="noindex, nofollow" />
+    ) : (
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    )}
+
+    <meta property="og:locale" content="ar_SA" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={organization.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:alt" content={title} />
+    <meta property="og:url" content={canonicalUrl} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageUrl} />
+    <meta name="twitter:image:alt" content={title} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/assets/logo.svg" />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="ar" href={canonicalUrl} />
+    <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+
+    <JsonLd data={structuredData} />
+    <ClientRouter />
+  </head>
+  <body class="flex min-h-screen flex-col bg-surface text-ink">
+    <SiteHeader />
+    <main class="flex-1" transition:animate="fade" id="main-content">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

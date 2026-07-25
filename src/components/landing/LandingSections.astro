@@ -1,0 +1,273 @@
+---
+import { buildWhatsAppUrl, clinicContact } from '../../data/contact';
+import { doctors } from '../../data/doctors';
+import { faqItems } from '../../data/faq';
+import { clinicServices } from '../../data/services';
+import {
+  articles,
+  clinicBenefits,
+  experiencePoints,
+  openingHours,
+  serviceGroups,
+  testimonials,
+  trustPoints,
+} from '../../data/landing';
+import DoctorCard from '../doctors/DoctorCard.astro';
+import FaqSection from '../sections/FaqSection.astro';
+import ServiceCard from '../services/ServiceCard.astro';
+import AssetIcon from '../ui/AssetIcon.astro';
+import ButtonLink from '../ui/ButtonLink.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+const landingDoctors = doctors.slice(0, 3);
+const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر بيوتي كورنر.');
+---
+
+<section class="border-b border-border bg-surface py-12 sm:py-16" aria-label="مزايا العيادة">
+  <ul class="page-container grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    {trustPoints.map((point) => (
+      <li class="flex min-h-12 items-center justify-center gap-2 rounded-full bg-surface-soft px-3 text-center text-[0.6875rem] font-bold sm:gap-3 sm:px-4 sm:text-sm">
+        <span class="grid size-7 shrink-0 place-items-center rounded-full bg-success-soft sm:size-9">
+          <AssetIcon src="/assets/plus.svg" size="sm" class="size-3 sm:size-4" />
+        </span>
+        {point}
+      </li>
+    ))}
+  </ul>
+</section>
+
+<section id="specialties" class="bg-surface-soft py-12 sm:py-24" aria-labelledby="specialties-heading">
+  <div class="page-container">
+    <div id="specialties-heading"><SectionHeading eyebrow="تخصصاتنا" title="ثلاثة تخصصات، فريق واحد" /></div>
+    <div class="mt-8 grid gap-4 sm:mt-10 sm:gap-5 md:grid-cols-3">
+      {clinicServices.map((service) => <ServiceCard service={service} />)}
+    </div>
+  </div>
+</section>
+
+<section id="services" class="bg-surface py-12 sm:py-24" aria-labelledby="selected-services-heading">
+  <div class="page-container">
+    <div id="selected-services-heading">
+      <SectionHeading
+        eyebrow="الخدمات"
+        title="خدمات مختارة بعناية طبية"
+        description="مجموعة من أهم الخدمات لدينا. للاطلاع على القائمة الكاملة يمكنك التواصل معنا."
+      />
+    </div>
+    <div class="mt-8 grid gap-4 sm:mt-10 sm:gap-5 md:grid-cols-3">
+      {serviceGroups.map((group) => (
+        <article class="rounded-[var(--radius-card)] border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-7">
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="text-lg font-bold sm:text-xl">{group.title}</h3>
+            <span class="rounded-full bg-surface-accent px-2.5 py-0.5 text-[0.6875rem] font-bold text-primary sm:px-3 sm:py-1 sm:text-xs">{group.items.length} خدمات</span>
+          </div>
+          <ul class="mt-4 space-y-2 text-sm text-muted sm:mt-5 sm:space-y-3">
+            {group.items.map((item) => (
+              <li class="flex items-start gap-2">
+                <AssetIcon src="/assets/plus.svg" size="sm" class="mt-0.5 shrink-0" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section id="why-beauty-corner" class="bg-surface-soft py-12 sm:py-24" aria-labelledby="why-heading">
+  <div class="page-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+    <div>
+      <span class="inline-block" id="why-heading">
+        <SectionHeading eyebrow="لماذا بيوتي كورنر" title="تجربة طبية تشعرك بالاطمئنان" />
+      </span>
+      <p class="mt-5 max-w-xl text-base leading-7 text-muted">
+        نجمع بين الخبرة الطبية والتقنيات الحديثة داخل بيئة هادئة وخاصة، لنقدّم لك رعاية مصممة خصيصًا لحالتك.
+      </p>
+    </div>
+    <div class="grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-4">
+      {clinicBenefits.map(([title, description]) => (
+        <article class="rounded-[var(--radius-section)] border border-border bg-surface p-4 sm:p-5">
+          <span class="grid size-9 place-items-center rounded-2xl bg-surface-accent sm:size-11"><AssetIcon src="/assets/plus.svg" size="sm" /></span>
+          <h3 class="mt-3 font-bold sm:mt-4">{title}</h3>
+          <p class="mt-1 text-sm leading-6 text-muted">{description}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="bg-surface py-12 sm:py-24" aria-labelledby="doctors-heading">
+  <div class="page-container">
+    <div id="doctors-heading"><SectionHeading eyebrow="فريقنا الطبي" title="أطباء متخصصون بخبرة موثوقة" /></div>
+    <div class="mt-10 grid gap-6 md:grid-cols-3">
+      {landingDoctors.map((doctor) => <DoctorCard doctor={doctor} />)}
+    </div>
+  </div>
+</section>
+
+<section class="bg-surface-soft py-12 sm:py-24" aria-labelledby="gallery-heading">
+  <div class="page-container">
+    <div id="gallery-heading"><SectionHeading eyebrow="نماذج من العيادة" title="لمحة من داخل العيادة" /></div>
+    <img
+      src="/assets/landing-clinic-gallery.jpg"
+      alt="منطقة الاستقبال والانتظار المضيئة داخل عيادة بيوتي كورنر"
+      class="mt-6 aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)] sm:mt-8 sm:aspect-[16/9]"
+      loading="lazy"
+    />
+  </div>
+</section>
+
+<section id="payment-options" class="bg-surface py-12 sm:py-24" aria-labelledby="payment-heading">
+  <div class="page-container">
+    <div id="payment-heading">
+      <SectionHeading
+        eyebrow="خيارات الدفع والتقسيط"
+        title="ادفع بالطريقة الأنسب لك"
+        description="طرق دفع متعددة داخل العيادة، مع إمكانية التقسيط عبر مزوّدين معتمدين."
+      />
+    </div>
+    <div class="mt-8 overflow-hidden rounded-[var(--radius-card)] border border-border bg-gradient-to-bl from-surface-accent via-surface to-success-soft p-5 shadow-[var(--shadow-card)] sm:mt-10 sm:p-10">
+      <span class="inline-flex rounded-full border border-gold/40 bg-surface/70 px-3 py-1 text-xs font-bold">ميزة التقسيط</span>
+      <h3 class="mt-3 text-xl font-black text-balance sm:mt-4 sm:text-3xl"><span class="text-gold">قسّط بسعر الكاش</span> عن طريق تابي وتمارا</h3>
+      <p class="mt-3 max-w-3xl text-sm leading-7 text-muted">استفد من خدمات العيادة ووزّع قيمة الدفع على دفعات ميسّرة، دون زيادة على السعر النقدي، وفق شروط وأحكام مزوّد الخدمة.</p>
+      <ul class="mt-4 space-y-2 text-sm"><li>✓ عدد الدفعات: 4</li><li>✓ مدة التقسيط: 12 شهر</li></ul>
+      <ButtonLink href="/contact" size="lg" class="mt-6">احجز واستفد من التقسيط</ButtonLink>
+    </div>
+  </div>
+</section>
+
+<section class="bg-surface-soft py-12 sm:py-24" aria-labelledby="hours-heading">
+  <div class="page-container">
+    <div id="hours-heading">
+      <SectionHeading
+        eyebrow="مواعيد العمل"
+        title="مواعيد العمل والحجز"
+        description="جدول عمل العيادة الأسبوعي — يخضع للتحديث خلال شهر رمضان والإجازات الرسمية."
+      />
+    </div>
+    <div class="mt-8 grid gap-6 sm:mt-10 lg:grid-cols-[1.2fr_0.8fr]">
+      <div class="overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4 sm:p-5">
+          <h3 class="font-bold">جدول العمل الأسبوعي</h3>
+          <span class="rounded-full bg-surface-soft px-3 py-1 text-xs">الفرع الرئيسي</span>
+        </div>
+        <dl>
+          {openingHours.map(([day, hours]) => (
+              <div class="flex items-center justify-between gap-3 border-b border-border px-4 py-3 text-sm sm:gap-4 sm:px-5 sm:py-4">
+              <dt class="font-bold">{day}</dt>
+              <dd class="text-sm text-muted">{hours}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+      <aside class="flex flex-col justify-center rounded-[var(--radius-card)] border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-7">
+        <h3 class="text-xl font-black text-balance sm:text-2xl">احجز موعدك بسهولة</h3>
+        <p class="mt-3 text-sm leading-7 text-pretty text-muted">قد تختلف مواعيد بعض الأطباء والخدمات حسب جدول الحجوزات. يرجى تأكيد الموعد قبل زيارة العيادة.</p>
+        <ul class="mt-5 space-y-3 text-sm"><li>✓ حجز إلكتروني خلال دقيقة</li><li>✓ تأكيد فوري عبر واتساب</li><li>✓ إعادة جدولة مرنة</li></ul>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <ButtonLink href="/contact" class="w-full justify-center sm:w-auto">احجز موعدك</ButtonLink>
+          <ButtonLink href={whatsappHref} variant="outline" target="_blank" class="w-full justify-center sm:w-auto">
+            واتساب
+            <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+          </ButtonLink>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="bg-surface-soft py-12 sm:py-24" aria-labelledby="reviews-heading">
+  <div class="page-container">
+    <div id="reviews-heading">
+      <SectionHeading eyebrow="آراء العملاء" title="آراء من واقع التجربة" description="مساحات مخصصة للمراجعات المعتمدة من مصادر رسمية." />
+    </div>
+    <div class="mt-8 grid gap-4 sm:mt-10 sm:gap-5 md:grid-cols-3">
+      {testimonials.map(([name, service, quote]) => (
+        <blockquote class="rounded-[var(--radius-card)] border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-6">
+          <p class="tracking-widest text-gold" aria-label="تقييم خمس نجوم">★★★★★</p>
+          <p class="mt-4 min-h-16 leading-7">“{quote}”</p>
+          <footer class="mt-5 border-t border-border pt-4">
+            <cite class="not-italic font-bold">{name}</cite>
+            <p class="text-xs text-muted">{service}</p>
+          </footer>
+        </blockquote>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="bg-surface py-12 sm:py-24" aria-labelledby="experience-heading">
+  <div class="page-container grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+    <img src="/assets/landing-waiting-area.jpg" alt="غرفة انتظار مريحة ومضيئة داخل العيادة" class="aspect-[7/5] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)]" loading="lazy" />
+    <div>
+      <div id="experience-heading"><SectionHeading eyebrow="التجربة داخل العيادة" title="بيئة طبية بلمسة هادئة وخاصة" /></div>
+      <div class="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-2 sm:gap-4">
+        {experiencePoints.map(([title, description]) => (
+          <article class="rounded-[var(--radius-section)] border border-border bg-surface-soft p-4 sm:p-5">
+            <span class="grid size-10 place-items-center rounded-2xl bg-success-soft"><AssetIcon src="/assets/plus.svg" size="sm" /></span>
+            <h3 class="mt-4 font-bold">{title}</h3>
+            <p class="mt-1 text-sm leading-6 text-muted">{description}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="bg-surface-soft py-12 sm:py-24" aria-labelledby="contact-heading">
+  <div class="page-container">
+    <div id="contact-heading"><SectionHeading eyebrow="الموقع والتواصل" title="نحن قريبون منك" /></div>
+    <div class="mt-8 grid gap-5 sm:mt-10 sm:gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+      <address class="not-italic rounded-[var(--radius-card)] border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-7">
+        <dl class="space-y-5">
+          <div><dt class="text-xs font-bold">العنوان</dt><dd class="mt-1 text-sm text-muted">[العنوان التفصيلي، المدينة، المملكة العربية السعودية]</dd></div>
+          <div><dt class="text-xs font-bold">أوقات العمل</dt><dd class="mt-1 text-sm text-muted">السبت – الخميس · 10:00 ص – 10:00 م</dd></div>
+          <div>
+            <dt class="text-xs font-bold">الهاتف وواتساب</dt>
+            <dd class="mt-1 text-sm text-muted">
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" dir="ltr" class="hover:text-primary">
+                {clinicContact.phoneDisplay}
+              </a>
+            </dd>
+          </div>
+          <div><dt class="text-xs font-bold">البريد</dt><dd class="mt-1 text-sm text-muted"><a href={`mailto:${clinicContact.email}`}>{clinicContact.email}</a></dd></div>
+          <div><dt class="text-xs font-bold">مواقف السيارات</dt><dd class="mt-1 text-sm text-muted">متوفرة أمام الفرع</dd></div>
+        </dl>
+      </address>
+      <div class="grid min-h-80 place-items-center rounded-[var(--radius-card)] border border-border bg-surface p-8 text-center shadow-[var(--shadow-card)]">
+        <div>
+          <AssetIcon src="/assets/location.svg" size="lg" class="mx-auto" />
+          <p class="mt-3 font-bold">مساحة مخصصة لخريطة الموقع</p>
+          <p class="text-xs text-muted">Embed Google Maps</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<FaqSection items={faqItems} />
+
+<section id="medical-blog" class="bg-surface-soft py-12 sm:py-24" aria-labelledby="blog-heading">
+  <div class="page-container">
+    <div id="blog-heading">
+      <SectionHeading eyebrow="المدوّنة الطبية" title="نصائح طبية من خبراء بيوتي كورنر" description="مقالات توعوية يعدّها فريق طبي." />
+    </div>
+    <div class="mt-10 grid gap-6 md:grid-cols-3">
+      {articles.map((article) => (
+        <article class="overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]">
+          <div class="relative">
+            <img src={article.image} alt={article.alt} class="aspect-[2/1] w-full object-cover" loading="lazy" />
+            <span class="absolute end-3 top-3 rounded-full bg-surface/95 px-3 py-1 text-xs font-bold">{article.category}</span>
+          </div>
+          <div class="p-5 sm:p-6">
+            <p class="text-xs text-muted">[تاريخ النشر] · [٥ دقائق قراءة]</p>
+            <h3 class="mt-3 text-lg font-black leading-7">{article.title}</h3>
+            <p class="mt-2 text-sm leading-6 text-muted">{article.description}</p>
+            <div class="mt-5 border-t border-border pt-4 text-sm font-bold text-primary">اقرأ المقال</div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,30 @@
+---
+import type { FaqItem } from '../../data/faq';
+import AssetIcon from '../ui/AssetIcon.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+export interface Props {
+  items: readonly FaqItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="bg-surface-soft/60 py-12 sm:py-24" aria-labelledby="faq-heading">
+  <div class="page-container max-w-4xl">
+    <div id="faq-heading">
+      <SectionHeading eyebrow="الأسئلة الشائعة" title="إجابات على أهم استفساراتك" />
+    </div>
+    <div class="mt-8 space-y-2 sm:mt-10 sm:space-y-3">
+      {items.map((item) => (
+        <details class="group overflow-hidden rounded-[var(--radius-section)] border border-border bg-surface px-4 sm:px-5">
+          <summary class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 py-3 text-sm font-bold marker:content-none sm:min-h-14 sm:gap-4 sm:py-4 sm:text-base">
+            <span>{item.question}</span>
+            <AssetIcon src="/assets/plus.svg" size="sm" class="transition-transform group-open:rotate-45 shrink-0" />
+          </summary>
+          <p class="border-t border-border pb-4 pt-3 text-sm leading-6 text-muted sm:pb-5 sm:pt-4 sm:leading-7">{item.answer}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,55 @@
+---
+import { clinicServices } from '../../data/services';
+
+const links = [
+  { label: 'الرئيسية', href: '/' },
+  { label: 'الخدمات', href: '/services' },
+  { label: 'الأطباء', href: '/doctors' },
+  { label: 'تواصل معنا', href: '/contact' },
+] as const;
+---
+
+<footer id="footer" class="border-t border-border bg-surface py-16 sm:py-24" transition:persist="site-footer">
+  <div class="page-container">
+    <div class="grid gap-10 border-b border-border pb-14 sm:grid-cols-2 lg:grid-cols-4">
+      <section>
+        <a href="/" class="mb-4 flex items-center gap-2" aria-label="بيوتي كورنر - الرئيسية">
+          <img src="/assets/logo.svg" alt="" class="h-[2.625rem] w-[3.125rem]" />
+          <span class="font-bold text-primary">بيوتي كورنر</span>
+        </a>
+        <p class="text-sm leading-6 text-muted">عيادة متعددة التخصصات في المملكة العربية السعودية — طب وتجميل الأسنان، الجلدية والتجميل، وخدمات الليزر.</p>
+      </section>
+      <section>
+        <h2 class="mb-4 text-sm font-bold">روابط مهمة</h2>
+        <div class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-2 sm:gap-x-6">
+          {links.map((link) => <a href={link.href} class="text-sm text-muted hover:text-primary">{link.label}</a>)}
+        </div>
+      </section>
+      <section>
+        <h2 class="mb-4 text-sm font-bold">الخدمات</h2>
+        <ul class="space-y-2 text-sm text-muted">
+          {clinicServices.map((service) => (
+            <li>
+              <a href={`/services/${service.id}`} class="hover:text-primary">{service.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section>
+        <h2 class="mb-4 text-sm font-bold">تواصل معنا</h2>
+        <ul class="space-y-2 text-sm text-muted">
+          <li><span dir="ltr">+966 5X XXX XXXX</span></li>
+          <li><a href="mailto:info@beautycorner.sa">info@beautycorner.sa</a></li>
+          <li>[المدينة، المملكة العربية السعودية]</li>
+        </ul>
+      </section>
+    </div>
+    <div class="flex flex-col gap-4 pt-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+      <p>© 2026 بيوتي كورنر — جميع الحقوق محفوظة.</p>
+      <div class="flex gap-5">
+        <span>سياسة الخصوصية</span>
+        <span>الشروط والأحكام</span>
+      </div>
+    </div>
+  </div>
+</footer>

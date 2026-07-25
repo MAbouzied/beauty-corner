@@ -1,0 +1,89 @@
+---
+import AssetIcon from '../ui/AssetIcon.astro';
+import ButtonLink from '../ui/ButtonLink.astro';
+
+const navItems = [
+  { label: 'الخدمات', href: '/services' },
+  { label: 'الأطباء', href: '/doctors' },
+  { label: 'تواصل معنا', href: '/contact' },
+] as const;
+---
+
+<header class="relative z-20 overflow-x-clip border-b border-border/60 bg-surface" transition:persist="site-header">
+  <div class="page-container flex min-h-20 items-center justify-between gap-3 sm:gap-4">
+    <a href="/" class="flex min-w-0 shrink-0 items-center gap-2" aria-label="بيوتي كورنر - الرئيسية">
+      <img src="/assets/logo.svg" alt="" class="h-[2.625rem] w-[3.125rem]" />
+      <span class="hidden text-base font-bold text-primary sm:block">بيوتي كورنر</span>
+    </a>
+
+    <nav class="hidden items-center gap-1 lg:flex" aria-label="التنقل الرئيسي">
+      {navItems.map((item) => (
+        <a href={item.href} class="rounded-lg px-3 py-2 text-sm font-bold text-ink hover:bg-surface-accent">
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+      <button
+        type="button"
+        class="inline-flex size-9 items-center justify-center rounded-full sm:size-11"
+        aria-label="تغيير اللغة (غير متاح حاليًا)"
+        aria-disabled="true"
+        title="تغيير اللغة غير متاح حاليًا"
+        disabled
+      >
+        <AssetIcon src="/assets/globe.svg" size="sm" />
+      </button>
+      <ButtonLink href="/contact" size="lg" class="hidden sm:inline-flex">
+        احجز موعدك الآن
+        <AssetIcon src="/assets/booking-arrow.svg" size="sm" />
+      </ButtonLink>
+      <details class="relative lg:hidden" data-mobile-nav>
+        <summary
+          class="flex size-9 cursor-pointer list-none items-center justify-center rounded-full border border-border text-lg sm:size-11 sm:text-xl [&::-webkit-details-marker]:hidden"
+          aria-label="فتح قائمة التنقل"
+        >
+          ☰
+        </summary>
+        <nav
+          class="absolute top-12 end-0 z-30 flex w-52 max-w-[calc(100vw-2rem)] flex-col rounded-2xl border border-border bg-surface p-2 shadow-[var(--shadow-card)] sm:top-14 sm:p-3"
+          aria-label="التنقل للجوال"
+        >
+          {navItems.map((item) => (
+            <a href={item.href} class="rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-surface-accent sm:py-3" data-mobile-nav-link>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+<script>
+  const closeMobileNav = () => {
+    document.querySelectorAll<HTMLDetailsElement>('details[data-mobile-nav][open]').forEach((nav) => {
+      nav.open = false;
+    });
+  };
+
+  document.addEventListener('astro:before-preparation', closeMobileNav);
+  document.addEventListener('astro:page-load', closeMobileNav);
+
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    if (target.closest('[data-mobile-nav-link]')) {
+      closeMobileNav();
+      return;
+    }
+
+    const openNav = document.querySelector<HTMLDetailsElement>('details[data-mobile-nav][open]');
+    if (!openNav) return;
+    if (!target.closest('details[data-mobile-nav]')) {
+      closeMobileNav();
+    }
+  });
+</script>

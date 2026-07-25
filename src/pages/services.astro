@@ -1,0 +1,154 @@
+---
+import DoctorCard from '../components/doctors/DoctorCard.astro';
+import FaqSection from '../components/sections/FaqSection.astro';
+import BookingSection from '../components/services/BookingSection.astro';
+import ServiceCard from '../components/services/ServiceCard.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import { doctors } from '../data/doctors';
+import { faqItems } from '../data/faq';
+import { clinicServices, serviceCategories } from '../data/services';
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildItemListSchema,
+  buildWebPageSchema,
+} from '../lib/schema';
+import Layout from '../layouts/Layout.astro';
+
+const featuredDoctors = doctors.slice(0, 3);
+const site = Astro.site!;
+const title = 'الخدمات';
+const description = 'تصفح خدمات بيوتي كورنر في طب وتجميل الأسنان، الجلدية، والليزر واحجز موعدك.';
+---
+
+<Layout
+  title={title}
+  description={description}
+  schemas={[
+    buildWebPageSchema({ site, path: '/services', name: title, description }),
+    buildBreadcrumbSchema(site, [
+      { name: 'الرئيسية', path: '/' },
+      { name: 'الخدمات', path: '/services' },
+    ]),
+    buildItemListSchema({
+      site,
+      path: '/services',
+      name: 'خدمات بيوتي كورنر',
+      description,
+      itemType: 'Service',
+      items: clinicServices.map((service) => ({
+        name: service.title,
+        path: `/services/${service.id}`,
+        description: service.description,
+        image: service.heroImage,
+      })),
+    }),
+    buildFaqSchema(faqItems),
+  ]}
+>
+  <section class="py-14 sm:py-24">
+    <div class="page-container">
+      <SectionHeading
+        eyebrow="تخصصاتنا"
+        title="ثلاثة تخصصات، فريق واحد"
+        description="تصفح جميع خدمات عيادات بيوتي كورنر حسب التخصص."
+        level={1}
+      />
+    </div>
+  </section>
+
+  <section class="pb-14 sm:pb-24" aria-labelledby="services-grid-heading">
+    <div class="page-container">
+      <h2 id="services-grid-heading" class="sr-only">قائمة الخدمات</h2>
+      <div
+        class="mx-auto flex w-full max-w-[707px] gap-1 overflow-x-auto rounded-[var(--radius-card)] border border-border bg-surface-soft p-1 sm:grid sm:grid-cols-4 sm:gap-1.5 sm:overflow-visible sm:p-1.5"
+        role="tablist"
+        aria-label="تصفية الخدمات حسب التخصص"
+      >
+          {serviceCategories.map((category, index) => (
+            <button
+              id={`service-tab-${index}`}
+              type="button"
+              role="tab"
+              aria-selected={index === 0 ? 'true' : 'false'}
+              aria-controls="services-panel"
+              tabindex={index === 0 ? 0 : -1}
+              data-service-filter={category}
+              class="min-h-11 shrink-0 rounded-full px-4 text-sm font-medium whitespace-nowrap text-muted transition-[color,background-color,box-shadow] hover:bg-surface hover:text-ink aria-selected:bg-primary aria-selected:text-surface aria-selected:shadow-[var(--shadow-control)] aria-selected:hover:bg-primary aria-selected:hover:text-surface sm:min-h-12 sm:w-full sm:px-4 sm:text-base"
+            >
+              {category}
+            </button>
+          ))}
+      </div>
+
+      <p id="services-status" class="sr-only" role="status" aria-live="polite">عدد الخدمات: {clinicServices.length}</p>
+      <div id="services-panel" role="tabpanel" aria-labelledby="service-tab-0" class="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {clinicServices.map((service) => <ServiceCard service={service} />)}
+      </div>
+    </div>
+  </section>
+
+  <BookingSection />
+
+  <section class="py-14 sm:py-24" aria-labelledby="medical-team-heading">
+    <div class="page-container">
+      <div id="medical-team-heading">
+        <SectionHeading eyebrow="فريقنا الطبي" title="أطباء متخصصون بخبرة موثوقة" />
+      </div>
+      <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+        {featuredDoctors.map((doctor) => <DoctorCard doctor={doctor} />)}
+      </div>
+    </div>
+  </section>
+
+  <FaqSection items={faqItems} />
+</Layout>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-service-filter]')];
+    const serviceCards = [...document.querySelectorAll<HTMLElement>('[data-service-card]')];
+    const servicesPanel = document.querySelector<HTMLElement>('#services-panel');
+    const servicesStatus = document.querySelector<HTMLElement>('#services-status');
+
+    if (tabs.length === 0) return;
+
+    const selectCategory = (selectedTab: HTMLButtonElement) => {
+      const category = selectedTab.dataset.serviceFilter ?? 'كل الخدمات';
+      let visibleCount = 0;
+
+      tabs.forEach((tab) => {
+        const isSelected = tab === selectedTab;
+        tab.setAttribute('aria-selected', String(isSelected));
+        tab.tabIndex = isSelected ? 0 : -1;
+      });
+
+      serviceCards.forEach((card) => {
+        const isVisible = category === 'كل الخدمات' || card.dataset.category === category;
+        card.hidden = !isVisible;
+        if (isVisible) visibleCount += 1;
+      });
+
+      servicesPanel?.setAttribute('aria-labelledby', selectedTab.id);
+      if (servicesStatus) servicesStatus.textContent = `عدد الخدمات: ${visibleCount}`;
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectCategory(tab));
+      tab.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const targetIndex = event.key === 'Home'
+          ? 0
+          : event.key === 'End'
+            ? tabs.length - 1
+            : (index + (event.key === 'ArrowLeft' ? 1 : -1) + tabs.length) % tabs.length;
+        const targetTab = tabs[targetIndex];
+        if (targetTab) {
+          selectCategory(targetTab);
+          targetTab.focus();
+        }
+      });
+    });
+  });
+</script>

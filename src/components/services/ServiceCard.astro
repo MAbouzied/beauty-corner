@@ -1,0 +1,34 @@
+---
+import type { ClinicService } from '../../data/services';
+
+export interface Props {
+  service: ClinicService;
+}
+
+const { service } = Astro.props;
+
+const iconBackgrounds: Record<ClinicService['category'], string> = {
+  'الأسنان': 'bg-success-soft',
+  'الجلدية': 'bg-surface-accent',
+  'الليزر': 'bg-gold-light/30',
+};
+---
+
+<a
+  href={`/services/${service.id}`}
+  class="flex min-h-48 flex-col items-start rounded-[var(--radius-card)] border border-border bg-surface p-5 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5 sm:min-h-56 sm:p-8"
+  data-service-card
+  data-category={service.category}
+  aria-label={`عرض تفاصيل خدمة ${service.title}`}
+>
+  <span
+    class:list={[
+      'flex size-14 shrink-0 items-center justify-center rounded-full',
+      iconBackgrounds[service.category],
+    ]}
+  >
+    <img src={service.icon} alt="" width="24" height="24" aria-hidden="true" />
+  </span>
+  <h3 class="mt-6 text-xl font-bold tracking-tight text-ink">{service.title}</h3>
+  <p class="mt-2 text-base leading-7 text-muted">{service.description}</p>
+</a>
