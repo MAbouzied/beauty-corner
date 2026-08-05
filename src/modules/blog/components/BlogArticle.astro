@@ -43,6 +43,8 @@ const hasBody =
       ? post.body.blocks.length > 0
       : post.body.format === 'html'
         ? post.body.html.trim().length > 0
+        : post.body.format === 'lexical'
+          ? post.body.json.trim().length > 0
         : false;
 ---
 
