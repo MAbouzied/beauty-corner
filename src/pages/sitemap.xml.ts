@@ -1,44 +1,79 @@
 import type { APIRoute } from 'astro';
-import { doctors } from '../data/doctors';
-import { clinicServices } from '../data/services';
+import { getSitemapRoutePairs } from '../lib/i18n/routes';
 
-const staticPaths = ['/', '/services', '/doctors', '/contact'] as const;
+function escapeXml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
+}
 
-export const GET: APIRoute = ({ site }) => {
+export const GET: APIRoute = async ({ site }) => {
   if (!site) {
     return new Response('Astro site URL must be configured.', { status: 500 });
   }
 
-  const lastmod = new Date().toISOString().split('T')[0];
-  const urls = [
-    ...staticPaths.map((path) => ({
-      loc: new URL(path, site).href,
-      changefreq: path === '/' ? 'weekly' : 'monthly',
-      priority: path === '/' ? '1.0' : '0.8',
-    })),
-    ...clinicServices.map((service) => ({
-      loc: new URL(`/services/${service.id}`, site).href,
-      changefreq: 'monthly',
-      priority: '0.7',
-    })),
-    ...doctors.map((doctor) => ({
-      loc: new URL(`/doctors/${doctor.id}`, site).href,
-      changefreq: 'monthly',
-      priority: '0.7',
-    })),
-  ];
+  const pairs = await getSitemapRoutePairs();
+
+  const urls = pairs.flatMap((pair) => {
+    const arabicLoc = new URL(pair.ar, site).href;
+    const englishLoc = pair.en ? new URL(pair.en, site).href : null;
+    const lastmod = pair.lastmod;
+
+    const arabicEntry = {
+      loc: arabicLoc,
+      changefreq: pair.changefreq ?? 'monthly',
+      priority: pair.priority,
+      lastmod,
+      alternates: {
+        ar: arabicLoc,
+        en: englishLoc,
+      },
+    };
+
+    if (!englishLoc) return [arabicEntry];
+
+    return [
+      arabicEntry,
+      {
+        loc: englishLoc,
+        changefreq: pair.changefreq ?? 'monthly',
+        priority: pair.priority,
+        lastmod,
+        alternates: {
+          ar: arabicLoc,
+          en: englishLoc,
+        },
+      },
+    ];
+  });
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls
-  .map(
-    (entry) => `  <url>
-    <loc>${entry.loc}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>${entry.changefreq}</changefreq>
-    <priority>${entry.priority}</priority>
-  </url>`,
-  )
+  .map((entry) => {
+    const priority =
+      entry.priority !== undefined ? `\n    <priority>${entry.priority.toFixed(1)}</priority>` : '';
+    const lastmod = entry.lastmod
+      ? `\n    <lastmod>${escapeXml(entry.lastmod)}</lastmod>`
+      : '';
+    const alternateLinks = entry.alternates.en
+      ? `
+    <xhtml:link rel="alternate" hreflang="ar" href="${escapeXml(entry.alternates.ar)}" />
+    <xhtml:link rel="alternate" hreflang="en" href="${escapeXml(entry.alternates.en)}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(entry.alternates.ar)}" />`
+      : `
+    <xhtml:link rel="alternate" hreflang="ar" href="${escapeXml(entry.alternates.ar)}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(entry.alternates.ar)}" />`;
+
+    return `  <url>
+    <loc>${escapeXml(entry.loc)}</loc>
+    <changefreq>${entry.changefreq}</changefreq>${priority}${lastmod}${alternateLinks}
+  </url>`;
+  })
   .join('\n')}
 </urlset>
 `;

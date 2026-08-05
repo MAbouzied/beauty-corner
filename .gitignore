@@ -9,6 +9,11 @@ node_modules/
 # Cloudflare / Wrangler
 .wrangler/
 .dev.vars
+fine-advantage-504306-c9-f4eb5ae91393.json
+
+# local browser / Studio generated artifacts
+.playwright-mcp/
+studio/.sanity/
 
 # logs
 npm-debug.log*
