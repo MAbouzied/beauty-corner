@@ -127,6 +127,13 @@ function lexicalUrl(value: unknown): string | null {
   return safeUrl(value);
 }
 
+function imageDisplayStyle(node: LexicalNode): string {
+  const width = node.width === 25 || node.width === 50 || node.width === 75 ? node.width : 100;
+  const align = node.align === 'left' || node.align === 'right' ? node.align : 'center';
+  const marginInline = align === 'center' ? 'auto' : align === 'right' ? '0 auto' : 'auto 0';
+  return ` style="width:${width}%;margin-inline:${marginInline}"`;
+}
+
 function textNodeToHtml(node: LexicalTextNode): string {
   let html = escapeHtml(node.text || '');
   const format = Number(node.format ?? 0);
@@ -168,12 +175,12 @@ function lexicalNodeToHtml(node: LexicalNode): string {
     if (!src) return '';
     const alt = typeof node.alt === 'string' ? node.alt : '';
     const caption = typeof node.caption === 'string' ? node.caption.trim() : '';
-    return `<figure class="blog-body__image"><img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}" loading="lazy" />${caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : ''}</figure>`;
+    return `<figure class="blog-body__image"${imageDisplayStyle(node)}><img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}" loading="lazy" />${caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : ''}</figure>`;
   }
   if (node.type === 'blog-video' || node.type === 'video') {
     const src = lexicalUrl(node.src);
     if (!src || !/^https:\/\/(www\.)?(youtube\.com|youtube-nocookie\.com|player\.vimeo\.com)\//i.test(src)) return '';
-    return `<figure class="blog-body__embed"><iframe src="${escapeAttribute(src)}" title="فيديو المقال" loading="lazy" allowfullscreen></iframe></figure>`;
+    return `<figure class="blog-body__embed"${imageDisplayStyle(node)}><iframe src="${escapeAttribute(src)}" title="فيديو المقال" loading="lazy" allowfullscreen></iframe></figure>`;
   }
   return lexicalChildren(node);
 }
@@ -219,12 +226,17 @@ export function normalizeLexicalJson(value: unknown): string {
       result.type = 'blog-image'; result.src = src; result.alt = alt;
       if (typeof raw.caption === 'string' && raw.caption.trim()) result.caption = raw.caption.trim().slice(0, 300);
       if (typeof raw.assetId === 'string' && raw.assetId.trim()) result.assetId = raw.assetId.trim();
+      if (raw.align === 'left' || raw.align === 'right') result.align = raw.align;
+      if (raw.width === 25 || raw.width === 50 || raw.width === 75) result.width = raw.width;
       return result;
     }
     if (type === 'blog-video' || type === 'video') {
       const src = lexicalUrl(raw.src);
       if (!src || !/^https:\/\/(www\.)?(youtube\.com|youtube-nocookie\.com|player\.vimeo\.com)\//i.test(src)) return null;
-      result.type = 'blog-video'; result.src = src; return result;
+      result.type = 'blog-video'; result.src = src;
+      if (raw.align === 'left' || raw.align === 'right') result.align = raw.align;
+      if (raw.width === 25 || raw.width === 50 || raw.width === 75) result.width = raw.width;
+      return result;
     }
     result.children = cleanChildren(raw.children);
     return result;

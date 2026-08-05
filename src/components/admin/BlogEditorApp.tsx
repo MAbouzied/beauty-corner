@@ -13,7 +13,7 @@ import { $setBlocksType } from '@lexical/selection';
 import { INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, ListItemNode, ListNode, $isListNode } from '@lexical/list';
 import { HeadingNode, QuoteNode, $createHeadingNode, $isHeadingNode, $isQuoteNode } from '@lexical/rich-text';
 import { LinkNode, TOGGLE_LINK_COMMAND, $isLinkNode } from '@lexical/link';
-import { $createParagraphNode, $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, REDO_COMMAND, UNDO_COMMAND, DecoratorNode, type DOMConversionMap, type DOMConversionOutput, type EditorState, type LexicalEditor, type NodeKey, type SerializedLexicalNode } from 'lexical';
+import { $createNodeSelection, $createParagraphNode, $getNodeByKey, $getRoot, $getSelection, $isNodeSelection, $isRangeSelection, $setSelection, FORMAT_TEXT_COMMAND, REDO_COMMAND, UNDO_COMMAND, DecoratorNode, type DOMConversionMap, type DOMConversionOutput, type EditorState, type LexicalEditor, type NodeKey, type SerializedLexicalNode } from 'lexical';
 import type { AdminPost } from '../../lib/admin/blog-admin.ts';
 import { ADMIN_EXCERPT_MAX, ADMIN_EXCERPT_MIN, ADMIN_TITLE_MAX, ADMIN_TITLE_MIN, shouldKeepExistingBlogSlug } from '../../lib/admin/blog-admin-helpers.ts';
 import { createBlogSlug } from '../../modules/blog/lib/slug.ts';
@@ -22,8 +22,18 @@ import '../../modules/blog/styles/blog.css';
 interface Props { post: AdminPost; services: Array<{ id: string; title: string }>; }
 type Action = 'save' | 'publish' | 'preview' | 'cover' | 'inline' | null;
 
-type SerializedBlogImageNode = SerializedLexicalNode & { type: 'blog-image'; src: string; alt: string; caption?: string; assetId?: string; };
-type SerializedBlogVideoNode = SerializedLexicalNode & { type: 'blog-video'; src: string; };
+type ImageAlignment = 'left' | 'center' | 'right';
+type ImageWidth = 25 | 50 | 75 | 100;
+type SerializedBlogImageNode = SerializedLexicalNode & { type: 'blog-image'; src: string; alt: string; caption?: string; assetId?: string; align?: ImageAlignment; width?: ImageWidth; };
+type SerializedBlogVideoNode = SerializedLexicalNode & { type: 'blog-video'; src: string; align?: ImageAlignment; width?: ImageWidth; };
+
+function readImageDisplay(element: Element): { align: ImageAlignment; width: ImageWidth } {
+  const widthValue = Number.parseFloat(element instanceof HTMLElement ? element.style.width : '');
+  const width: ImageWidth = widthValue === 25 || widthValue === 50 || widthValue === 75 ? widthValue : 100;
+  const marginInline = element instanceof HTMLElement ? element.style.marginInline : '';
+  const align: ImageAlignment = marginInline === '0px auto' || marginInline === '0 auto' ? 'right' : marginInline === 'auto 0px' || marginInline === 'auto 0' ? 'left' : 'center';
+  return { align, width };
+}
 
 function convertLegacyImageElement(domNode: Node): DOMConversionOutput | null {
   if (domNode instanceof HTMLElement && domNode.tagName === 'FIGURE') {
@@ -33,45 +43,138 @@ function convertLegacyImageElement(domNode: Node): DOMConversionOutput | null {
     const alt = image.getAttribute('alt') || '';
     if (!src || !alt) return null;
     const caption = domNode.querySelector('figcaption')?.textContent?.trim() || '';
-    return { node: $createBlogImageNode(src, alt, caption) };
+    const display = readImageDisplay(domNode);
+    return { node: $createBlogImageNode(src, alt, caption, '', display.align, display.width) };
   }
   if (!(domNode instanceof HTMLImageElement)) return null;
   if (domNode.closest('figure')) return null;
   const src = domNode.getAttribute('src') || '';
   const alt = domNode.getAttribute('alt') || '';
   if (!src || !alt) return null;
-  return { node: $createBlogImageNode(src, alt) };
+  const display = readImageDisplay(domNode);
+  return { node: $createBlogImageNode(src, alt, '', '', display.align, display.width) };
 }
 
 class BlogImageNode extends DecoratorNode<ReactNode> {
-  __src: string; __alt: string; __caption: string; __assetId: string;
+  __src: string; __alt: string; __caption: string; __assetId: string; __align: ImageAlignment; __width: ImageWidth;
   static getType(): string { return 'blog-image'; }
-  static clone(node: BlogImageNode): BlogImageNode { return new BlogImageNode(node.__src, node.__alt, node.__caption, node.__assetId, node.__key); }
-  static importJSON(serialized: SerializedBlogImageNode): BlogImageNode { return new BlogImageNode(serialized.src, serialized.alt, serialized.caption || '', serialized.assetId || ''); }
+  static clone(node: BlogImageNode): BlogImageNode { return new BlogImageNode(node.__src, node.__alt, node.__caption, node.__assetId, node.__align, node.__width, node.__key); }
+  static importJSON(serialized: SerializedBlogImageNode): BlogImageNode { return new BlogImageNode(serialized.src, serialized.alt, serialized.caption || '', serialized.assetId || '', serialized.align, serialized.width); }
   static importDOM(): DOMConversionMap | null {
     return {
       figure: () => ({ conversion: convertLegacyImageElement, priority: 2 }),
       img: () => ({ conversion: convertLegacyImageElement, priority: 2 }),
     };
   }
-  constructor(src: string, alt: string, caption = '', assetId = '', key?: NodeKey) { super(key); this.__src = src; this.__alt = alt; this.__caption = caption; this.__assetId = assetId; }
-  exportJSON(): SerializedBlogImageNode { return { type: 'blog-image', version: 1, src: this.__src, alt: this.__alt, ...(this.__caption ? { caption: this.__caption } : {}), ...(this.__assetId ? { assetId: this.__assetId } : {}) }; }
+  constructor(src: string, alt: string, caption = '', assetId = '', align: ImageAlignment = 'center', width: ImageWidth = 100, key?: NodeKey) { super(key); this.__src = src; this.__alt = alt; this.__caption = caption; this.__assetId = assetId; this.__align = align === 'left' || align === 'right' ? align : 'center'; this.__width = width === 25 || width === 50 || width === 75 ? width : 100; }
+  exportJSON(): SerializedBlogImageNode { return { type: 'blog-image', version: 1, src: this.__src, alt: this.__alt, ...(this.__caption ? { caption: this.__caption } : {}), ...(this.__assetId ? { assetId: this.__assetId } : {}), ...(this.__align !== 'center' ? { align: this.__align } : {}), ...(this.__width !== 100 ? { width: this.__width } : {}) }; }
+  setDisplay(align: ImageAlignment, width: ImageWidth): void { const writable = this.getWritable(); writable.__align = align; writable.__width = width; }
+  getDisplay(): { align: ImageAlignment; width: ImageWidth } { return { align: this.__align, width: this.__width }; }
   createDOM(): HTMLElement { const figure = document.createElement('figure'); figure.className = 'editor-inline-image'; return figure; }
   updateDOM(): false { return false; }
-  decorate(): ReactNode { return <figure className="editor-inline-image"><img src={this.__src} alt={this.__alt} loading="lazy" />{this.__caption ? <figcaption>{this.__caption}</figcaption> : null}</figure>; }
+  decorate(): ReactNode { return <BlogImageDecorator nodeKey={this.__key} src={this.__src} alt={this.__alt} caption={this.__caption} align={this.__align} width={this.__width} />; }
 }
 
-function $createBlogImageNode(src: string, alt: string, caption = '', assetId = ''): BlogImageNode { return new BlogImageNode(src, alt, caption, assetId); }
+function BlogImageDecorator({ nodeKey, src, alt, caption, align, width }: { nodeKey: NodeKey; src: string; alt: string; caption: string; align: ImageAlignment; width: ImageWidth }) {
+  const [editor] = useLexicalComposerContext();
+  const [selected, setSelected] = useState(false);
+
+  useEffect(() => editor.registerUpdateListener(({ editorState }) => {
+    editorState.read(() => {
+      const selection = $getSelection();
+      setSelected($isNodeSelection(selection) && selection.has(nodeKey));
+    });
+  }), [editor, nodeKey]);
+
+  const selectImage = () => editor.update(() => {
+    const selection = $createNodeSelection();
+    selection.add(nodeKey);
+    $setSelection(selection);
+  });
+  const updateDisplay = (nextAlign: ImageAlignment, nextWidth: ImageWidth) => editor.update(() => {
+    const node = $getNodeByKey(nodeKey);
+    if (node instanceof BlogImageNode) node.setDisplay(nextAlign, nextWidth);
+  });
+  const removeImage = () => editor.update(() => {
+    const node = $getNodeByKey(nodeKey);
+    if (node instanceof BlogImageNode) node.remove();
+  });
+  const marginInline = align === 'center' ? 'auto' : align === 'right' ? '0 auto' : 'auto 0';
+
+  return <figure
+    className={`editor-inline-image${selected ? ' is-selected' : ''}`}
+    style={{ width: `${width}%`, marginInline }}
+    onClick={(event) => { event.stopPropagation(); selectImage(); }}
+  >
+    <img src={src} alt={alt} loading="lazy" />
+    {caption ? <figcaption>{caption}</figcaption> : null}
+    {selected ? <div className="editor-image-tools" role="toolbar" aria-label="خيارات الصورة" onMouseDown={(event) => event.preventDefault()} onClick={(event) => event.stopPropagation()}>
+      <span className="editor-image-tools-label">محاذاة</span>
+      <button type="button" aria-label="محاذاة لليمين" aria-pressed={align === 'right'} onClick={() => updateDisplay('right', width)}>يمين</button>
+      <button type="button" aria-label="محاذاة للوسط" aria-pressed={align === 'center'} onClick={() => updateDisplay('center', width)}>وسط</button>
+      <button type="button" aria-label="محاذاة لليسار" aria-pressed={align === 'left'} onClick={() => updateDisplay('left', width)}>يسار</button>
+      <span className="editor-image-tools-label">الحجم</span>
+      {[25, 50, 75, 100].map((nextWidth) => <button key={nextWidth} type="button" aria-label={`عرض ${nextWidth}%`} aria-pressed={width === nextWidth} onClick={() => updateDisplay(align, nextWidth as ImageWidth)}>{nextWidth}%</button>)}
+      <button type="button" className="editor-image-remove" onClick={removeImage}>حذف الصورة</button>
+    </div> : null}
+  </figure>;
+}
+
+function $createBlogImageNode(src: string, alt: string, caption = '', assetId = '', align: ImageAlignment = 'center', width: ImageWidth = 100): BlogImageNode { return new BlogImageNode(src, alt, caption, assetId, align, width); }
 class BlogVideoNode extends DecoratorNode<ReactNode> {
-  __src: string;
+  __src: string; __align: ImageAlignment; __width: ImageWidth;
   static getType(): string { return 'blog-video'; }
-  static clone(node: BlogVideoNode): BlogVideoNode { return new BlogVideoNode(node.__src, node.__key); }
-  static importJSON(serialized: SerializedBlogVideoNode): BlogVideoNode { return new BlogVideoNode(serialized.src); }
-  constructor(src: string, key?: NodeKey) { super(key); this.__src = src; }
-  exportJSON(): SerializedBlogVideoNode { return { type: 'blog-video', version: 1, src: this.__src }; }
+  static clone(node: BlogVideoNode): BlogVideoNode { return new BlogVideoNode(node.__src, node.__align, node.__width, node.__key); }
+  static importJSON(serialized: SerializedBlogVideoNode): BlogVideoNode { return new BlogVideoNode(serialized.src, serialized.align, serialized.width); }
+  constructor(src: string, align: ImageAlignment = 'center', width: ImageWidth = 100, key?: NodeKey) { super(key); this.__src = src; this.__align = align === 'left' || align === 'right' ? align : 'center'; this.__width = width === 25 || width === 50 || width === 75 ? width : 100; }
+  exportJSON(): SerializedBlogVideoNode { return { type: 'blog-video', version: 1, src: this.__src, ...(this.__align !== 'center' ? { align: this.__align } : {}), ...(this.__width !== 100 ? { width: this.__width } : {}) }; }
+  setDisplay(align: ImageAlignment, width: ImageWidth): void { const writable = this.getWritable(); writable.__align = align; writable.__width = width; }
   createDOM(): HTMLElement { const figure = document.createElement('figure'); figure.className = 'editor-inline-video'; return figure; }
   updateDOM(): false { return false; }
-  decorate(): ReactNode { return <figure className="editor-inline-video"><iframe src={this.__src} title="فيديو المقال" loading="lazy" allowFullScreen /></figure>; }
+  decorate(): ReactNode { return <BlogVideoDecorator nodeKey={this.__key} src={this.__src} align={this.__align} width={this.__width} />; }
+}
+
+function BlogVideoDecorator({ nodeKey, src, align, width }: { nodeKey: NodeKey; src: string; align: ImageAlignment; width: ImageWidth }) {
+  const [editor] = useLexicalComposerContext();
+  const [selected, setSelected] = useState(false);
+
+  useEffect(() => editor.registerUpdateListener(({ editorState }) => {
+    editorState.read(() => {
+      const selection = $getSelection();
+      setSelected($isNodeSelection(selection) && selection.has(nodeKey));
+    });
+  }), [editor, nodeKey]);
+
+  const selectVideo = () => editor.update(() => {
+    const selection = $createNodeSelection();
+    selection.add(nodeKey);
+    $setSelection(selection);
+  });
+  const updateDisplay = (nextAlign: ImageAlignment, nextWidth: ImageWidth) => editor.update(() => {
+    const node = $getNodeByKey(nodeKey);
+    if (node instanceof BlogVideoNode) node.setDisplay(nextAlign, nextWidth);
+  });
+  const removeVideo = () => editor.update(() => {
+    const node = $getNodeByKey(nodeKey);
+    if (node instanceof BlogVideoNode) node.remove();
+  });
+  const marginInline = align === 'center' ? 'auto' : align === 'right' ? '0 auto' : 'auto 0';
+
+  return <figure className={`editor-inline-video${selected ? ' is-selected' : ''}`} style={{ width: `${width}%`, marginInline }}>
+    <div className="editor-video-frame">
+      <iframe src={src} title="فيديو المقال" loading="lazy" allowFullScreen />
+      <button type="button" className="editor-video-select-overlay" aria-label="تحديد الفيديو لتعديل خصائصه" onClick={(event) => { event.stopPropagation(); selectVideo(); }} />
+    </div>
+    {selected ? <div className="editor-image-tools editor-video-tools" role="toolbar" aria-label="خيارات الفيديو" onMouseDown={(event) => event.preventDefault()} onClick={(event) => event.stopPropagation()}>
+      <span className="editor-image-tools-label">محاذاة</span>
+      <button type="button" aria-label="محاذاة لليمين" aria-pressed={align === 'right'} onClick={() => updateDisplay('right', width)}>يمين</button>
+      <button type="button" aria-label="محاذاة للوسط" aria-pressed={align === 'center'} onClick={() => updateDisplay('center', width)}>وسط</button>
+      <button type="button" aria-label="محاذاة لليسار" aria-pressed={align === 'left'} onClick={() => updateDisplay('left', width)}>يسار</button>
+      <span className="editor-image-tools-label">الحجم</span>
+      {[25, 50, 75, 100].map((nextWidth) => <button key={nextWidth} type="button" aria-label={`عرض ${nextWidth}%`} aria-pressed={width === nextWidth} onClick={() => updateDisplay(align, nextWidth as ImageWidth)}>{nextWidth}%</button>)}
+      <button type="button" className="editor-image-remove" onClick={removeVideo}>حذف الفيديو</button>
+    </div> : null}
+  </figure>;
 }
 
 function Spinner() { return <span className="action-spinner" aria-hidden="true" />; }

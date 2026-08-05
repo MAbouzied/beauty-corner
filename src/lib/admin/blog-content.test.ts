@@ -34,4 +34,24 @@ describe('Lexical blog content', () => {
     const html = lexicalJsonToHtml(normalizeLexicalJson(json));
     assert.equal(html, '<p>يبقى النص</p>');
   });
+
+  it('keeps supported inline image alignment and width controls', () => {
+    const json = JSON.stringify({ root: { type: 'root', children: [
+      { type: 'blog-image', src: 'https://cdn.sanity.io/image.jpg', alt: 'صورة', align: 'left', width: 50 },
+    ] } });
+    const normalized = normalizeLexicalJson(json);
+    assert.match(normalized, /"align":"left"/);
+    assert.match(normalized, /"width":50/);
+    assert.match(lexicalJsonToHtml(normalized), /style="width:50%;margin-inline:auto 0"/);
+  });
+
+  it('keeps supported video alignment and width controls', () => {
+    const json = JSON.stringify({ root: { type: 'root', children: [
+      { type: 'blog-video', src: 'https://www.youtube-nocookie.com/embed/demo', align: 'right', width: 75 },
+    ] } });
+    const normalized = normalizeLexicalJson(json);
+    assert.match(normalized, /"align":"right"/);
+    assert.match(normalized, /"width":75/);
+    assert.match(lexicalJsonToHtml(normalized), /<figure class="blog-body__embed" style="width:75%;margin-inline:0 auto"/);
+  });
 });
