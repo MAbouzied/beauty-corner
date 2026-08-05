@@ -1,35 +1,39 @@
 ---
-import { branches, services, specialties } from '../../data/doctors';
+import type { Doctor } from '../../data/doctors';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeSpecialty } from '../../lib/i18n/localize';
 import AssetIcon from '../ui/AssetIcon.astro';
 
-const specialtyLabels = {
-  'كل الأطباء': 'كل الأطباء',
-  'طب وتجميل الأسنان': 'طب وتجميل الأسنان',
-  'الأمراض الجلدية والتجميل': 'الأمراض الجلدية والتجميل',
-  'خدمات الليزر': 'الليزر',
-} as const;
+export interface Props {
+  doctors: readonly Doctor[];
+  locale?: Locale;
+}
+
+const { doctors, locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const specialties = ['كل الأطباء', ...new Set(doctors.map((doctor) => doctor.specialty))];
 ---
 
-<aside class="lg:w-96 lg:shrink-0" aria-label="تصفية الأطباء">
+<aside class="lg:w-96 lg:shrink-0" aria-label={en ? 'Filter doctors' : 'تصفية الأطباء'}>
   <details class="doctor-filters group rounded-2xl border border-border bg-surface sm:rounded-3xl lg:rounded-none lg:border-0" open>
     <summary class="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 text-sm font-bold sm:min-h-14 sm:px-5 sm:text-base lg:hidden">
-      تصفية النتائج
+      {en ? 'Filter results' : 'تصفية النتائج'}
       <AssetIcon src="/assets/chevron-down.svg" size="sm" class="transition-transform group-open:rotate-180" />
     </summary>
     <div class="space-y-4 border-t border-border p-3 sm:space-y-6 sm:p-4 lg:border-0 lg:px-4 lg:py-2">
       <label class="relative block">
-        <span class="sr-only">ابحث عن طبيب</span>
+        <span class="sr-only">{en ? 'Search for a doctor' : 'ابحث عن طبيب'}</span>
         <input
           id="doctor-search"
           type="search"
-          placeholder="تبحث عن طبيب؟"
+          placeholder={en ? 'Looking for a doctor?' : 'تبحث عن طبيب؟'}
           class="h-12 w-full rounded-full border border-border-control bg-surface pe-4 ps-11 text-base shadow-[var(--shadow-control)] placeholder:text-placeholder"
         />
         <AssetIcon src="/assets/search.svg" class="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2" />
       </label>
 
       <fieldset class="border-y border-border py-4">
-        <legend class="sr-only">التخصص</legend>
+        <legend class="sr-only">{en ? 'Specialty' : 'التخصص'}</legend>
         <div class="space-y-1">
           {specialties.map((specialty, index) => (
             <label class="block cursor-pointer">
@@ -41,31 +45,15 @@ const specialtyLabels = {
                 checked={index === 0}
               />
               <span class="flex min-h-12 items-center rounded-lg px-3 text-sm peer-checked:bg-surface-accent peer-checked:font-bold peer-checked:text-primary peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus">
-                {specialtyLabels[specialty]}
+                {localizeSpecialty(specialty, locale)}
               </span>
             </label>
           ))}
         </div>
       </fieldset>
 
-      <label class="block">
-        <span class="sr-only">اختر الفرع</span>
-        <select id="branch-filter" class="h-12 w-full rounded-full border border-border-control bg-surface px-4 text-placeholder shadow-[var(--shadow-control)]">
-          <option value="">الفرع</option>
-          {branches.map((branch) => <option value={branch}>{branch}</option>)}
-        </select>
-      </label>
-
-      <label class="block">
-        <span class="sr-only">اختر الخدمة</span>
-        <select id="service-filter" class="h-12 w-full rounded-full border border-border-control bg-surface px-4 text-placeholder shadow-[var(--shadow-control)]">
-          <option value="">الخدمات</option>
-          {services.map((service) => <option value={service}>{service}</option>)}
-        </select>
-      </label>
-
       <button id="reset-filters" type="button" class="min-h-11 w-full rounded-full border border-border text-sm font-bold hover:border-primary hover:text-primary">
-        إعادة ضبط التصفية
+        {en ? 'Reset filters' : 'إعادة ضبط التصفية'}
       </button>
     </div>
   </details>

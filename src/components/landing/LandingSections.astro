@@ -1,26 +1,28 @@
 ---
-import { buildWhatsAppUrl, clinicContact } from '../../data/contact';
+import { buildPhoneUrl, buildWhatsAppUrl, clinicContact } from '../../data/contact';
 import { doctors } from '../../data/doctors';
 import { faqItems } from '../../data/faq';
 import { clinicServices } from '../../data/services';
 import {
-  articles,
   clinicBenefits,
   experiencePoints,
   openingHours,
   serviceGroups,
-  testimonials,
   trustPoints,
 } from '../../data/landing';
+import { clinicMapUrl } from '../../data/seo';
 import DoctorCard from '../doctors/DoctorCard.astro';
 import FaqSection from '../sections/FaqSection.astro';
 import ServiceCard from '../services/ServiceCard.astro';
 import AssetIcon from '../ui/AssetIcon.astro';
 import ButtonLink from '../ui/ButtonLink.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
+import DevicesSection from './DevicesSection.astro';
 
 const landingDoctors = doctors.slice(0, 3);
+const landingServices = clinicServices.filter((service) => service.department === 'أسنان');
 const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر بيوتي كورنر.');
+const phoneHref = buildPhoneUrl();
 ---
 
 <section class="border-b border-border bg-surface py-12 sm:py-16" aria-label="مزايا العيادة">
@@ -38,9 +40,9 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
 
 <section id="specialties" class="bg-surface-soft py-12 sm:py-24" aria-labelledby="specialties-heading">
   <div class="page-container">
-    <div id="specialties-heading"><SectionHeading eyebrow="تخصصاتنا" title="ثلاثة تخصصات، فريق واحد" /></div>
-    <div class="mt-8 grid gap-4 sm:mt-10 sm:gap-5 md:grid-cols-3">
-      {clinicServices.map((service) => <ServiceCard service={service} />)}
+    <div id="specialties-heading"><SectionHeading eyebrow="خدماتنا" title="خدمات طب الأسنان في مكان واحد" /></div>
+    <div class="mt-8 grid gap-4 sm:mt-10 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {landingServices.map((service) => <ServiceCard service={service} />)}
     </div>
   </div>
 </section>
@@ -97,6 +99,8 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
   </div>
 </section>
 
+<DevicesSection />
+
 <section class="bg-surface py-12 sm:py-24" aria-labelledby="doctors-heading">
   <div class="page-container">
     <div id="doctors-heading"><SectionHeading eyebrow="فريقنا الطبي" title="أطباء متخصصون بخبرة موثوقة" /></div>
@@ -122,17 +126,17 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
   <div class="page-container">
     <div id="payment-heading">
       <SectionHeading
-        eyebrow="خيارات الدفع والتقسيط"
+        eyebrow="خيارات الدفع"
         title="ادفع بالطريقة الأنسب لك"
-        description="طرق دفع متعددة داخل العيادة، مع إمكانية التقسيط عبر مزوّدين معتمدين."
+        description="تتوفر داخل العيادة خيارات دفع متعددة. اسأل الاستقبال عن الوسائل المتاحة عند تأكيد موعدك."
       />
     </div>
     <div class="mt-8 overflow-hidden rounded-[var(--radius-card)] border border-border bg-gradient-to-bl from-surface-accent via-surface to-success-soft p-5 shadow-[var(--shadow-card)] sm:mt-10 sm:p-10">
-      <span class="inline-flex rounded-full border border-gold/40 bg-surface/70 px-3 py-1 text-xs font-bold">ميزة التقسيط</span>
-      <h3 class="mt-3 text-xl font-black text-balance sm:mt-4 sm:text-3xl"><span class="text-gold">قسّط بسعر الكاش</span> عن طريق تابي وتمارا</h3>
-      <p class="mt-3 max-w-3xl text-sm leading-7 text-muted">استفد من خدمات العيادة ووزّع قيمة الدفع على دفعات ميسّرة، دون زيادة على السعر النقدي، وفق شروط وأحكام مزوّد الخدمة.</p>
-      <ul class="mt-4 space-y-2 text-sm"><li>✓ عدد الدفعات: 4</li><li>✓ مدة التقسيط: 12 شهر</li></ul>
-      <ButtonLink href="/contact" size="lg" class="mt-6">احجز واستفد من التقسيط</ButtonLink>
+      <h3 class="text-xl font-black text-balance sm:text-3xl">مرونة في الدفع داخل العيادة</h3>
+      <p class="mt-3 max-w-3xl text-sm leading-7 text-muted">
+        يوضح فريق الاستقبال وسائل الدفع المتاحة لكل خدمة عند تأكيد الموعد، بما في ذلك أي خيارات تقسيط إن توفرت وفق شروط مزوّد الخدمة.
+      </p>
+      <ButtonLink href="/book" size="lg" class="mt-6">احجز موعدك الآن</ButtonLink>
     </div>
   </div>
 </section>
@@ -150,7 +154,7 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
       <div class="overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4 sm:p-5">
           <h3 class="font-bold">جدول العمل الأسبوعي</h3>
-          <span class="rounded-full bg-surface-soft px-3 py-1 text-xs">الفرع الرئيسي</span>
+          <span class="rounded-full bg-surface-soft px-3 py-1 text-xs">حفر الباطن</span>
         </div>
         <dl>
           {openingHours.map(([day, hours]) => (
@@ -165,11 +169,15 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
         <h3 class="text-xl font-black text-balance sm:text-2xl">احجز موعدك بسهولة</h3>
         <p class="mt-3 text-sm leading-7 text-pretty text-muted">قد تختلف مواعيد بعض الأطباء والخدمات حسب جدول الحجوزات. يرجى تأكيد الموعد قبل زيارة العيادة.</p>
         <ul class="mt-5 space-y-3 text-sm"><li>✓ حجز إلكتروني خلال دقيقة</li><li>✓ تأكيد فوري عبر واتساب</li><li>✓ إعادة جدولة مرنة</li></ul>
-        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <ButtonLink href="/contact" class="w-full justify-center sm:w-auto">احجز موعدك</ButtonLink>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap" data-gtm-location="hours_cta">
+          <ButtonLink href="/book" class="w-full justify-center sm:w-auto">احجز موعدك</ButtonLink>
           <ButtonLink href={whatsappHref} variant="outline" target="_blank" class="w-full justify-center sm:w-auto">
             واتساب
             <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+          </ButtonLink>
+          <ButtonLink href={phoneHref} variant="outline" class="w-full justify-center sm:w-auto">
+            اتصال
+            <AssetIcon src="/assets/phone.svg" size="sm" />
           </ButtonLink>
         </div>
       </aside>
@@ -177,29 +185,18 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
   </div>
 </section>
 
-<section class="bg-surface-soft py-12 sm:py-24" aria-labelledby="reviews-heading">
-  <div class="page-container">
-    <div id="reviews-heading">
-      <SectionHeading eyebrow="آراء العملاء" title="آراء من واقع التجربة" description="مساحات مخصصة للمراجعات المعتمدة من مصادر رسمية." />
-    </div>
-    <div class="mt-8 grid gap-4 sm:mt-10 sm:gap-5 md:grid-cols-3">
-      {testimonials.map(([name, service, quote]) => (
-        <blockquote class="rounded-[var(--radius-card)] border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-6">
-          <p class="tracking-widest text-gold" aria-label="تقييم خمس نجوم">★★★★★</p>
-          <p class="mt-4 min-h-16 leading-7">“{quote}”</p>
-          <footer class="mt-5 border-t border-border pt-4">
-            <cite class="not-italic font-bold">{name}</cite>
-            <p class="text-xs text-muted">{service}</p>
-          </footer>
-        </blockquote>
-      ))}
-    </div>
-  </div>
-</section>
-
 <section class="bg-surface py-12 sm:py-24" aria-labelledby="experience-heading">
   <div class="page-container grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-    <img src="/assets/landing-waiting-area.jpg" alt="غرفة انتظار مريحة ومضيئة داخل العيادة" class="aspect-[7/5] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)]" loading="lazy" />
+    <img
+      src="/assets/landing-waiting-area.jpg"
+      alt="غرفة انتظار مريحة ومضيئة داخل عيادة بيوتي كورنر"
+      width="187"
+      height="256"
+      sizes="(max-width: 1024px) 100vw, 50vw"
+      class="aspect-[7/5] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)]"
+      loading="lazy"
+      decoding="async"
+    />
     <div>
       <div id="experience-heading"><SectionHeading eyebrow="التجربة داخل العيادة" title="بيئة طبية بلمسة هادئة وخاصة" /></div>
       <div class="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-2 sm:gap-4">
@@ -221,25 +218,33 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
     <div class="mt-8 grid gap-5 sm:mt-10 sm:gap-6 lg:grid-cols-[0.9fr_1.1fr]">
       <address class="not-italic rounded-[var(--radius-card)] border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-7">
         <dl class="space-y-5">
-          <div><dt class="text-xs font-bold">العنوان</dt><dd class="mt-1 text-sm text-muted">[العنوان التفصيلي، المدينة، المملكة العربية السعودية]</dd></div>
-          <div><dt class="text-xs font-bold">أوقات العمل</dt><dd class="mt-1 text-sm text-muted">السبت – الخميس · 10:00 ص – 10:00 م</dd></div>
+          <div><dt class="text-xs font-bold">العنوان</dt><dd class="mt-1 text-sm text-muted">{clinicContact.location}</dd></div>
+          <div><dt class="text-xs font-bold">أوقات العمل</dt><dd class="mt-1 text-sm text-muted">{clinicContact.hours}</dd></div>
           <div>
             <dt class="text-xs font-bold">الهاتف وواتساب</dt>
-            <dd class="mt-1 text-sm text-muted">
-              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" dir="ltr" class="hover:text-primary">
-                {clinicContact.phoneDisplay}
-              </a>
+            <dd class="mt-1 flex flex-wrap gap-3 text-sm text-muted" data-gtm-location="contact">
+              <a href={phoneHref} dir="ltr" class="hover:text-primary">{clinicContact.phoneDisplay}</a>
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="font-bold text-success hover:underline">واتساب</a>
+              <a href={phoneHref} class="font-bold text-primary hover:underline">اتصال</a>
             </dd>
           </div>
-          <div><dt class="text-xs font-bold">البريد</dt><dd class="mt-1 text-sm text-muted"><a href={`mailto:${clinicContact.email}`}>{clinicContact.email}</a></dd></div>
+          <div data-gtm-location="contact"><dt class="text-xs font-bold">البريد</dt><dd class="mt-1 text-sm text-muted"><a href={`mailto:${clinicContact.email}`}>{clinicContact.email}</a></dd></div>
           <div><dt class="text-xs font-bold">مواقف السيارات</dt><dd class="mt-1 text-sm text-muted">متوفرة أمام الفرع</dd></div>
         </dl>
       </address>
-      <div class="grid min-h-80 place-items-center rounded-[var(--radius-card)] border border-border bg-surface p-8 text-center shadow-[var(--shadow-card)]">
-        <div>
-          <AssetIcon src="/assets/location.svg" size="lg" class="mx-auto" />
-          <p class="mt-3 font-bold">مساحة مخصصة لخريطة الموقع</p>
-          <p class="text-xs text-muted">Embed Google Maps</p>
+      <div class="overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]">
+        <iframe
+          title="موقع عيادة بيوتي كورنر على خرائط جوجل"
+          src="https://www.google.com/maps?q=%D8%AD%D9%8A+%D8%A7%D9%84%D9%85%D8%AD%D9%85%D8%AF%D9%8A%D8%A9+%D8%B7%D8%B1%D9%8A%D9%82+%D8%A7%D9%84%D9%85%D9%84%D9%83+%D9%81%D9%8A%D8%B5%D9%84+%D8%AD%D9%81%D8%B1+%D8%A7%D9%84%D8%A8%D8%A7%D8%B7%D9%86&output=embed"
+          class="min-h-80 w-full border-0"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen
+        ></iframe>
+        <div class="border-t border-border px-4 py-3 text-center">
+          <a href={clinicMapUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-primary hover:underline">
+            فتح الموقع في خرائط جوجل
+          </a>
         </div>
       </div>
     </div>
@@ -247,27 +252,3 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
 </section>
 
 <FaqSection items={faqItems} />
-
-<section id="medical-blog" class="bg-surface-soft py-12 sm:py-24" aria-labelledby="blog-heading">
-  <div class="page-container">
-    <div id="blog-heading">
-      <SectionHeading eyebrow="المدوّنة الطبية" title="نصائح طبية من خبراء بيوتي كورنر" description="مقالات توعوية يعدّها فريق طبي." />
-    </div>
-    <div class="mt-10 grid gap-6 md:grid-cols-3">
-      {articles.map((article) => (
-        <article class="overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]">
-          <div class="relative">
-            <img src={article.image} alt={article.alt} class="aspect-[2/1] w-full object-cover" loading="lazy" />
-            <span class="absolute end-3 top-3 rounded-full bg-surface/95 px-3 py-1 text-xs font-bold">{article.category}</span>
-          </div>
-          <div class="p-5 sm:p-6">
-            <p class="text-xs text-muted">[تاريخ النشر] · [٥ دقائق قراءة]</p>
-            <h3 class="mt-3 text-lg font-black leading-7">{article.title}</h3>
-            <p class="mt-2 text-sm leading-6 text-muted">{article.description}</p>
-            <div class="mt-5 border-t border-border pt-4 text-sm font-bold text-primary">اقرأ المقال</div>
-          </div>
-        </article>
-      ))}
-    </div>
-  </div>
-</section>

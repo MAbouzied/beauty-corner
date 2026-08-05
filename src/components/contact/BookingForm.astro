@@ -1,9 +1,16 @@
 ---
-import { buildWhatsAppUrl, clinicContact } from '../../data/contact';
+import { buildPhoneUrl, buildWhatsAppUrl, clinicContact } from '../../data/contact';
+import { clinicServices } from '../../data/services';
 import AssetIcon from '../ui/AssetIcon.astro';
 import PillLabel from '../ui/PillLabel.astro';
 
 const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر بيوتي كورنر.');
+const phoneHref = buildPhoneUrl();
+const departments = ['أسنان', 'جلدية'] as const;
+const servicesPayload = clinicServices.map((service) => ({
+  title: service.title,
+  department: service.department,
+}));
 ---
 
 <section id="booking" class="bg-surface py-16 sm:py-24" aria-labelledby="booking-heading">
@@ -12,19 +19,31 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
       <PillLabel text="احجز موعدك" />
       <h2 id="booking-heading" class="text-display mt-3 font-black sm:mt-4">نموذج حجز سريع</h2>
       <p class="mt-4 max-w-lg text-sm leading-7 text-pretty text-muted">
-        املأ البيانات ثم أرسل الطلب عبر واتساب لتأكيد الموعد مباشرة مع فريق العيادة.
+        املأ الاسم ورقم الجوال واختر القسم والخدمة، ثم أرسل الطلب عبر واتساب.
       </p>
-      <a
-        href={whatsappHref}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="mt-6 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-full border border-success/40 bg-success-soft px-5 text-xs font-bold whitespace-nowrap text-success transition-transform hover:-translate-y-0.5 sm:w-auto"
-      >
-        تواصل معنا عبر واتساب
-        <AssetIcon src="/assets/whatsapp.svg" size="sm" />
-      </a>
-      <ul class="mt-5 space-y-2 text-sm text-muted sm:mt-7 sm:space-y-3">
-        <li class="flex items-center gap-2 sm:gap-3"><AssetIcon src="/assets/phone.svg" size="sm" class="shrink-0" /><span dir="ltr">{clinicContact.phoneDisplay}</span></li>
+      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap" data-gtm-location="booking_contact_sidebar">
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-full border border-success/40 bg-success-soft px-5 text-xs font-bold whitespace-nowrap text-success transition-transform hover:-translate-y-0.5 sm:w-auto"
+        >
+          واتساب
+          <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+        </a>
+        <a
+          href={phoneHref}
+          class="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-surface-accent px-5 text-xs font-bold whitespace-nowrap text-primary transition-transform hover:-translate-y-0.5 sm:w-auto"
+        >
+          اتصال
+          <AssetIcon src="/assets/phone.svg" size="sm" />
+        </a>
+      </div>
+      <ul class="mt-5 space-y-2 text-sm text-muted sm:mt-7 sm:space-y-3" data-gtm-location="booking_contact_sidebar">
+        <li class="flex items-center gap-2 sm:gap-3">
+          <AssetIcon src="/assets/phone.svg" size="sm" class="shrink-0" />
+          <a href={phoneHref} dir="ltr" class="hover:text-primary">{clinicContact.phoneDisplay}</a>
+        </li>
         <li class="flex items-center gap-2 sm:gap-3"><AssetIcon src="/assets/clock.svg" size="sm" class="shrink-0" /><span>{clinicContact.hours}</span></li>
         <li class="flex items-center gap-2 sm:gap-3"><AssetIcon src="/assets/location.svg" size="sm" class="shrink-0" />{clinicContact.location}</li>
       </ul>
@@ -34,12 +53,18 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
       class="rounded-[var(--radius-card)] border border-border bg-surface p-4 shadow-[var(--shadow-card)] sm:p-8"
       aria-describedby="contact-booking-notice"
       data-booking-form
+      data-gtm-form="booking_contact"
+      data-services={JSON.stringify(servicesPayload)}
       novalidate
     >
       <p id="contact-booking-notice" class="mb-5 rounded-2xl bg-surface-soft px-4 py-3 text-sm leading-6 text-muted" role="note">
-        عند الإرسال سيتم فتح واتساب برسالة تتضمن بيانات الحجز لإرسالها إلى العيادة.
+        سيتم حفظ بيانات الحجز لدى العيادة للمتابعة، ثم فتح واتساب لإرسال الطلب.
       </p>
-      <div class="grid gap-4 sm:grid-cols-2">
+      <label class="absolute -left-[9999px]" aria-hidden="true">
+        Website
+        <input name="website" type="text" tabindex="-1" autocomplete="off" />
+      </label>
+      <div class="grid gap-4">
         <label class="grid gap-2 text-xs font-bold">
           الاسم الكامل
           <input name="name" autocomplete="name" required minlength="3" placeholder="مثال: عبدالله محمد" class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
@@ -49,42 +74,30 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
           <input name="phone" type="tel" dir="ltr" inputmode="numeric" autocomplete="tel" required pattern="05[0-9]{8}" placeholder="05XXXXXXXX" class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
         </label>
         <label class="grid gap-2 text-xs font-bold">
-          التخصص
-          <select name="specialty" required class="min-h-12 rounded-2xl border border-border bg-surface px-4 text-sm font-normal shadow-[var(--shadow-control)]">
-            <option value="">اختر التخصص</option>
-            <option value="طب وتجميل الأسنان">طب وتجميل الأسنان</option>
-            <option value="الجلدية والتجميل">الجلدية والتجميل</option>
-            <option value="خدمات الليزر">خدمات الليزر</option>
+          القسم
+          <select name="department" required data-department-select class="min-h-12 rounded-2xl border border-border bg-surface px-4 text-sm font-normal shadow-[var(--shadow-control)]">
+            <option value="">اختر القسم</option>
+            {departments.map((department) => (
+              <option value={department}>{department}</option>
+            ))}
           </select>
         </label>
         <label class="grid gap-2 text-xs font-bold">
           الخدمة
-          <input name="service" placeholder="مثال: تنظيف الأسنان" class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
-        </label>
-        <label class="grid gap-2 text-xs font-bold">
-          الفرع
-          <select name="branch" required class="min-h-12 rounded-2xl border border-border bg-surface px-4 text-sm font-normal shadow-[var(--shadow-control)]">
-            <option value="">اختر الفرع</option>
-            <option value="الفرع الرئيسي">الفرع الرئيسي</option>
-            <option value="فرع الشمال">فرع الشمال</option>
+          <select name="service" required data-service-select class="min-h-12 rounded-2xl border border-border bg-surface px-4 text-sm font-normal shadow-[var(--shadow-control)]">
+            <option value="">اختر الخدمة</option>
           </select>
-        </label>
-        <label class="grid gap-2 text-xs font-bold">
-          التاريخ المفضل
-          <input name="date" type="date" required class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
-        </label>
-        <label class="grid gap-2 text-xs font-bold">
-          الوقت المفضل
-          <input name="time" type="time" class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
-        </label>
-        <label class="grid gap-2 text-xs font-bold sm:col-span-2">
-          رسالة إضافية (اختياري)
-          <textarea name="message" rows="3" placeholder="أي ملاحظات تودّ إخبارنا بها" class="resize-y rounded-2xl border border-border px-4 py-3 text-sm font-normal shadow-[var(--shadow-control)]"></textarea>
         </label>
       </div>
       <label class="mt-5 flex items-start gap-3 text-xs leading-6 text-muted">
         <input name="consent" type="checkbox" required class="mt-1 size-4 shrink-0 accent-primary" />
-        أوافق على سياسة الخصوصية والتواصل معي لتأكيد الحجز.
+        <span>
+          أوافق على
+          {' '}
+          <a href="/privacy" class="font-bold text-primary underline-offset-2 hover:underline">سياسة الخصوصية</a>
+          {' '}
+          والتواصل معي لتأكيد الحجز.
+        </span>
       </label>
       <button type="submit" class="mt-6 inline-flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-full bg-gold-gradient px-7 text-sm font-bold whitespace-nowrap text-ink-button shadow-[var(--shadow-gold)] transition-transform hover:-translate-y-0.5 sm:text-base">
         إرسال عبر واتساب
@@ -96,7 +109,9 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
 </section>
 
 <script>
-  import { buildBookingWhatsAppMessage, buildWhatsAppUrl } from '../../data/contact';
+  import { buildBookingWhatsAppMessage, buildWhatsAppUrl, clinicContact } from '../../data/contact';
+  import { saveCustomerLead } from '../../lib/customer-leads';
+  import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
 
   document.addEventListener('astro:page-load', () => {
     document.querySelectorAll<HTMLFormElement>('[data-booking-form]').forEach((form) => {
@@ -104,18 +119,39 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
       form.dataset.bound = 'true';
 
       const status = form.querySelector<HTMLElement>('[data-booking-status]');
-      const dateInput = form.querySelector<HTMLInputElement>('input[name="date"]');
+      const departmentSelect = form.querySelector<HTMLSelectElement>('[data-department-select]');
+      const serviceSelect = form.querySelector<HTMLSelectElement>('[data-service-select]');
+      const formId = form.dataset.gtmForm ?? 'booking_contact';
 
-      if (dateInput) {
-        const now = new Date();
-        const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().split('T')[0];
-        if (localDate) dateInput.min = localDate;
+      type ServiceOption = { title: string; department: string };
+      let services: ServiceOption[] = [];
+      try {
+        services = JSON.parse(form.dataset.services ?? '[]') as ServiceOption[];
+      } catch {
+        services = [];
       }
+
+      const populateServices = () => {
+        if (!departmentSelect || !serviceSelect) return;
+        const department = departmentSelect.value;
+        const options = services.filter((service) => service.department === department);
+        serviceSelect.innerHTML = '<option value="">اختر الخدمة</option>';
+        options.forEach((service) => {
+          const option = document.createElement('option');
+          option.value = service.title;
+          option.textContent = service.title;
+          serviceSelect.append(option);
+        });
+      };
+
+      populateServices();
+      departmentSelect?.addEventListener('change', populateServices);
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
 
         if (!form.reportValidity()) {
+          pushGtmEvent(GtmEvents.formError, { form_id: formId, method: 'whatsapp' });
           if (status) {
             status.textContent = 'يرجى تعبئة الحقول المطلوبة قبل الإرسال.';
             status.className = 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
@@ -124,21 +160,37 @@ const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر �
         }
 
         const data = new FormData(form);
+        const department = String(data.get('department') ?? '').trim();
+        const service = String(data.get('service') ?? '').trim();
         const message = buildBookingWhatsAppMessage({
           name: String(data.get('name') ?? '').trim(),
           phone: String(data.get('phone') ?? '').trim(),
-          specialty: String(data.get('specialty') ?? '').trim(),
-          service: String(data.get('service') ?? '').trim(),
-          branch: String(data.get('branch') ?? '').trim(),
-          date: String(data.get('date') ?? '').trim(),
-          time: String(data.get('time') ?? '').trim(),
-          message: String(data.get('message') ?? '').trim(),
+          department,
+          service,
+          branch: clinicContact.branch,
         });
 
         if (status) {
           status.textContent = 'جارٍ فتح واتساب لإرسال طلب الحجز...';
           status.className = 'mt-3 min-h-5 text-center text-sm font-medium text-success';
         }
+
+        pushGtmEvent(GtmEvents.formSubmit, {
+          form_id: formId,
+          method: 'whatsapp',
+          department,
+          service,
+        });
+
+        void saveCustomerLead({
+          name: String(data.get('name') ?? '').trim(),
+          phone: String(data.get('phone') ?? '').trim(),
+          department,
+          service,
+          locale: 'ar',
+          consent: data.has('consent'),
+          website: String(data.get('website') ?? ''),
+        }).catch((error) => console.error('Unable to save booking details.', error));
 
         window.open(buildWhatsAppUrl(message), '_blank', 'noopener,noreferrer');
       });

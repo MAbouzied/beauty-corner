@@ -1,18 +1,22 @@
 ---
 import type { ClinicService } from '../../data/services';
+import type { Locale } from '../../lib/i18n/localize';
+import { localizeDepartment, localizeService } from '../../lib/i18n/localize';
 import PillLabel from '../ui/PillLabel.astro';
 
 export interface Props {
   service: ClinicService;
+  locale?: Locale;
 }
 
-const { service } = Astro.props;
+const { service: rawService, locale = 'ar' } = Astro.props;
+const service = localizeService(rawService, locale);
 ---
 
 <section class="pb-10 pt-14 sm:pb-14 sm:pt-24" aria-labelledby="service-detail-heading">
   <div class="page-container">
     <div class="mx-auto flex max-w-3xl flex-col items-center gap-3 text-center">
-      <PillLabel text={service.category} />
+      <PillLabel text={localizeDepartment(service.department, locale)} />
       <h1 id="service-detail-heading" class="text-display font-black text-ink">
         {service.title}
       </h1>

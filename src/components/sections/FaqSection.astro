@@ -1,30 +1,98 @@
 ---
 import type { FaqItem } from '../../data/faq';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, ui } from '../../lib/i18n/localize';
 import AssetIcon from '../ui/AssetIcon.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 
 export interface Props {
   items: readonly FaqItem[];
+  locale?: Locale;
 }
 
-const { items } = Astro.props;
+const { items, locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
 ---
 
-<section class="bg-surface-soft/60 py-12 sm:py-24" aria-labelledby="faq-heading">
-  <div class="page-container max-w-4xl">
+<section class="bg-surface py-12 sm:py-24" aria-labelledby="faq-heading">
+  <div class="page-container">
     <div id="faq-heading">
-      <SectionHeading eyebrow="الأسئلة الشائعة" title="إجابات على أهم استفساراتك" />
+      <SectionHeading
+        eyebrow={en ? copy!.faq.eyebrow : 'الأسئلة الشائعة'}
+        title={en ? copy!.faq.title : 'أسئلة يتكرر طرحها'}
+      />
     </div>
-    <div class="mt-8 space-y-2 sm:mt-10 sm:space-y-3">
-      {items.map((item) => (
-        <details class="group overflow-hidden rounded-[var(--radius-section)] border border-border bg-surface px-4 sm:px-5">
-          <summary class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 py-3 text-sm font-bold marker:content-none sm:min-h-14 sm:gap-4 sm:py-4 sm:text-base">
+    <div class="mx-auto mt-8 max-w-3xl space-y-3 sm:mt-10">
+      <style>
+        .faq-answer {
+          display: grid;
+          grid-template-rows: 1fr;
+          opacity: 1;
+          transition:
+            grid-template-rows 320ms cubic-bezier(0.16, 1, 0.3, 1),
+            opacity 180ms ease-out;
+        }
+
+        .faq-answer-inner {
+          overflow: hidden;
+        }
+
+        .faq-item[data-ready] .faq-answer {
+          grid-template-rows: 0fr;
+          opacity: 0;
+        }
+
+        .faq-item[data-open] .faq-answer {
+          grid-template-rows: 1fr;
+          opacity: 1;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .faq-answer {
+            transition-duration: 0.01ms;
+          }
+        }
+      </style>
+      {items.map((item, index) => (
+        <div class="faq-item group overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface-soft px-4 py-3 sm:px-5 sm:py-4" data-faq-item>
+          <button
+            type="button"
+            class="flex w-full cursor-pointer items-center justify-between gap-4 text-start text-sm font-bold text-ink sm:text-base"
+            aria-expanded="false"
+            aria-controls={`faq-answer-${index}`}
+          >
             <span>{item.question}</span>
-            <AssetIcon src="/assets/plus.svg" size="sm" class="transition-transform group-open:rotate-45 shrink-0" />
-          </summary>
-          <p class="border-t border-border pb-4 pt-3 text-sm leading-6 text-muted sm:pb-5 sm:pt-4 sm:leading-7">{item.answer}</p>
-        </details>
+            <AssetIcon src="/assets/plus.svg" size="sm" class="shrink-0 transition-transform duration-300 group-data-[open]:rotate-45" />
+          </button>
+          <div id={`faq-answer-${index}`} class="faq-answer">
+            <div class="faq-answer-inner">
+              <p class="pt-3 text-sm leading-7 text-muted sm:text-base sm:leading-8">{item.answer}</p>
+            </div>
+          </div>
+        </div>
       ))}
     </div>
   </div>
 </section>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLElement>('[data-faq-item]').forEach((item) => {
+      if (item.dataset.ready === 'true') return;
+
+      const button = item.querySelector<HTMLButtonElement>('button[aria-controls]');
+      const answer = item.querySelector<HTMLElement>('.faq-answer');
+      if (!button || !answer) return;
+
+      item.dataset.ready = 'true';
+      answer.setAttribute('aria-hidden', 'true');
+      button.addEventListener('click', () => {
+        const isOpen = !item.hasAttribute('data-open');
+        item.toggleAttribute('data-open', isOpen);
+        button.setAttribute('aria-expanded', String(isOpen));
+        answer.setAttribute('aria-hidden', String(!isOpen));
+      });
+    });
+  });
+</script>

@@ -1,0 +1,142 @@
+---
+import BookingSection from '../../../components/services/BookingSection.astro';
+import ServiceCard from '../../../components/services/ServiceCard.astro';
+import SectionHeading from '../../../components/ui/SectionHeading.astro';
+import FaqSection from '../../../components/sections/FaqSection.astro';
+import { clinicServices, serviceDepartments } from '../../../data/services';
+import {
+  localizeDepartment,
+  localizeFaq,
+  localizeService,
+  ui,
+} from '../../../lib/i18n/localize';
+import {
+  buildBreadcrumbSchema,
+  buildItemListSchema,
+  buildWebPageSchema,
+} from '../../../lib/schema';
+import Layout from '../../../layouts/Layout.astro';
+
+const site = Astro.site!;
+const copy = ui('en')!;
+const title = copy.pages.servicesTitle;
+const description = copy.pages.servicesDescription;
+const faqItems = localizeFaq('en');
+const localizedServices = clinicServices.map((service) => localizeService(service, 'en'));
+---
+
+<Layout
+  title={title}
+  description={description}
+  locale="en"
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: '/en/services',
+      name: title,
+      description,
+      locale: 'en',
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: copy.nav.home, path: '/en' },
+      { name: copy.nav.services, path: '/en/services' },
+    ]),
+    buildItemListSchema({
+      site,
+      path: '/en/services',
+      name: 'Beauty Corner services',
+      description,
+      itemType: 'Service',
+      items: localizedServices.map((service) => ({
+        name: service.title,
+        path: `/en/services/${service.id}`,
+        description: service.description,
+        image: service.heroImage,
+      })),
+    }),
+  ]}
+>
+  <section class="py-14 sm:py-24">
+    <div class="page-container">
+      <SectionHeading
+        eyebrow={copy.nav.services}
+        title={copy.pages.servicesHeading}
+        description={description}
+        level={1}
+      />
+    </div>
+  </section>
+
+  <section class="pb-14 sm:pb-24" aria-labelledby="services-grid-heading">
+    <div class="page-container">
+      <h2 id="services-grid-heading" class="sr-only">Services list</h2>
+      <div
+        class="mx-auto flex w-full max-w-[480px] gap-1 overflow-x-auto rounded-[var(--radius-card)] border border-border bg-surface-soft p-1 sm:grid sm:grid-cols-3 sm:gap-1.5 sm:overflow-visible sm:p-1.5"
+        role="tablist"
+        aria-label="Filter services by department"
+      >
+        {serviceDepartments.map((department, index) => (
+          <button
+            id={`service-tab-${index}`}
+            type="button"
+            role="tab"
+            aria-selected={index === 0 ? 'true' : 'false'}
+            aria-controls="services-panel"
+            tabindex={index === 0 ? 0 : -1}
+            data-service-filter={department}
+            class="min-h-11 shrink-0 rounded-full px-4 text-sm font-medium whitespace-nowrap text-muted transition-[color,background-color,box-shadow] hover:bg-surface hover:text-ink aria-selected:bg-primary aria-selected:text-surface aria-selected:shadow-[var(--shadow-control)] aria-selected:hover:bg-primary aria-selected:hover:text-surface sm:min-h-12 sm:w-full sm:px-4 sm:text-base"
+          >
+            {localizeDepartment(department, 'en')}
+          </button>
+        ))}
+      </div>
+
+      <div id="services-panel" role="tabpanel" aria-labelledby="service-tab-0" class="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {clinicServices.map((service) => <ServiceCard service={service} locale="en" />)}
+      </div>
+    </div>
+  </section>
+
+  <BookingSection locale="en" />
+  <FaqSection items={faqItems} locale="en" />
+</Layout>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-service-filter]')];
+    const serviceCards = [...document.querySelectorAll<HTMLElement>('[data-service-card]')];
+    const servicesPanel = document.querySelector<HTMLElement>('#services-panel');
+    if (tabs.length === 0) return;
+
+    const selectCategory = (selectedTab: HTMLButtonElement) => {
+      const department = selectedTab.dataset.serviceFilter ?? 'كل الخدمات';
+      tabs.forEach((tab) => {
+        const isSelected = tab === selectedTab;
+        tab.setAttribute('aria-selected', String(isSelected));
+        tab.tabIndex = isSelected ? 0 : -1;
+      });
+      serviceCards.forEach((card) => {
+        card.hidden = !(department === 'كل الخدمات' || card.dataset.department === department);
+      });
+      servicesPanel?.setAttribute('aria-labelledby', selectedTab.id);
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectCategory(tab));
+      tab.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const targetIndex = event.key === 'Home'
+          ? 0
+          : event.key === 'End'
+            ? tabs.length - 1
+            : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+        const targetTab = tabs[targetIndex];
+        if (targetTab) {
+          selectCategory(targetTab);
+          targetTab.focus();
+        }
+      });
+    });
+  });
+</script>

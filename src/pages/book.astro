@@ -1,0 +1,171 @@
+---
+import AssetIcon from '../components/ui/AssetIcon.astro';
+import { buildPhoneUrl, buildWhatsAppUrl, clinicContact } from '../data/contact';
+import { clinicServices } from '../data/services';
+import { organization } from '../data/organization';
+import { buildWebPageSchema } from '../lib/schema';
+import Layout from '../layouts/Layout.astro';
+
+const dentalServices = clinicServices.filter((service) => service.department === 'أسنان');
+const whatsappHref = buildWhatsAppUrl('مرحباً، أود الاستفسار عن خدمات بيوتي كورنر.');
+const phoneHref = buildPhoneUrl();
+const site = Astro.site!;
+const title = 'احجز موعدك في عيادة بيوتي كورنر بحفر الباطن';
+const description =
+  'احجز موعد أسنان أو جلدية في بيوتي كورنر بحفر الباطن خلال دقائق — أدخل اسمك ورقم جوالك واختر الخدمة.';
+const fieldClass =
+  'min-h-12 w-full rounded-2xl border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-muted/70 focus:border-primary';
+---
+
+<Layout
+  title={title}
+  description={description}
+  noindex={false}
+  schemas={[
+    buildWebPageSchema({ site, path: '/book', name: title, description }),
+  ]}
+>
+  <section class="relative overflow-hidden border-b border-border bg-gradient-to-bl from-surface-accent via-surface to-surface-soft py-10 sm:py-16">
+    <div class="page-container mx-auto max-w-xl">
+      <div class="mb-8 text-center">
+        <img src={organization.logoPath} alt="" class="mx-auto h-16 w-auto" />
+        <p class="mt-4 text-sm font-bold text-primary">{organization.name}</p>
+        <h1 class="text-display mt-3 font-black text-ink">احجز موعدك الآن</h1>
+        <p class="mt-3 text-sm leading-7 text-muted">
+          فرع حفر الباطن — حي المحمدية، طريق الملك فيصل
+        </p>
+      </div>
+
+      <form
+        class="rounded-[2rem] border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-8"
+        data-lead-form
+        data-gtm-form="lead_quick"
+        novalidate
+      >
+        <label class="absolute -left-[9999px]" aria-hidden="true">
+          Website
+          <input name="website" type="text" tabindex="-1" autocomplete="off" />
+        </label>
+        <div class="grid gap-4">
+          <label class="grid gap-2 text-xs font-bold">
+            الاسم
+            <input name="name" type="text" required minlength="3" autocomplete="name" placeholder="اسمك الكامل" class={fieldClass} />
+          </label>
+          <label class="grid gap-2 text-xs font-bold">
+            رقم الجوال
+            <input name="phone" type="tel" dir="ltr" required pattern="05[0-9]{8}" inputmode="numeric" autocomplete="tel" placeholder="05XXXXXXXX" class={fieldClass} />
+          </label>
+          <label class="grid gap-2 text-xs font-bold">
+            الخدمة
+            <select name="service" required class={fieldClass}>
+              <option value="">اختر خدمة الأسنان</option>
+              {dentalServices.map((service) => (
+                <option value={service.title}>{service.title}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <label class="mt-5 flex items-start gap-3 text-xs leading-6 text-muted">
+          <input name="consent" type="checkbox" required class="mt-1 size-4 shrink-0 accent-primary" />
+          <span>
+            أوافق على
+            {' '}
+            <a href="/privacy" class="font-bold text-primary underline-offset-2 hover:underline">سياسة الخصوصية</a>
+            {' '}
+            وحفظ بيانات الحجز والتواصل معي لتأكيد الموعد.
+          </span>
+        </label>
+
+        <button
+          type="submit"
+          class="mt-6 inline-flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-full bg-gold-gradient px-7 text-sm font-bold text-ink-button shadow-[var(--shadow-gold)] transition-transform hover:-translate-y-0.5"
+        >
+          إرسال عبر واتساب
+          <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+        </button>
+        <p class="mt-3 min-h-5 text-center text-sm font-medium" role="status" aria-live="polite" data-lead-status></p>
+      </form>
+
+      <div class="mt-6 flex flex-col gap-3 sm:flex-row" data-gtm-location="lead_quick">
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full border border-success/40 bg-success-soft px-5 text-sm font-bold text-success"
+        >
+          تواصل عبر واتساب
+          <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+        </a>
+        <a
+          href={phoneHref}
+          class="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full border border-primary/30 bg-surface-accent px-5 text-sm font-bold text-primary"
+        >
+          اتصال مباشر
+          <AssetIcon src="/assets/phone.svg" size="sm" />
+        </a>
+      </div>
+
+      <p class="mt-6 text-center text-xs text-muted" dir="ltr">{clinicContact.phoneDisplay}</p>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  import { buildLeadWhatsAppMessage, buildWhatsAppUrl } from '../data/contact';
+  import { saveCustomerLead } from '../lib/customer-leads';
+  import { GtmEvents, pushGtmEvent } from '../lib/gtm';
+
+  document.addEventListener('astro:page-load', () => {
+    const form = document.querySelector<HTMLFormElement>('[data-lead-form]');
+    if (!form || form.dataset.bound === 'true') return;
+    form.dataset.bound = 'true';
+
+    const status = form.querySelector<HTMLElement>('[data-lead-status]');
+    const formId = form.dataset.gtmForm ?? 'lead_quick';
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) {
+        pushGtmEvent(GtmEvents.formError, { form_id: formId, method: 'whatsapp' });
+        if (status) {
+          status.textContent = 'يرجى تعبئة الاسم ورقم الجوال والخدمة.';
+          status.className = 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
+        }
+        return;
+      }
+
+      const data = new FormData(form);
+      const service = String(data.get('service') ?? '').trim();
+      const message = buildLeadWhatsAppMessage({
+        name: String(data.get('name') ?? '').trim(),
+        phone: String(data.get('phone') ?? '').trim(),
+        service,
+      });
+
+      if (status) {
+        status.textContent = 'جارٍ فتح واتساب...';
+        status.className = 'mt-3 min-h-5 text-center text-sm font-medium text-success';
+      }
+
+      pushGtmEvent(GtmEvents.formSubmit, {
+        form_id: formId,
+        method: 'whatsapp',
+        department: 'أسنان',
+        service,
+      });
+
+      void saveCustomerLead({
+        name: String(data.get('name') ?? '').trim(),
+        phone: String(data.get('phone') ?? '').trim(),
+        department: 'أسنان',
+        service,
+        locale: 'ar',
+        consent: data.has('consent'),
+        website: String(data.get('website') ?? ''),
+      }).catch((error) => console.error('Unable to save booking details.', error));
+
+      window.open(buildWhatsAppUrl(message), '_blank', 'noopener,noreferrer');
+    });
+  });
+</script>

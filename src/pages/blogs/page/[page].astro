@@ -1,0 +1,81 @@
+---
+export const prerender = false;
+
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import BookingSection from '../../../components/services/BookingSection.astro';
+import Layout from '../../../layouts/Layout.astro';
+import { buildBlogCollectionSchemas } from '../../../lib/schema';
+import BlogListing from '../../../modules/blog/components/BlogListing.astro';
+import {
+  BLOG_PAGE_SIZE,
+  DEFAULT_BLOG_LISTING_LABELS,
+  listingPathForPage,
+  paginatePosts,
+  selectListing,
+} from '../../../modules/blog';
+import { getBlogRepository } from '../../../modules/blog/repository/get-blog-repository';
+import {
+  BLOG_CACHE_MAX_AGE_SECONDS,
+  BLOG_CACHE_SWR_SECONDS,
+  blogListingCacheTags,
+} from '../../../modules/blog/cache';
+
+const pageNumber = Number.parseInt(Astro.params.page ?? '', 10);
+if (!Number.isInteger(pageNumber) || pageNumber < 2) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+const repository = getBlogRepository();
+const posts = await repository.getPublishedPosts();
+const listing = selectListing(posts);
+const recentPage = paginatePosts(listing.recent, pageNumber, BLOG_PAGE_SIZE);
+
+if (!recentPage) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+if (Astro.cache.enabled) {
+  Astro.cache.set({
+    maxAge: BLOG_CACHE_MAX_AGE_SECONDS,
+    swr: BLOG_CACHE_SWR_SECONDS,
+    tags: blogListingCacheTags(),
+  });
+}
+
+const site = Astro.site!;
+const path = listingPathForPage(pageNumber);
+const title = `مدونة بيوتي كورنر — صفحة ${pageNumber} | مقالات الأسنان والجلدية`;
+const description =
+  'مقالات عربية إضافية من عيادة بيوتي كورنر في حفر الباطن حول صحة الأسنان والبشرة والعناية الوقائية.';
+---
+
+<Layout
+  title={title}
+  description={description}
+  canonicalPath={path}
+  schemas={buildBlogCollectionSchemas({
+    site,
+    path,
+    name: title,
+    description,
+    posts: recentPage.items,
+  })}
+>
+  <Breadcrumbs
+    items={[
+      { name: 'الرئيسية', href: '/' },
+      { name: 'المدونة', href: '/blogs' },
+      { name: `صفحة ${pageNumber}` },
+    ]}
+  />
+  <BlogListing
+    featured={null}
+    recent={recentPage.items}
+    totalPublished={listing.allPublished.length}
+    page={pageNumber}
+    totalPages={recentPage.totalPages}
+    labels={DEFAULT_BLOG_LISTING_LABELS}
+  >
+    <BookingSection slot="cta" />
+  </BlogListing>
+</Layout>

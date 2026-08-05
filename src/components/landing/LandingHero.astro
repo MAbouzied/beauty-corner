@@ -15,9 +15,9 @@ import ButtonLink from '../ui/ButtonLink.astro';
         رعاية متكاملة <span class="text-gold">لابتسامتك</span> وبشرتك
       </h1>
       <p class="mt-3 max-w-2xl text-sm leading-7 text-pretty text-muted sm:text-lg lg:text-xl">
-        خدمات الأسنان والجلدية والليزر بخطط علاجية تناسب احتياجك، داخل بيئة طبية حديثة تحافظ على راحتك وخصوصيتك.
+        خدمات الأسنان والجلدية بخطط علاجية تناسب احتياجك، في فرعنا بحفر الباطن — حي المحمدية، طريق الملك فيصل.
       </p>
-      <ButtonLink href="/contact" size="lg" class="mt-6 w-full whitespace-nowrap sm:w-auto">
+      <ButtonLink href="/book" size="lg" class="mt-6 w-full whitespace-nowrap sm:w-auto">
         احجز موعدك الآن
         <AssetIcon src="/assets/booking-arrow.svg" size="sm" />
       </ButtonLink>
@@ -26,9 +26,13 @@ import ButtonLink from '../ui/ButtonLink.astro';
     <div class="relative order-1 mx-auto w-full max-w-xl lg:order-2">
       <img
         src="/assets/landing-hero.jpg"
-        alt="جهاز ليزر طبي داخل عيادة بيوتي كورنر"
+        alt="غرفة علاج أسنان حديثة داخل عيادة بيوتي كورنر بحفر الباطن"
+        width="167"
+        height="256"
+        sizes="(max-width: 1024px) 100vw, 40vw"
         class="aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)]"
         fetchpriority="high"
+        decoding="async"
       />
       <div class="mx-auto -mt-6 flex w-[calc(100%-1.5rem)] max-w-sm items-center gap-3 rounded-[var(--radius-section)] border border-border bg-surface/95 p-3 shadow-[var(--shadow-card)] backdrop-blur-sm sm:absolute sm:-bottom-7 sm:start-5 sm:mt-0 sm:w-[calc(100%-2.5rem)] sm:p-4">
         <span class="grid size-9 shrink-0 place-items-center rounded-full bg-surface-accent text-primary sm:size-10" aria-hidden="true">♡</span>

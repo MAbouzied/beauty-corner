@@ -1,87 +1,294 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import Gtm from '../components/analytics/Gtm.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
 import SiteHeader from '../components/site/SiteHeader.astro';
 import { organization } from '../data/organization';
+import { imageMimeType, socialCard } from '../data/seo';
+import { GTM_ID, isGtmEnabled } from '../lib/gtm';
+import {
+  getAlternatePaths,
+  htmlLang,
+  localeFromPathname,
+  normalizePathname,
+  ogLocale,
+  type Locale,
+} from '../lib/i18n/localize';
+import { findRoutePair } from '../lib/i18n/routes';
 import { buildGraph } from '../lib/schema';
 import '../styles/global.css';
 
+export interface ArticleMeta {
+  publishedTime: string;
+  modifiedTime?: string;
+  author?: string;
+  section?: string;
+  tags?: readonly string[];
+}
+
 export interface Props {
+  /** Full document title (unique, search-focused; include brand when needed). */
   title: string;
   description: string;
   image?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  imageAlt?: string;
   noindex?: boolean;
+  /** Use noindex,follow for soft errors like 404. */
+  robotsFollow?: boolean;
   ogType?: 'website' | 'article' | 'profile';
   schemas?: Record<string, unknown>[];
+  locale?: Locale;
+  hideChrome?: boolean;
+  /** Override canonical path (defaults to current pathname). */
+  canonicalPath?: string;
+  /** Skip canonical/hreflang (error pages). */
+  omitAlternates?: boolean;
+  /** Optional Open Graph article metadata. */
+  article?: ArticleMeta;
+  /** Disable GTM on staff/auth surfaces. */
+  disableAnalytics?: boolean;
+  /** Skip public JSON-LD graph (admin/login). */
+  omitStructuredData?: boolean;
 }
 
 const {
   title,
   description,
-  image = organization.imagePath,
+  image = socialCard.path,
+  imageWidth = socialCard.width,
+  imageHeight = socialCard.height,
+  imageAlt,
   noindex = false,
+  robotsFollow = true,
   ogType = 'website',
   schemas = [],
+  locale: localeProp,
+  hideChrome = false,
+  canonicalPath,
+  omitAlternates = false,
+  article,
+  disableAnalytics = false,
+  omitStructuredData = false,
 } = Astro.props;
 
 const site = Astro.site;
 if (!site) throw new Error('Astro site URL must be configured.');
 
-const canonicalUrl = new URL(Astro.url.pathname, site);
-const socialImageUrl = new URL(image, site);
-const fullTitle = `${title} — ${organization.name}`;
-const structuredData = buildGraph(site, schemas);
+const pathname = normalizePathname(Astro.url.pathname);
+const locale = localeProp ?? localeFromPathname(pathname);
+const isEnglish = locale === 'en';
+
+const host = Astro.url.hostname.toLowerCase();
+const isPreviewHost =
+  host.endsWith('.workers.dev') ||
+  host.endsWith('.pages.dev') ||
+  host.includes('localhost') ||
+  host === '127.0.0.1';
+
+const routePair = findRoutePair(pathname);
+const effectiveNoindex = noindex || isPreviewHost || routePair?.indexable === false;
+
+const resolvedCanonicalPath = normalizePathname(canonicalPath ?? pathname);
+const canonicalUrl = new URL(resolvedCanonicalPath, site);
+const socialImageUrl = new URL(image, site).href;
+const socialImageSecureUrl = socialImageUrl.replace(/^http:\/\//i, 'https://');
+const socialMime = imageMimeType(image);
+const brandName = isEnglish ? organization.alternateName : organization.name;
+const fullTitle = title;
+const resolvedImageAlt = imageAlt ?? (isEnglish ? socialCard.altEn : socialCard.altAr);
+const structuredData = omitStructuredData ? null : buildGraph(site, schemas, locale);
+const analyticsEnabled = isGtmEnabled && !disableAnalytics;
+
+const alternates =
+  omitAlternates || effectiveNoindex ? null : getAlternatePaths(resolvedCanonicalPath);
+const arabicAlternate = alternates ? new URL(alternates.ar, site).href : null;
+const englishAlternate =
+  alternates?.en !== undefined ? new URL(alternates.en, site).href : null;
+const primaryOgLocale = ogLocale(locale);
+const alternateOgLocale =
+  arabicAlternate && englishAlternate ? ogLocale(isEnglish ? 'ar' : 'en') : null;
+
+const robotsContent = effectiveNoindex
+  ? robotsFollow
+    ? 'noindex, follow'
+    : 'noindex, nofollow'
+  : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 ---
 
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang={htmlLang(locale)} dir={isEnglish ? 'ltr' : 'rtl'}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#b53874" />
+    {analyticsEnabled && <Gtm />}
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <meta name="author" content={organization.name} />
+    <meta name="author" content={brandName} />
     <meta name="application-name" content={organization.alternateName} />
+    <meta name="robots" content={robotsContent} />
 
-    {noindex ? (
-      <meta name="robots" content="noindex, nofollow" />
-    ) : (
-      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    )}
-
-    <meta property="og:locale" content="ar_SA" />
+    <meta property="og:locale" content={primaryOgLocale} />
+    {alternateOgLocale && <meta property="og:locale:alternate" content={alternateOgLocale} />}
     <meta property="og:type" content={ogType} />
-    <meta property="og:site_name" content={organization.name} />
+    <meta property="og:site_name" content={brandName} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={socialImageUrl} />
-    <meta property="og:image:alt" content={title} />
+    <meta property="og:image" content={socialImageSecureUrl} />
+    <meta property="og:image:secure_url" content={socialImageSecureUrl} />
+    <meta property="og:image:alt" content={resolvedImageAlt} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:image:type" content={socialMime} />
     <meta property="og:url" content={canonicalUrl} />
+    {article && ogType === 'article' && (
+      <>
+        <meta property="article:published_time" content={article.publishedTime} />
+        {article.modifiedTime && (
+          <meta property="article:modified_time" content={article.modifiedTime} />
+        )}
+        {article.author && <meta property="article:author" content={article.author} />}
+        {article.section && <meta property="article:section" content={article.section} />}
+        {article.tags?.map((tag) => <meta property="article:tag" content={tag} />)}
+      </>
+    )}
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={socialImageUrl} />
-    <meta name="twitter:image:alt" content={title} />
+    <meta name="twitter:image" content={socialImageSecureUrl} />
+    <meta name="twitter:image:alt" content={resolvedImageAlt} />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/assets/logo.svg" />
-    <link rel="canonical" href={canonicalUrl} />
-    <link rel="alternate" hreflang="ar" href={canonicalUrl} />
-    <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    {!effectiveNoindex && <link rel="canonical" href={canonicalUrl} />}
+    {arabicAlternate && englishAlternate && (
+      <>
+        <link rel="alternate" hreflang="ar" href={arabicAlternate} />
+        <link rel="alternate" hreflang="en" href={englishAlternate} />
+        <link rel="alternate" hreflang="x-default" href={arabicAlternate} />
+      </>
+    )}
+    {arabicAlternate && !englishAlternate && !effectiveNoindex && (
+      <>
+        <link rel="alternate" hreflang="ar" href={arabicAlternate} />
+        <link rel="alternate" hreflang="x-default" href={arabicAlternate} />
+      </>
+    )}
 
-    <JsonLd data={structuredData} />
+    {structuredData && <JsonLd data={structuredData} />}
     <ClientRouter />
+    <script is:inline>
+      (() => {
+        if (window.__bcScrollTopBound) return;
+        window.__bcScrollTopBound = true;
+
+        const SCROLL_DURATION_MS = 750;
+        let previousScrollY = 0;
+        let shouldAnimateTop = false;
+        let animationFrameId = 0;
+
+        const maxScrollY = () =>
+          Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
+        const jumpScroll = (top) => {
+          const html = document.documentElement;
+          const previousBehavior = html.style.scrollBehavior;
+          html.style.scrollBehavior = 'auto';
+          window.scrollTo({ top, left: 0, behavior: 'instant' });
+          html.style.scrollBehavior = previousBehavior;
+        };
+
+        const restoreStartScroll = () => {
+          jumpScroll(Math.min(previousScrollY, maxScrollY()));
+        };
+
+        const animateScrollToTop = (durationMs) => {
+          if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+          const startY = window.scrollY;
+          if (startY <= 0) return;
+
+          const startTime = performance.now();
+          const easeOutCubic = (t) => 1 - (1 - t) ** 3;
+
+          const step = (now) => {
+            const progress = Math.min(1, (now - startTime) / durationMs);
+            jumpScroll(Math.round(startY * (1 - easeOutCubic(progress))));
+            if (progress < 1) {
+              animationFrameId = requestAnimationFrame(step);
+            } else {
+              animationFrameId = 0;
+            }
+          };
+
+          animationFrameId = requestAnimationFrame(step);
+        };
+
+        document.addEventListener('astro:before-preparation', () => {
+          previousScrollY = window.scrollY;
+          shouldAnimateTop = previousScrollY > 0 && !window.location.hash;
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = 0;
+          }
+        });
+
+        document.addEventListener('astro:after-swap', () => {
+          const active = document.activeElement;
+          if (active instanceof HTMLElement && active !== document.body) {
+            active.blur();
+          }
+
+          if (!shouldAnimateTop) return;
+          restoreStartScroll();
+        });
+
+        document.addEventListener('astro:page-load', () => {
+          if (!shouldAnimateTop) return;
+          shouldAnimateTop = false;
+
+          if (window.location.hash) return;
+
+          restoreStartScroll();
+
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            jumpScroll(0);
+            return;
+          }
+
+          requestAnimationFrame(() => {
+            restoreStartScroll();
+            animateScrollToTop(SCROLL_DURATION_MS);
+          });
+        });
+      })();
+    </script>
   </head>
   <body class="flex min-h-screen flex-col bg-surface text-ink">
-    <SiteHeader />
+    {analyticsEnabled && (
+      <>
+        <!-- Google Tag Manager (noscript) -->
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style="display:none;visibility:hidden"
+            title="Google Tag Manager"
+          ></iframe>
+        </noscript>
+        <!-- End Google Tag Manager (noscript) -->
+      </>
+    )}
+    {!hideChrome && <SiteHeader locale={locale} />}
     <main class="flex-1" transition:animate="fade" id="main-content">
       <slot />
     </main>
-    <SiteFooter />
+    {!hideChrome && <SiteFooter locale={locale} />}
   </body>
 </html>

@@ -1,30 +1,33 @@
 ---
 import LandingHero from '../components/landing/LandingHero.astro';
 import LandingSections from '../components/landing/LandingSections.astro';
-import { organization } from '../data/organization';
+import { faqItems } from '../data/faq';
 import {
   buildBreadcrumbSchema,
+  buildFaqSchema,
   buildWebPageSchema,
 } from '../lib/schema';
 import Layout from '../layouts/Layout.astro';
 
 const site = Astro.site!;
-const title = 'الرئيسية';
-const description = organization.description;
+const title = 'عيادة أسنان وجلدية في حفر الباطن | بيوتي كورنر';
+const description =
+  'عيادة بيوتي كورنر لطب الأسنان والجلدية في حفر الباطن — حي المحمدية، طريق الملك فيصل. احجز موعدك بسهولة عبر الموقع أو واتساب.';
 ---
 
 <Layout
   title={title}
   description={description}
-  image="/assets/landing-hero.jpg"
   schemas={[
     buildWebPageSchema({
       site,
       path: '/',
-      name: `${organization.name} | عيادة أسنان وجلدية وليزر`,
+      name: title,
       description,
+      locale: 'ar',
     }),
     buildBreadcrumbSchema(site, [{ name: 'الرئيسية', path: '/' }]),
+    buildFaqSchema(faqItems),
   ]}
 >
   <LandingHero />

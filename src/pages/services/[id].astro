@@ -1,6 +1,7 @@
 ---
 import DoctorCard from '../../components/doctors/DoctorCard.astro';
 import FaqSection from '../../components/sections/FaqSection.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
 import BookingSection from '../../components/services/BookingSection.astro';
 import ServiceDetailContent from '../../components/services/ServiceDetailContent.astro';
 import SectionHeading from '../../components/ui/SectionHeading.astro';
@@ -9,7 +10,6 @@ import { faqItems } from '../../data/faq';
 import { clinicServices, getServiceById } from '../../data/services';
 import {
   buildBreadcrumbSchema,
-  buildFaqSchema,
   buildServiceSchema,
   buildWebPageSchema,
 } from '../../lib/schema';
@@ -29,35 +29,47 @@ if (!service) {
 }
 
 const site = Astro.site!;
+const servicePath = `/services/${service.id}`;
+const mainEntityId = `${new URL(servicePath, site).href}#service`;
+const title = `${service.title} في حفر الباطن | بيوتي كورنر`;
+const description =
+  service.description.length < 140
+    ? `${service.description} احجز في بيوتي كورنر بحفر الباطن.`
+    : service.description;
 const relatedDoctors = doctors.filter((doctor) => doctor.specialty === service.doctorSpecialty).slice(0, 3);
 const doctorsToShow = relatedDoctors.length > 0 ? relatedDoctors : doctors.slice(0, 3);
 ---
 
 <Layout
-  title={service.title}
-  description={service.description}
-  image={service.heroImage}
-  ogType="article"
+  title={title}
+  description={description}
   schemas={[
     buildWebPageSchema({
       site,
-      path: `/services/${service.id}`,
-      name: service.title,
-      description: service.description,
+      path: servicePath,
+      name: title,
+      description,
+      mainEntityId,
     }),
     buildBreadcrumbSchema(site, [
       { name: 'الرئيسية', path: '/' },
       { name: 'الخدمات', path: '/services' },
-      { name: service.title, path: `/services/${service.id}` },
+      { name: service.title, path: servicePath },
     ]),
     buildServiceSchema(site, service),
-    buildFaqSchema(faqItems),
   ]}
 >
+  <Breadcrumbs
+    items={[
+      { name: 'الرئيسية', href: '/' },
+      { name: 'الخدمات', href: '/services' },
+      { name: service.title },
+    ]}
+  />
   <ServiceDetailContent service={service} />
 
   <BookingSection
-    defaultSpecialty={service.doctorSpecialty}
+    defaultDepartment={service.department}
     defaultService={service.title}
   />
 

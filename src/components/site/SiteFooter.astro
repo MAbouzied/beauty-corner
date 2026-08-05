@@ -1,55 +1,162 @@
 ---
+import { clinicLicenses } from '../../data/licenses';
 import { clinicServices } from '../../data/services';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeContact, localizeService, ui } from '../../lib/i18n/localize';
 
-const links = [
-  { label: 'الرئيسية', href: '/' },
-  { label: 'الخدمات', href: '/services' },
-  { label: 'الأطباء', href: '/doctors' },
-  { label: 'تواصل معنا', href: '/contact' },
-] as const;
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
+const contact = localizeContact(locale);
+const currentYear = new Date().getFullYear();
+
+const links = en
+  ? [
+      { label: copy!.nav.home, href: '/en' },
+      { label: copy!.nav.services, href: '/en/services' },
+      { label: copy!.nav.devices, href: '/en#devices' },
+      { label: copy!.nav.doctors, href: '/en/doctors' },
+      { label: copy!.nav.contact, href: '/en/contact' },
+      { label: copy!.nav.quickBook, href: '/en/book' },
+      { label: 'Privacy Policy', href: '/en/privacy' },
+    ]
+  : [
+      { label: 'الرئيسية', href: '/' },
+      { label: 'الخدمات', href: '/services' },
+      { label: 'الأجهزة', href: '/#devices' },
+      { label: 'الأطباء', href: '/doctors' },
+      { label: 'المدونة', href: '/blogs' },
+      { label: 'تواصل معنا', href: '/contact' },
+      { label: 'حجز سريع', href: '/book' },
+      { label: 'سياسة الخصوصية', href: '/privacy' },
+    ];
+
+const footerServices = clinicServices
+  .filter((service) => service.department === 'أسنان')
+  .slice(0, 6)
+  .map((service) => localizeService(service, locale));
+
+const licenseCopy = en
+  ? {
+      title: copy!.common.officialLicenses,
+      commercialRegister: copy!.common.commercialRegister,
+      municipalLicense: copy!.common.municipalLicense,
+      licensedActivity: copy!.common.licensedActivity,
+      viewCr: copy!.common.viewCommercialRegistration,
+      sbcAlt: copy!.common.saudiBusinessCenter,
+      municipality: clinicLicenses.municipalityEn,
+      activity: clinicLicenses.licensedActivityEn,
+    }
+  : {
+      title: 'بيانات الترخيص الرسمية:',
+      commercialRegister: 'السجل التجاري (الرقم الوطني الموحد)',
+      municipalLicense: 'رخصة النشاط البلدية (بلدي)',
+      licensedActivity: 'النشاط المرخّص',
+      viewCr: 'عرض شهادة السجل التجاري',
+      sbcAlt: 'المركز السعودي للأعمال',
+      municipality: clinicLicenses.municipalityAr,
+      activity: clinicLicenses.licensedActivityAr,
+    };
 ---
 
-<footer id="footer" class="border-t border-border bg-surface py-16 sm:py-24" transition:persist="site-footer">
+<footer id="footer" class="border-t border-border bg-surface py-16 sm:py-24">
   <div class="page-container">
     <div class="grid gap-10 border-b border-border pb-14 sm:grid-cols-2 lg:grid-cols-4">
       <section>
-        <a href="/" class="mb-4 flex items-center gap-2" aria-label="بيوتي كورنر - الرئيسية">
-          <img src="/assets/logo.svg" alt="" class="h-[2.625rem] w-[3.125rem]" />
-          <span class="font-bold text-primary">بيوتي كورنر</span>
+        <a href={en ? '/en' : '/'} class="mb-4 flex items-center gap-2" aria-label={en ? 'Beauty Corner - Home' : 'بيوتي كورنر - الرئيسية'}>
+          <img src="/assets/logo.png" alt="" class="h-14 w-auto" />
         </a>
-        <p class="text-sm leading-6 text-muted">عيادة متعددة التخصصات في المملكة العربية السعودية — طب وتجميل الأسنان، الجلدية والتجميل، وخدمات الليزر.</p>
+        <p class="text-sm leading-6 text-muted">
+          {en
+            ? 'Dental and dermatology clinic in Hafr Al-Batin — Al Muhammadiyah, King Faisal Road.'
+            : 'عيادة لطب الأسنان والجلدية في حفر الباطن — حي المحمدية، طريق الملك فيصل.'}
+        </p>
       </section>
       <section>
-        <h2 class="mb-4 text-sm font-bold">روابط مهمة</h2>
+        <h2 class="mb-4 text-sm font-bold">{en ? copy!.common.importantLinks : 'روابط مهمة'}</h2>
         <div class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-2 sm:gap-x-6">
           {links.map((link) => <a href={link.href} class="text-sm text-muted hover:text-primary">{link.label}</a>)}
         </div>
       </section>
       <section>
-        <h2 class="mb-4 text-sm font-bold">الخدمات</h2>
+        <h2 class="mb-4 text-sm font-bold">{en ? copy!.nav.services : 'الخدمات'}</h2>
         <ul class="space-y-2 text-sm text-muted">
-          {clinicServices.map((service) => (
+          {footerServices.map((service) => (
             <li>
-              <a href={`/services/${service.id}`} class="hover:text-primary">{service.title}</a>
+              <a href={en ? `/en/services/${service.id}` : `/services/${service.id}`} class="hover:text-primary">
+                {service.title}
+              </a>
             </li>
           ))}
         </ul>
       </section>
       <section>
-        <h2 class="mb-4 text-sm font-bold">تواصل معنا</h2>
+        <h2 class="mb-4 text-sm font-bold">{en ? copy!.nav.contact : 'تواصل معنا'}</h2>
         <ul class="space-y-2 text-sm text-muted">
-          <li><span dir="ltr">+966 5X XXX XXXX</span></li>
-          <li><a href="mailto:info@beautycorner.sa">info@beautycorner.sa</a></li>
-          <li>[المدينة، المملكة العربية السعودية]</li>
+          <li><span dir="ltr">{contact.phoneDisplay}</span></li>
+          <li data-gtm-location="footer"><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+          <li>{contact.location}</li>
         </ul>
       </section>
     </div>
-    <div class="flex flex-col gap-4 pt-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
-      <p>© 2026 بيوتي كورنر — جميع الحقوق محفوظة.</p>
-      <div class="flex gap-5">
-        <span>سياسة الخصوصية</span>
-        <span>الشروط والأحكام</span>
+
+    <section
+      class="mt-8 rounded-[var(--radius-section)] border border-border bg-surface-soft px-4 py-5 sm:px-6 sm:py-6"
+      aria-labelledby="footer-licenses-heading"
+    >
+      <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+        <div class="min-w-0 flex-1 space-y-2 text-sm leading-7 text-ink">
+          <h2 id="footer-licenses-heading" class="text-sm font-bold text-ink">
+            {licenseCopy.title}
+          </h2>
+          <p>
+            {licenseCopy.commercialRegister}:
+            {' '}
+            <span dir="ltr" class="font-medium tabular-nums">{clinicLicenses.unifiedNationalNumber}</span>
+          </p>
+          <p>
+            {licenseCopy.municipalLicense}:
+            {' '}
+            <span dir="ltr" class="font-medium tabular-nums">{clinicLicenses.municipalLicenseNumber}</span>
+            {' – '}
+            {licenseCopy.municipality}
+          </p>
+          <p>
+            {licenseCopy.licensedActivity}:
+            {' '}
+            {licenseCopy.activity}
+          </p>
+        </div>
+
+        <a
+          href={clinicLicenses.commercialRegistrationCertificate}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex shrink-0 flex-col items-center gap-2 self-center rounded-2xl border border-border bg-surface p-3 transition hover:border-primary/40 hover:shadow-[var(--shadow-card)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:self-start"
+          aria-label={licenseCopy.viewCr}
+        >
+          <img
+            src={clinicLicenses.saudiBusinessCenterLogo}
+            alt={licenseCopy.sbcAlt}
+            width="72"
+            height="70"
+            class="h-16 w-auto sm:h-[4.5rem]"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="max-w-[8rem] text-center text-[0.6875rem] font-bold leading-4 text-muted">
+            {licenseCopy.sbcAlt}
+          </span>
+        </a>
       </div>
+    </section>
+
+    <div class="pt-6 text-xs text-muted">
+      <p>© {currentYear} {en ? 'Beauty Corner — All rights reserved.' : 'بيوتي كورنر — جميع الحقوق محفوظة.'}</p>
     </div>
   </div>
 </footer>

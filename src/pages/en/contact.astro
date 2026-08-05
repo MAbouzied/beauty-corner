@@ -1,0 +1,80 @@
+---
+import BookingSection from '../../components/services/BookingSection.astro';
+import FaqSection from '../../components/sections/FaqSection.astro';
+import SectionHeading from '../../components/ui/SectionHeading.astro';
+import AssetIcon from '../../components/ui/AssetIcon.astro';
+import { buildPhoneUrl, buildWhatsAppUrl } from '../../data/contact';
+import { localizeContact, localizeFaq, ui } from '../../lib/i18n/localize';
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildWebPageSchema,
+} from '../../lib/schema';
+import Layout from '../../layouts/Layout.astro';
+
+const site = Astro.site!;
+const copy = ui('en')!;
+const contact = localizeContact('en');
+const title = copy.pages.contactTitle;
+const description = copy.pages.contactDescription;
+const faqItems = localizeFaq('en');
+const whatsappHref = buildWhatsAppUrl('Hello, I would like to book at Beauty Corner.');
+const phoneHref = buildPhoneUrl();
+---
+
+<Layout
+  title={title}
+  description={description}
+  locale="en"
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: '/en/contact',
+      name: title,
+      description,
+      type: 'ContactPage',
+      locale: 'en',
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: copy.nav.home, path: '/en' },
+      { name: copy.nav.contact, path: '/en/contact' },
+    ]),
+    buildFaqSchema(faqItems),
+  ]}
+>
+  <section class="py-14 sm:py-24">
+    <div class="page-container grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+      <div>
+        <SectionHeading eyebrow={copy.nav.contact} title={copy.home.locationTitle} description={description} level={1} />
+        <ul class="mt-8 space-y-4 text-sm leading-7 text-muted">
+          <li class="flex items-start gap-3">
+            <AssetIcon src="/assets/location.svg" size="sm" class="mt-1 shrink-0" />
+            <span>{contact.location}</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <AssetIcon src="/assets/clock.svg" size="sm" class="mt-1 shrink-0" />
+            <span>{contact.hours}</span>
+          </li>
+          <li class="flex items-start gap-3" data-gtm-location="contact_page">
+            <AssetIcon src="/assets/phone.svg" size="sm" class="mt-1 shrink-0" />
+            <a href={phoneHref} dir="ltr" class="hover:text-primary">{contact.phoneDisplay}</a>
+          </li>
+        </ul>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row" data-gtm-location="contact_page">
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-success/40 bg-success-soft px-5 text-sm font-bold text-success">
+            {copy.common.whatsapp}
+            <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+          </a>
+          <a href={phoneHref} class="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-primary/30 bg-surface-accent px-5 text-sm font-bold text-primary">
+            {copy.common.call}
+            <AssetIcon src="/assets/phone.svg" size="sm" />
+          </a>
+        </div>
+      </div>
+      <img src="/assets/landing-clinic-gallery.jpg" alt="Beauty Corner clinic" class="aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)]" />
+    </div>
+  </section>
+
+  <BookingSection locale="en" />
+  <FaqSection items={faqItems} locale="en" />
+</Layout>

@@ -1,0 +1,49 @@
+---
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeDevices, ui } from '../../lib/i18n/localize';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const devices = localizeDevices(locale);
+const en = isEnglish(locale);
+const copy = ui(locale);
+---
+
+<section id="devices" class="border-b border-border bg-surface-soft py-12 sm:py-24" aria-labelledby="devices-heading">
+  <div class="page-container">
+    <div id="devices-heading">
+      <SectionHeading
+        eyebrow={en ? copy!.home.devicesEyebrow : 'أجهزتنا'}
+        title={en ? copy!.home.devicesSectionTitle : 'أجهزة وتقنيات داخل العيادة'}
+        description={en
+          ? copy!.home.devicesSectionText
+          : 'تعرف على أبرز الأجهزة المستخدمة في عيادة بيوتي كورنر لتقديم رعاية أدق وأكثر راحة.'}
+      />
+    </div>
+    <ul class="mt-8 grid list-none gap-4 p-0 sm:mt-10 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {devices.map((device) => (
+        <li>
+          <article class="h-full overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]">
+            <img
+              src={device.image}
+              alt={device.imageAlt}
+              width="640"
+              height="480"
+              class="aspect-[4/3] w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="p-5 sm:p-6">
+              <h3 class="text-lg font-bold tracking-tight text-balance text-ink">{device.name}</h3>
+              <p class="mt-2 text-sm leading-6 text-pretty text-muted">{device.description}</p>
+            </div>
+          </article>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

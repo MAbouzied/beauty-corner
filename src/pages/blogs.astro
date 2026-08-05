@@ -1,0 +1,71 @@
+---
+export const prerender = false;
+
+import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
+import BookingSection from '../components/services/BookingSection.astro';
+import Layout from '../layouts/Layout.astro';
+import {
+  buildBlogCollectionSchemas,
+} from '../lib/schema';
+import BlogListing from '../modules/blog/components/BlogListing.astro';
+import {
+  BLOG_PAGE_SIZE,
+  DEFAULT_BLOG_LISTING_LABELS,
+  paginatePosts,
+  selectListing,
+} from '../modules/blog';
+import { getBlogRepository } from '../modules/blog/repository/get-blog-repository';
+import {
+  BLOG_CACHE_MAX_AGE_SECONDS,
+  BLOG_CACHE_SWR_SECONDS,
+  blogListingCacheTags,
+} from '../modules/blog/cache';
+
+const repository = getBlogRepository();
+const posts = await repository.getPublishedPosts();
+if (Astro.cache.enabled) {
+  Astro.cache.set({
+    maxAge: BLOG_CACHE_MAX_AGE_SECONDS,
+    swr: BLOG_CACHE_SWR_SECONDS,
+    tags: blogListingCacheTags(),
+  });
+}
+const listing = selectListing(posts);
+const recentPage = paginatePosts(listing.recent, 1, BLOG_PAGE_SIZE);
+const totalPages = recentPage?.totalPages ?? 1;
+
+const site = Astro.site!;
+const title = 'مدونة بيوتي كورنر | مقالات عن الأسنان والجلدية في حفر الباطن';
+const description =
+  'مقالات عربية من عيادة بيوتي كورنر في حفر الباطن حول طب الأسنان والجلدية والليزر والعناية الوقائية، مع مسار واضح لحجز موعد.';
+const labels = DEFAULT_BLOG_LISTING_LABELS;
+---
+
+<Layout
+  title={title}
+  description={description}
+  schemas={buildBlogCollectionSchemas({
+    site,
+    path: '/blogs',
+    name: title,
+    description,
+    posts: listing.allPublished,
+  })}
+>
+  <Breadcrumbs
+    items={[
+      { name: 'الرئيسية', href: '/' },
+      { name: 'المدونة' },
+    ]}
+  />
+  <BlogListing
+    featured={listing.featured}
+    recent={recentPage?.items ?? []}
+    totalPublished={listing.allPublished.length}
+    page={1}
+    totalPages={totalPages}
+    labels={labels}
+  >
+    <BookingSection slot="cta" />
+  </BlogListing>
+</Layout>

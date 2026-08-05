@@ -6,18 +6,16 @@ export const organization = {
   alternateName: 'Beauty Corner',
   legalName: 'بيوتي كورنر',
   description:
-    'عيادة متعددة التخصصات في المملكة العربية السعودية — طب وتجميل الأسنان، الجلدية والتجميل، وخدمات الليزر.',
+    'عيادة لطب الأسنان والجلدية في حفر الباطن — حي المحمدية، طريق الملك فيصل.',
   email: clinicContact.email,
   telephone: `+${clinicContact.whatsappNumber}`,
   whatsappUrl: `https://wa.me/${clinicContact.whatsappNumber}`,
-  logoPath: '/assets/logo.svg',
+  logoPath: '/assets/logo.png',
   imagePath: '/assets/landing-hero.jpg',
   addressCountry: 'SA',
-  addressRegion: 'المملكة العربية السعودية',
-  addressLocality: clinicContact.location.includes('[')
-    ? 'المملكة العربية السعودية'
-    : clinicContact.location,
-  streetAddress: clinicContact.location.includes('[') ? undefined : clinicContact.location,
+  addressRegion: 'المنطقة الشرقية',
+  addressLocality: clinicContact.city,
+  streetAddress: `${clinicContact.district}، ${clinicContact.street}`,
   openingHours: {
     days: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'] as const,
     opens: '10:00',

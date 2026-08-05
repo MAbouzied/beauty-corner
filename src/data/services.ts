@@ -1,6 +1,10 @@
 import type { Specialty } from './doctors';
 
-export const serviceCategories = ['كل الخدمات', 'الأسنان', 'الجلدية', 'الليزر'] as const;
+export const serviceDepartments = ['كل الخدمات', 'أسنان', 'جلدية'] as const;
+
+export type ServiceDepartment = (typeof serviceDepartments)[number];
+
+export const serviceCategories = ['كل الخدمات', 'تجميل', 'علاج وجراحة', 'تركيبات وتشخيص'] as const;
 
 export type ServiceCategory = (typeof serviceCategories)[number];
 
@@ -16,6 +20,7 @@ export interface ClinicService {
   title: string;
   description: string;
   category: Exclude<ServiceCategory, 'كل الخدمات'>;
+  department: Exclude<ServiceDepartment, 'كل الخدمات'>;
   icon: string;
   heroImage: string;
   heroImageAlt: string;
@@ -23,102 +28,343 @@ export interface ClinicService {
   sections: readonly ServiceDetailSection[];
 }
 
+const dentalHero = '/assets/service-detail-dentistry.jpg';
+const dentalHeroAlt = 'غرفة علاج أسنان حديثة داخل عيادة بيوتي كورنر';
+const dentistrySpecialty = 'طب وتجميل الأسنان' as const;
+
 export const clinicServices: readonly ClinicService[] = [
   {
-    id: 'dentistry',
-    title: 'طب وتجميل الأسنان',
-    description: 'خطط علاجية شاملة للحفاظ على صحة أسنانك وابتسامتك.',
-    category: 'الأسنان',
-    icon: '/assets/service-dentistry.svg',
-    heroImage: '/assets/service-detail-dentistry.jpg',
-    heroImageAlt: 'غرفة علاج أسنان حديثة داخل عيادة بيوتي كورنر',
-    doctorSpecialty: 'طب وتجميل الأسنان',
+    id: 'dental-implants',
+    title: 'زراعة الأسنان',
+    description: 'استعادة الأسنان المفقودة بزراعة آمنة ومظهر طبيعي.',
+    category: 'علاج وجراحة',
+    department: 'أسنان',
+    icon: '/assets/service-implants.svg',
+    heroImage: dentalHero,
+    heroImageAlt: dentalHeroAlt,
+    doctorSpecialty: dentistrySpecialty,
     sections: [
       {
-        title: 'طب أسنان الأطفال',
+        title: 'ما هي زراعة الأسنان؟',
         paragraphs: [
-          'في بيوتي كورنر نوفر تجربة مريحة أثناء علاج الأسنان داخل بيئة هادئة وبرعاية متكاملة. نحرص على بناء الثقة مع المرضى عبر التثقيف الصحي والوضوح في الخطة العلاجية قبل البدء.',
+          'زراعة الأسنان حل دائم لتعويض الأسنان المفقودة، يعتمد على تقييم دقيق لعظم الفك ثم وضع غرسة تتوافق مع ابتسامتك وعضّتك.',
         ],
       },
       {
-        title: 'علاجات الأسنان والتجميل',
-        paragraphs: [
-          'نغطي احتياجاتك من الفحص والتنظيف إلى التبييض والتقويم والتجميل، مع تقييم طبي يحدد الأولويات ويحافظ على صحة الفم واللثة على المدى الطويل.',
-        ],
-      },
-      {
-        title: 'ما الذي يميز زيارة الأسنان لدينا؟',
-        listIntro: 'نركز على راحة المريض ووضوح الخطوات من أول استشارة حتى المتابعة:',
+        title: 'خطوات العلاج',
+        listIntro: 'نسير معك بخطوات واضحة من التقييم حتى النتيجة النهائية:',
         listItems: [
-          'تقييم شامل للفم والأسنان قبل اقتراح أي إجراء.',
-          'شرح واضح للخطة والخيارات المتاحة بما يناسب حالتك.',
-          'متابعة بعد الجلسة للاطمئنان على النتائج والتعافي.',
+          'فحص وأشعة لتحديد جاهزية عظم الفك.',
+          'وضع الغرسة وفق خطة علاجية مخصصة.',
+          'تركيب التاج النهائي ومتابعة الالتئام.',
         ],
       },
     ],
   },
   {
-    id: 'dermatology',
-    title: 'الجلدية والتجميل',
-    description: 'تشخيص وعلاج مشكلات البشرة بإجراءات طبية دقيقة.',
-    category: 'الجلدية',
+    id: 'dental-prosthetics',
+    title: 'تركيبات الأسنان',
+    description: 'تيجان وجسور وتركيبات تعيد الوظيفة والمظهر الطبيعي.',
+    category: 'تركيبات وتشخيص',
+    department: 'أسنان',
+    icon: '/assets/service-prosthetics.svg',
+    heroImage: '/assets/landing-clinic-gallery.jpg',
+    heroImageAlt: dentalHeroAlt,
+    doctorSpecialty: dentistrySpecialty,
+    sections: [
+      {
+        title: 'تركيبات تناسب حالتك',
+        paragraphs: [
+          'نقدم تيجانًا وجسورًا وتركيبات ثابتة أو متحركة بعد تقييم دقيق لحالة الأسنان واللثة، مع الحرص على الراحة والمظهر الطبيعي.',
+        ],
+      },
+      {
+        title: 'متى تحتاج إلى تركيبات؟',
+        listItems: [
+          'تعويض سن مفقود أو متضرر بشدة.',
+          'حماية الأسنان بعد علاج العصب.',
+          'تحسين شكل الابتسامة ووظيفة المضغ.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'teeth-whitening',
+    title: 'تبييض الأسنان',
+    description: 'تبييض طبي آمن لتفتيح لون الأسنان بإشراف مختص.',
+    category: 'تجميل',
+    department: 'أسنان',
+    icon: '/assets/service-whitening.svg',
+    heroImage: '/assets/landing-blog-dental.jpg',
+    heroImageAlt: dentalHeroAlt,
+    doctorSpecialty: dentistrySpecialty,
+    sections: [
+      {
+        title: 'ابتسامة أكثر إشراقًا',
+        paragraphs: [
+          'جلسات التبييض لدينا تتم بتقييم لون الأسنان وصحة اللثة أولاً، ثم اختيار الطريقة المناسبة للحصول على نتيجة طبيعية وآمنة.',
+        ],
+      },
+      {
+        title: 'قبل التبييض',
+        listItems: [
+          'فحص الأسنان واللثة للتأكد من جاهزيتها.',
+          'تحديد درجة التبييض المناسبة لحالتك.',
+          'إرشادات للعناية بعد الجلسة للحفاظ على النتيجة.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'cleaning-polishing',
+    title: 'تنظيف وتلميع الأسنان',
+    description: 'إزالة الجير والبقع والحفاظ على صحة الفم واللثة.',
+    category: 'تجميل',
+    department: 'أسنان',
+    icon: '/assets/service-cleaning.svg',
+    heroImage: '/assets/landing-waiting-area.jpg',
+    heroImageAlt: dentalHeroAlt,
+    doctorSpecialty: dentistrySpecialty,
+    sections: [
+      {
+        title: 'عناية وقائية أساسية',
+        paragraphs: [
+          'تنظيف وتلميع الأسنان يزيل الجير والتصبغات السطحية ويساعد على الوقاية من التهاب اللثة وتسوس الأسنان.',
+        ],
+      },
+      {
+        title: 'ماذا تشمل الجلسة؟',
+        listItems: [
+          'إزالة الجير والترسبات.',
+          'تلميع سطح الأسنان.',
+          'نصائح للعناية اليومية بالمنزل.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'tooth-extraction',
+    title: 'الخلع (جراحي وعادي)',
+    description: 'خلع آمن للأسنان مع تقييم مسبق وخطة تعافٍ واضحة.',
+    category: 'علاج وجراحة',
+    department: 'أسنان',
+    icon: '/assets/service-extraction.svg',
+    heroImage: dentalHero,
+    heroImageAlt: dentalHeroAlt,
+    doctorSpecialty: dentistrySpecialty,
+    sections: [
+      {
+        title: 'خلع عادي أو جراحي حسب الحالة',
+        paragraphs: [
+          'نحدد نوع الخلع بعد الفحص والأشعة، مع شرح الخطوات وتعليمات ما بعد الخلع لضمان تعافٍ مريح وآمن.',
+        ],
+      },
+      {
+        title: 'بعد الخلع',
+        listItems: [
+          'تعليمات واضحة للعناية بالجرح.',
+          'متابعة عند الحاجة للاطمئنان على الالتئام.',
+          'خيارات لتعويض السن عند مناسبة الحالة.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'root-canal',
+    title: 'حشوات العصب',
+    description: 'علاج عصب دقيق لإنقاذ السن وتخفيف الألم.',
+    category: 'علاج وجراحة',
+    department: 'أسنان',
+    icon: '/assets/service-root-canal.svg',
+    heroImage: '/assets/landing-hero.jpg',
+    heroImageAlt: dentalHeroAlt,
+    doctorSpecialty: dentistrySpecialty,
+    sections: [
+      {
+        title: 'علاج العصب بأمان',
+        paragraphs: [
+          'حشوة العصب تهدف إلى إزالة الالتهاب والحفاظ على السن، مع تخدير مناسب وخطة ترميم بعد العلاج.',
+        ],
+      },
+      {
+        title: 'علامات قد تستدعي علاج العصب',
+        listItems: [
+          'ألم مستمر أو حساسية شديدة.',
+          'تورم أو التهاب حول السن.',
+          'تسوس عميق وصل إلى العصب.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'cosmetic-fillings',
+    title: 'الحشوات التجميلية',
+    description: 'حشوات بلون الأسنان لعلاج التسوس بمظهر طبيعي.',
+    category: 'تجميل',
+    department: 'أسنان',
+    icon: '/assets/service-fillings.svg',
+    heroImage: '/assets/landing-blog-dental.jpg',
+    heroImageAlt: dentalHeroAlt,
+    doctorSpecialty: dentistrySpecialty,
+    sections: [
+      {
+        title: 'ترميم بمظهر طبيعي',
+        paragraphs: [
+          'الحشوات التجميلية تعالج التسوس أو الكسور الصغيرة مع مطابقة لون السن، للحفاظ على الوظيفة والمظهر معًا.',
+        ],
+      },
+      {
+        title: 'مميزات الحشوة التجميلية',
+        listItems: [
+          'لون قريب من لون الأسنان الطبيعية.',
+          'ترميم محافظ يبقي أكبر قدر من بنية السن.',
+          'نتيجة فورية في جلسة واحدة غالبًا.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'gum-contouring',
+    title: 'قص اللثة (جراحي وليزر)',
+    description: 'إعادة تشكيل خط اللثة جراحيًا أو بالليزر لمظهر متناسق.',
+    category: 'علاج وجراحة',
+    department: 'أسنان',
+    icon: '/assets/service-gum-contour.svg',
+    heroImage: '/assets/landing-blog-laser.jpg',
+    heroImageAlt: dentalHeroAlt,
+    doctorSpecialty: dentistrySpecialty,
+    sections: [
+      {
+        title: 'خط لثة أكثر تناسقًا',
+        paragraphs: [
+          'قص اللثة يساعد على تحسين مظهر الابتسامة وعلاج بعض مشكلات اللثة، ويُختار الأسلوب الجراحي أو الليزري حسب تقييم الطبيب.',
+        ],
+      },
+      {
+        title: 'قبل الإجراء',
+        listItems: [
+          'تقييم صحة اللثة وخط الابتسامة.',
+          'اختيار التقنية الأنسب لحالتك.',
+          'شرح التوقعات وتعليمات ما بعد الجلسة.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'gum-depigmentation',
+    title: 'توريد اللثة بالليزر',
+    description: 'تفتيح لون اللثة الداكنة بتقنية ليزر طبية.',
+    category: 'تجميل',
+    department: 'أسنان',
+    icon: '/assets/service-gum-laser.svg',
+    heroImage: '/assets/landing-blog-laser.jpg',
+    heroImageAlt: dentalHeroAlt,
+    doctorSpecialty: dentistrySpecialty,
+    sections: [
+      {
+        title: 'لثة بمظهر وردي طبيعي',
+        paragraphs: [
+          'توريد اللثة بالليزر يستهدف التصبغات الداكنة لتحسين مظهر الابتسامة، بعد تقييم سبب التصبغ ومدى ملاءمة الحالة للإجراء.',
+        ],
+      },
+      {
+        title: 'ما تتوقعه',
+        listItems: [
+          'جلسة تقييم لتحديد سبب التصبغ.',
+          'إجراء ليزري مضبوط وفق حالة اللثة.',
+          'إرشادات للعناية خلال فترة التعافي.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dental-xray-3d',
+    title: 'أشعة الأسنان 3D',
+    description: 'تصوير ثلاثي الأبعاد لتشخيص أدق وخطط علاجية أوضح.',
+    category: 'تركيبات وتشخيص',
+    department: 'أسنان',
+    icon: '/assets/service-xray-3d.svg',
+    heroImage: '/assets/landing-clinic-gallery.jpg',
+    heroImageAlt: dentalHeroAlt,
+    doctorSpecialty: dentistrySpecialty,
+    sections: [
+      {
+        title: 'تشخيص أوضح بتقنية ثلاثية الأبعاد',
+        paragraphs: [
+          'أشعة الأسنان ثلاثية الأبعاد تساعد على تقييم العظم والجذور ومواقع الزراعة بدقة أعلى قبل بدء الخطة العلاجية.',
+        ],
+      },
+      {
+        title: 'متى تُطلب أشعة 3D؟',
+        listItems: [
+          'قبل زراعة الأسنان.',
+          'في حالات الجراحة أو الخلع المعقد.',
+          'عند الحاجة لتقييم تفصيلي لبنية الفك والأسنان.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'acne-treatment',
+    title: 'علاج حب الشباب وآثاره',
+    description: 'تشخيص وعلاج حب الشباب والندبات بخطط طبية مخصصة.',
+    category: 'تجميل',
+    department: 'جلدية',
     icon: '/assets/service-dermatology.svg',
     heroImage: '/assets/landing-blog-skin.jpg',
-    heroImageAlt: 'مساحة هادئة للعناية بالبشرة داخل عيادة بيوتي كورنر',
+    heroImageAlt: 'عناية بالبشرة داخل عيادة بيوتي كورنر',
     doctorSpecialty: 'الأمراض الجلدية والتجميل',
     sections: [
       {
-        title: 'تقييم البشرة أولاً',
+        title: 'علاج مخصص لنوع بشرتك',
         paragraphs: [
-          'نبدأ بفحص نوع البشرة وتحديد سبب المشكلة قبل اختيار العلاج. سواء كانت حب الشباب أو التصبغات أو الجفاف، تُبنى الخطة وفق حالتك وليس وفق حلول عامة.',
+          'نبدأ بتقييم نوع البشرة وسبب حب الشباب قبل بناء خطة علاجية تدريجية تناسب حالتك.',
         ],
       },
       {
-        title: 'علاجات تجميلية غير جراحية',
-        paragraphs: [
-          'نقدم إجراءات تجميلية طبية تهدف إلى توحيد لون البشرة وتحسين مظهرها مع الحفاظ على مظهر طبيعي، تحت إشراف مختصين وببروتوكولات آمنة.',
-        ],
-      },
-      {
-        title: 'متى تحتاج إلى استشارة جلدية؟',
-        listIntro: 'ننصح بمراجعة الطبيب عند ملاحظة أي من التالي:',
+        title: 'ما يشمله العلاج',
         listItems: [
-          'حب الشباب المتكرر أو الندبات الناتجة عنه.',
-          'تصبغات أو تفاوت واضح في لون البشرة.',
-          'حساسية مزمنة أو تغيّر مفاجئ في ملمس البشرة.',
+          'تقييم طبي دقيق للبشرة.',
+          'خطة علاجية مرحلية.',
+          'متابعة النتائج وتعديل الخطة عند الحاجة.',
         ],
       },
     ],
   },
   {
-    id: 'laser',
-    title: 'خدمات الليزر',
-    description: 'جلسات ليزر مخصصة بعد تقييم دقيق لنوع البشرة والشعر.',
-    category: 'الليزر',
-    icon: '/assets/service-laser.svg',
-    heroImage: '/assets/landing-blog-laser.jpg',
-    heroImageAlt: 'جهاز ليزر طبي داخل عيادة بيوتي كورنر',
-    doctorSpecialty: 'خدمات الليزر',
+    id: 'pigmentation',
+    title: 'التصبغات وتوحيد لون البشرة',
+    description: 'علاجات طبية لتفتيح التصبغات وتوحيد لون البشرة.',
+    category: 'تجميل',
+    department: 'جلدية',
+    icon: '/assets/service-dermatology.svg',
+    heroImage: '/assets/landing-blog-skin.jpg',
+    heroImageAlt: 'جلسة عناية بالتصبغات داخل العيادة',
+    doctorSpecialty: 'الأمراض الجلدية والتجميل',
     sections: [
       {
-        title: 'ليزر بمقاييس طبية',
+        title: 'توحيد لون البشرة بأمان',
         paragraphs: [
-          'جلسات الليزر لدينا تبدأ بتقييم نوع البشرة والشعر لتحديد الجهاز والإعدادات المناسبة. الهدف نتائج آمنة ومستقرة مع أقل قدر من التهيج.',
+          'نحدد سبب التصبغ أولاً ثم نختار الإجراء الأنسب للحصول على نتيجة طبيعية وآمنة.',
         ],
       },
+    ],
+  },
+  {
+    id: 'non-surgical-aesthetics',
+    title: 'الإجراءات التجميلية غير الجراحية',
+    description: 'إجراءات تجميلية طبية لتحسين مظهر البشرة دون جراحة.',
+    category: 'تجميل',
+    department: 'جلدية',
+    icon: '/assets/service-dermatology.svg',
+    heroImage: '/assets/landing-blog-skin.jpg',
+    heroImageAlt: 'إجراءات تجميلية غير جراحية داخل العيادة',
+    doctorSpecialty: 'الأمراض الجلدية والتجميل',
+    sections: [
       {
-        title: 'خطة جلسات واضحة',
+        title: 'تجميل طبي بمظهر طبيعي',
         paragraphs: [
-          'نحدد عدد الجلسات المتوقع والفواصل الزمنية بينها بناءً على استجابة بشرتك، مع متابعة مستمرة لتعديل الخطة عند الحاجة.',
-        ],
-      },
-      {
-        title: 'قبل جلسة الليزر',
-        listIntro: 'لنتائج أفضل وأكثر أماناً، التزم بهذه الإرشادات الأساسية:',
-        listItems: [
-          'تجنّب التعرض المباشر للشمس والترطيب الزائد قبل الجلسة حسب تعليمات الطبيب.',
-          'أخبر الفريق بأي أدوية أو إجراءات تجميلية حديثة.',
-          'التزم بمواعيد المتابعة لتقييم الاستجابة وضبط الخطة.',
+          'نقدم إجراءات غير جراحية بعد تقييم البشرة، مع شرح التوقعات وخطوات العناية بعدها.',
         ],
       },
     ],

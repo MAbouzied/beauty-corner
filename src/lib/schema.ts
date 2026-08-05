@@ -1,40 +1,94 @@
 import type { Doctor } from '../data/doctors';
 import type { FaqItem } from '../data/faq';
+import { clinicLicenses } from '../data/licenses';
 import { organization } from '../data/organization';
+import { clinicGeo, clinicMapUrl } from '../data/seo';
 import type { ClinicService } from '../data/services';
+import {
+  localizeCategory,
+  localizeDoctorService,
+  localizeServices,
+  localizeSpecialty,
+  localizedPath,
+  schemaLanguage,
+  type Locale,
+} from './i18n/localize';
+
+export {
+  buildBlogCollectionSchemas,
+  buildBlogPostingSchema,
+  buildCollectionPageSchema,
+  serializeJsonLd,
+} from '../modules/blog/lib/blog-jsonld';
 
 type JsonLd = Record<string, unknown>;
 
 const absoluteUrl = (site: URL, path = '/'): string => new URL(path, site).href;
 
+const AVAILABLE_LANGUAGES = ['ar', 'en'] as const;
+
+/** Stable across locales — do not localize these IDs. */
 export const organizationId = (site: URL): string => `${site.origin}/#organization`;
 export const websiteId = (site: URL): string => `${site.origin}/#website`;
 
-export function buildOrganizationSchema(site: URL): JsonLd {
+export function buildOrganizationSchema(site: URL, locale: Locale = 'ar'): JsonLd {
+  const isEnglish = locale === 'en';
   const address: JsonLd = {
     '@type': 'PostalAddress',
     addressCountry: organization.addressCountry,
-    addressRegion: organization.addressRegion,
-    addressLocality: organization.addressLocality,
+    addressRegion: isEnglish ? 'Eastern Province' : organization.addressRegion,
+    addressLocality: isEnglish ? 'Hafr Al-Batin' : organization.addressLocality,
   };
 
   if (organization.streetAddress) {
-    address.streetAddress = organization.streetAddress;
+    address.streetAddress = isEnglish
+      ? 'Al Muhammadiyah, King Faisal Road'
+      : organization.streetAddress;
   }
+
+  const description = isEnglish
+    ? 'Dental and dermatology clinic in Hafr Al-Batin — Al Muhammadiyah district, King Faisal Road.'
+    : organization.description;
+
+  const catalogName = isEnglish ? 'Beauty Corner services' : 'خدمات بيوتي كورنر';
+  const catalogServices = localizeServices(locale);
 
   return {
     '@type': 'MedicalClinic',
     '@id': organizationId(site),
-    name: organization.name,
-    alternateName: organization.alternateName,
+    name: isEnglish ? organization.alternateName : organization.name,
+    alternateName: isEnglish ? organization.name : organization.alternateName,
     legalName: organization.legalName,
-    description: organization.description,
-    url: site.origin,
+    description,
+    url: absoluteUrl(site, '/'),
     logo: absoluteUrl(site, organization.logoPath),
     image: absoluteUrl(site, organization.imagePath),
     email: organization.email,
     telephone: organization.telephone,
     address,
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: clinicGeo.latitude,
+      longitude: clinicGeo.longitude,
+    },
+    hasMap: clinicMapUrl,
+    identifier: [
+      {
+        '@type': 'PropertyValue',
+        name: 'Unified National Number',
+        value: clinicLicenses.unifiedNationalNumber,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Commercial Registration Number',
+        value: clinicLicenses.commercialRegistrationNumber,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Municipal License Number',
+        value: clinicLicenses.municipalLicenseNumber,
+      },
+    ],
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
@@ -44,34 +98,34 @@ export function buildOrganizationSchema(site: URL): JsonLd {
       },
     ],
     medicalSpecialty: [...organization.medicalSpecialties],
-    availableLanguage: ['ar'],
+    availableLanguage: [...AVAILABLE_LANGUAGES],
     contactPoint: [
       {
         '@type': 'ContactPoint',
         contactType: 'customer service',
         telephone: organization.telephone,
         email: organization.email,
-        availableLanguage: ['ar'],
+        availableLanguage: [...AVAILABLE_LANGUAGES],
         url: organization.whatsappUrl,
       },
       {
         '@type': 'ContactPoint',
         contactType: 'reservations',
         telephone: organization.telephone,
-        availableLanguage: ['ar'],
-        url: absoluteUrl(site, '/contact'),
+        availableLanguage: [...AVAILABLE_LANGUAGES],
+        url: absoluteUrl(site, localizedPath('/book', locale)),
       },
     ],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
-      name: 'خدمات بيوتي كورنر',
-      itemListElement: organization.serviceCatalog.map((service, index) => ({
+      name: catalogName,
+      itemListElement: catalogServices.map((service, index) => ({
         '@type': 'Offer',
         itemOffered: {
           '@type': 'Service',
-          name: service.name,
+          name: service.title,
           description: service.description,
-          url: absoluteUrl(site, `/services/${service.id}`),
+          url: absoluteUrl(site, localizedPath(`/services/${service.id}`, locale)),
         },
         position: index + 1,
       })),
@@ -79,15 +133,18 @@ export function buildOrganizationSchema(site: URL): JsonLd {
   };
 }
 
-export function buildWebsiteSchema(site: URL): JsonLd {
+export function buildWebsiteSchema(site: URL, locale: Locale = 'ar'): JsonLd {
+  const isEnglish = locale === 'en';
   return {
     '@type': 'WebSite',
     '@id': websiteId(site),
-    url: site.origin,
-    name: organization.name,
-    alternateName: organization.alternateName,
-    description: organization.description,
-    inLanguage: 'ar',
+    url: absoluteUrl(site, '/'),
+    name: isEnglish ? organization.alternateName : organization.name,
+    alternateName: isEnglish ? organization.name : organization.alternateName,
+    description: isEnglish
+      ? 'Dental and dermatology clinic in Hafr Al-Batin — Al Muhammadiyah district, King Faisal Road.'
+      : organization.description,
+    inLanguage: [...AVAILABLE_LANGUAGES],
     publisher: { '@id': organizationId(site) },
   };
 }
@@ -98,19 +155,28 @@ export function buildWebPageSchema(options: {
   name: string;
   description: string;
   type?: string;
+  locale?: Locale;
+  mainEntityId?: string;
 }): JsonLd {
+  const locale = options.locale ?? 'ar';
   const url = absoluteUrl(options.site, options.path);
-  return {
+  const schema: JsonLd = {
     '@type': options.type ?? 'WebPage',
     '@id': `${url}#webpage`,
     url,
     name: options.name,
     description: options.description,
-    inLanguage: 'ar',
+    inLanguage: schemaLanguage(locale),
     isPartOf: { '@id': websiteId(options.site) },
     about: { '@id': organizationId(options.site) },
     provider: { '@id': organizationId(options.site) },
   };
+
+  if (options.mainEntityId) {
+    schema.mainEntity = { '@id': options.mainEntityId };
+  }
+
+  return schema;
 }
 
 export function buildBreadcrumbSchema(
@@ -142,8 +208,14 @@ export function buildFaqSchema(items: readonly FaqItem[]): JsonLd {
   };
 }
 
-export function buildServiceSchema(site: URL, service: ClinicService): JsonLd {
-  const url = absoluteUrl(site, `/services/${service.id}`);
+export function buildServiceSchema(
+  site: URL,
+  service: ClinicService,
+  locale: Locale = 'ar',
+): JsonLd {
+  const path = localizedPath(`/services/${service.id}`, locale);
+  const url = absoluteUrl(site, path);
+  const bookingPath = localizedPath('/book', locale);
   return {
     '@type': 'Service',
     '@id': `${url}#service`,
@@ -151,27 +223,34 @@ export function buildServiceSchema(site: URL, service: ClinicService): JsonLd {
     description: service.description,
     url,
     image: absoluteUrl(site, service.heroImage),
-    serviceType: service.category,
-    category: service.doctorSpecialty,
+    serviceType: localizeCategory(service.category, locale),
+    category: localizeSpecialty(service.doctorSpecialty, locale),
     provider: { '@id': organizationId(site) },
     areaServed: {
-      '@type': 'Country',
-      name: 'Saudi Arabia',
+      '@type': 'City',
+      name: locale === 'en' ? 'Hafr Al-Batin' : 'حفر الباطن',
     },
     availableChannel: {
       '@type': 'ServiceChannel',
-      serviceUrl: absoluteUrl(site, '/contact'),
+      serviceUrl: absoluteUrl(site, bookingPath),
       servicePhone: {
         '@type': 'ContactPoint',
         telephone: organization.telephone,
         contactType: 'reservations',
+        availableLanguage: [...AVAILABLE_LANGUAGES],
       },
     },
   };
 }
 
-export function buildPhysicianSchema(site: URL, doctor: Doctor): JsonLd {
-  const url = absoluteUrl(site, `/doctors/${doctor.id}`);
+export function buildPhysicianSchema(
+  site: URL,
+  doctor: Doctor & { specialtyLabel?: string },
+  locale: Locale = 'ar',
+): JsonLd {
+  const path = localizedPath(`/doctors/${doctor.id}`, locale);
+  const url = absoluteUrl(site, path);
+  const specialtyLabel = doctor.specialtyLabel ?? localizeSpecialty(doctor.specialty, locale);
   return {
     '@type': 'Physician',
     '@id': `${url}#physician`,
@@ -180,16 +259,16 @@ export function buildPhysicianSchema(site: URL, doctor: Doctor): JsonLd {
     url,
     image: absoluteUrl(site, doctor.image),
     jobTitle: doctor.title,
-    medicalSpecialty: doctor.specialty,
+    medicalSpecialty: specialtyLabel,
     worksFor: { '@id': organizationId(site) },
     hospitalAffiliation: { '@id': organizationId(site) },
     knowsAbout: [
-      doctor.specialty,
+      specialtyLabel,
       ...doctor.sections.flatMap((section) => section.listItems ?? []),
     ],
     availableService: doctor.services.map((serviceName) => ({
       '@type': 'MedicalProcedure',
-      name: serviceName,
+      name: localizeDoctorService(serviceName, locale),
     })),
     additionalProperty: {
       '@type': 'PropertyValue',
@@ -230,9 +309,13 @@ export function buildItemListSchema(options: {
   };
 }
 
-export function buildGraph(site: URL, nodes: JsonLd[]): JsonLd {
+export function buildGraph(site: URL, nodes: JsonLd[], locale: Locale = 'ar'): JsonLd {
   return {
     '@context': 'https://schema.org',
-    '@graph': [buildOrganizationSchema(site), buildWebsiteSchema(site), ...nodes],
+    '@graph': [
+      buildOrganizationSchema(site, locale),
+      buildWebsiteSchema(site, locale),
+      ...nodes,
+    ],
   };
 }

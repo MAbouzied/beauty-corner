@@ -6,10 +6,9 @@ import ServiceCard from '../components/services/ServiceCard.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
 import { doctors } from '../data/doctors';
 import { faqItems } from '../data/faq';
-import { clinicServices, serviceCategories } from '../data/services';
+import { clinicServices, serviceDepartments } from '../data/services';
 import {
   buildBreadcrumbSchema,
-  buildFaqSchema,
   buildItemListSchema,
   buildWebPageSchema,
 } from '../lib/schema';
@@ -17,8 +16,9 @@ import Layout from '../layouts/Layout.astro';
 
 const featuredDoctors = doctors.slice(0, 3);
 const site = Astro.site!;
-const title = 'الخدمات';
-const description = 'تصفح خدمات بيوتي كورنر في طب وتجميل الأسنان، الجلدية، والليزر واحجز موعدك.';
+const title = 'خدمات الأسنان والجلدية في حفر الباطن | بيوتي كورنر';
+const description =
+  'تصفح خدمات طب الأسنان والجلدية في عيادة بيوتي كورنر بحفر الباطن واحجز موعدك مع فريق متخصص.';
 ---
 
 <Layout
@@ -43,15 +43,14 @@ const description = 'تصفح خدمات بيوتي كورنر في طب وتج�
         image: service.heroImage,
       })),
     }),
-    buildFaqSchema(faqItems),
   ]}
 >
   <section class="py-14 sm:py-24">
     <div class="page-container">
       <SectionHeading
-        eyebrow="تخصصاتنا"
-        title="ثلاثة تخصصات، فريق واحد"
-        description="تصفح جميع خدمات عيادات بيوتي كورنر حسب التخصص."
+        eyebrow="خدماتنا"
+        title="خدمات الأسنان والجلدية"
+        description="تصفح جميع خدمات عيادة بيوتي كورنر في حفر الباطن واحجز موعدك."
         level={1}
       />
     </div>
@@ -61,11 +60,11 @@ const description = 'تصفح خدمات بيوتي كورنر في طب وتج�
     <div class="page-container">
       <h2 id="services-grid-heading" class="sr-only">قائمة الخدمات</h2>
       <div
-        class="mx-auto flex w-full max-w-[707px] gap-1 overflow-x-auto rounded-[var(--radius-card)] border border-border bg-surface-soft p-1 sm:grid sm:grid-cols-4 sm:gap-1.5 sm:overflow-visible sm:p-1.5"
+        class="mx-auto flex w-full max-w-[480px] gap-1 overflow-x-auto rounded-[var(--radius-card)] border border-border bg-surface-soft p-1 sm:grid sm:grid-cols-3 sm:gap-1.5 sm:overflow-visible sm:p-1.5"
         role="tablist"
-        aria-label="تصفية الخدمات حسب التخصص"
+        aria-label="تصفية الخدمات حسب القسم"
       >
-          {serviceCategories.map((category, index) => (
+          {serviceDepartments.map((department, index) => (
             <button
               id={`service-tab-${index}`}
               type="button"
@@ -73,10 +72,10 @@ const description = 'تصفح خدمات بيوتي كورنر في طب وتج�
               aria-selected={index === 0 ? 'true' : 'false'}
               aria-controls="services-panel"
               tabindex={index === 0 ? 0 : -1}
-              data-service-filter={category}
+              data-service-filter={department}
               class="min-h-11 shrink-0 rounded-full px-4 text-sm font-medium whitespace-nowrap text-muted transition-[color,background-color,box-shadow] hover:bg-surface hover:text-ink aria-selected:bg-primary aria-selected:text-surface aria-selected:shadow-[var(--shadow-control)] aria-selected:hover:bg-primary aria-selected:hover:text-surface sm:min-h-12 sm:w-full sm:px-4 sm:text-base"
             >
-              {category}
+              {department}
             </button>
           ))}
       </div>
@@ -114,7 +113,7 @@ const description = 'تصفح خدمات بيوتي كورنر في طب وتج�
     if (tabs.length === 0) return;
 
     const selectCategory = (selectedTab: HTMLButtonElement) => {
-      const category = selectedTab.dataset.serviceFilter ?? 'كل الخدمات';
+      const department = selectedTab.dataset.serviceFilter ?? 'كل الخدمات';
       let visibleCount = 0;
 
       tabs.forEach((tab) => {
@@ -124,7 +123,7 @@ const description = 'تصفح خدمات بيوتي كورنر في طب وتج�
       });
 
       serviceCards.forEach((card) => {
-        const isVisible = category === 'كل الخدمات' || card.dataset.category === category;
+        const isVisible = department === 'كل الخدمات' || card.dataset.department === department;
         card.hidden = !isVisible;
         if (isVisible) visibleCount += 1;
       });

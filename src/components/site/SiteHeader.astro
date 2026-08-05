@@ -1,22 +1,58 @@
 ---
 import AssetIcon from '../ui/AssetIcon.astro';
 import ButtonLink from '../ui/ButtonLink.astro';
+import type { Locale } from '../../lib/i18n/localize';
+import { languageSwitchHref } from '../../lib/i18n/localize';
 
-const navItems = [
-  { label: 'الخدمات', href: '/services' },
-  { label: 'الأطباء', href: '/doctors' },
-  { label: 'تواصل معنا', href: '/contact' },
-] as const;
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const isEnglish = locale === 'en';
+const languageHref = languageSwitchHref(
+  Astro.url.pathname,
+  locale,
+  Astro.url.search,
+  Astro.url.hash,
+);
+
+const navItems = isEnglish
+  ? [
+      { label: 'Services', href: '/en/services' },
+      { label: 'Devices', href: '/en#devices' },
+      { label: 'Doctors', href: '/en/doctors' },
+      { label: 'Contact', href: '/en/contact' },
+    ]
+  : [
+      { label: 'الخدمات', href: '/services' },
+      { label: 'الأجهزة', href: '/#devices' },
+      { label: 'الأطباء', href: '/doctors' },
+      { label: 'المدونة', href: '/blogs' },
+      { label: 'تواصل معنا', href: '/contact' },
+    ];
+
+const homeHref = isEnglish ? '/en' : '/';
+const bookHref = isEnglish ? '/en/book' : '/book';
+const languageLabel = isEnglish ? 'العربية' : 'English';
+const bookLabel = isEnglish ? 'Book now' : 'احجز موعدك الآن';
+const brandLabel = isEnglish ? 'Beauty Corner - Home' : 'بيوتي كورنر - الرئيسية';
 ---
 
-<header class="relative z-20 overflow-x-clip border-b border-border/60 bg-surface" transition:persist="site-header">
+<header class="relative z-20 overflow-x-clip border-b border-border/60 bg-surface" data-site-locale={locale}>
   <div class="page-container flex min-h-20 items-center justify-between gap-3 sm:gap-4">
-    <a href="/" class="flex min-w-0 shrink-0 items-center gap-2" aria-label="بيوتي كورنر - الرئيسية">
-      <img src="/assets/logo.svg" alt="" class="h-[2.625rem] w-[3.125rem]" />
-      <span class="hidden text-base font-bold text-primary sm:block">بيوتي كورنر</span>
+    <a href={homeHref} class="flex min-w-0 shrink-0 items-center gap-2" aria-label={brandLabel}>
+      <img
+        src="/assets/logo.png"
+        alt=""
+        width="1320"
+        height="1215"
+        class="h-12 w-auto sm:h-14"
+        decoding="async"
+      />
     </a>
 
-    <nav class="hidden items-center gap-1 lg:flex" aria-label="التنقل الرئيسي">
+    <nav class="hidden items-center gap-1 lg:flex" aria-label={isEnglish ? 'Main navigation' : 'التنقل الرئيسي'}>
       {navItems.map((item) => (
         <a href={item.href} class="rounded-lg px-3 py-2 text-sm font-bold text-ink hover:bg-surface-accent">
           {item.label}
@@ -25,36 +61,46 @@ const navItems = [
     </nav>
 
     <div class="flex shrink-0 items-center gap-2 sm:gap-3">
-      <button
-        type="button"
-        class="inline-flex size-9 items-center justify-center rounded-full sm:size-11"
-        aria-label="تغيير اللغة (غير متاح حاليًا)"
-        aria-disabled="true"
-        title="تغيير اللغة غير متاح حاليًا"
-        disabled
+      <a
+        href={languageHref}
+        data-language-switch
+        class="inline-flex min-h-9 items-center justify-center rounded-full border border-border px-3 text-xs font-bold text-ink hover:bg-surface-accent sm:min-h-11 sm:px-4 sm:text-sm"
+        aria-label={isEnglish ? 'Switch to Arabic' : 'Switch to English'}
+        title={languageLabel}
       >
-        <AssetIcon src="/assets/globe.svg" size="sm" />
-      </button>
-      <ButtonLink href="/contact" size="lg" class="hidden sm:inline-flex">
-        احجز موعدك الآن
+        <span class="flex items-center gap-1.5">
+          <AssetIcon src="/assets/globe.svg" size="sm" />
+          <span>{isEnglish ? 'AR' : 'EN'}</span>
+        </span>
+      </a>
+      <ButtonLink href={bookHref} size="lg" class="hidden sm:inline-flex">
+        {bookLabel}
         <AssetIcon src="/assets/booking-arrow.svg" size="sm" />
       </ButtonLink>
       <details class="relative lg:hidden" data-mobile-nav>
         <summary
           class="flex size-9 cursor-pointer list-none items-center justify-center rounded-full border border-border text-lg sm:size-11 sm:text-xl [&::-webkit-details-marker]:hidden"
-          aria-label="فتح قائمة التنقل"
+          aria-label={isEnglish ? 'Open menu' : 'فتح قائمة التنقل'}
         >
           ☰
         </summary>
         <nav
           class="absolute top-12 end-0 z-30 flex w-52 max-w-[calc(100vw-2rem)] flex-col rounded-2xl border border-border bg-surface p-2 shadow-[var(--shadow-card)] sm:top-14 sm:p-3"
-          aria-label="التنقل للجوال"
+          aria-label={isEnglish ? 'Mobile navigation' : 'التنقل للجوال'}
         >
           {navItems.map((item) => (
             <a href={item.href} class="rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-surface-accent sm:py-3" data-mobile-nav-link>
               {item.label}
             </a>
           ))}
+          <a
+            href={languageHref}
+            data-language-switch
+            class="rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-surface-accent sm:py-3"
+            data-mobile-nav-link
+          >
+            {languageLabel}
+          </a>
         </nav>
       </details>
     </div>
@@ -68,8 +114,36 @@ const navItems = [
     });
   };
 
+  const alternateLanguagePath = (pathname: string, locale: 'ar' | 'en'): string => {
+    const raw = pathname.split(/[?#]/)[0] || '/';
+    const path = raw.length > 1 ? raw.replace(/\/+$/, '') : raw;
+    if (locale === 'en') {
+      if (path === '/en') return '/';
+      if (path.startsWith('/en/')) return path.slice(3) || '/';
+      return path;
+    }
+    // Arabic-only routes (blog) fall back to the English home rather than inventing a counterpart.
+    if (path === '/blogs' || path.startsWith('/blogs/')) return '/en';
+    if (path === '/') return '/en';
+    return `/en${path}`;
+  };
+
+  const syncLanguageSwitchHrefs = () => {
+    const header = document.querySelector<HTMLElement>('header[data-site-locale]');
+    const locale = header?.dataset.siteLocale === 'en' ? 'en' : 'ar';
+    const base = alternateLanguagePath(window.location.pathname, locale);
+    const suffix = `${window.location.search}${window.location.hash}`;
+    document.querySelectorAll<HTMLAnchorElement>('a[data-language-switch]').forEach((link) => {
+      link.href = `${base}${suffix}`;
+    });
+  };
+
   document.addEventListener('astro:before-preparation', closeMobileNav);
-  document.addEventListener('astro:page-load', closeMobileNav);
+  document.addEventListener('astro:page-load', () => {
+    closeMobileNav();
+    syncLanguageSwitchHrefs();
+  });
+  window.addEventListener('hashchange', syncLanguageSwitchHrefs);
 
   document.addEventListener('click', (event) => {
     const target = event.target;

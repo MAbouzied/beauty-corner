@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+# Keep API and tooling out of discovery crawls when possible.
+Disallow: /api/
+
 Sitemap: https://beautycorner.sa/sitemap.xml
