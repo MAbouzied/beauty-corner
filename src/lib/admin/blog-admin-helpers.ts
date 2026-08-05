@@ -10,16 +10,28 @@ export function shouldKeepExistingBlogSlug(slug: string): boolean {
   return slug.trim().length > 0;
 }
 
+function stableDocumentIdHash(value: string): string {
+  let hash = 14695981039346656037n;
+  for (const character of value) {
+    hash ^= BigInt(character.codePointAt(0) ?? 0);
+    hash = BigInt.asUintN(64, hash * 1099511628211n);
+  }
+  return hash.toString(16).padStart(16, '0');
+}
+
+function adminTaxonomyDocumentId(prefix: string, value: string, fallback: string): string {
+  const normalized = value.trim() || fallback;
+  return `${prefix}-${stableDocumentIdHash(createBlogSlug(normalized) || fallback)}`;
+}
+
 /** Deterministic Sanity document id for a category label. */
 export function adminCategoryDocumentId(label: string): string {
-  const slug = createBlogSlug(label.trim() || 'عام') || 'general';
-  return `blog-category-${slug}`;
+  return adminTaxonomyDocumentId('blog-category', label, 'general');
 }
 
 /** Deterministic Sanity document id for an author name. */
 export function adminAuthorDocumentId(name: string): string {
-  const slug = createBlogSlug(name.trim() || 'فريق بيوتي كورنر') || 'default';
-  return `blog-author-${slug}`;
+  return adminTaxonomyDocumentId('blog-author', name, 'default');
 }
 
 /**

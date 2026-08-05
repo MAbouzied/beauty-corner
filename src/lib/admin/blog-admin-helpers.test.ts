@@ -23,11 +23,10 @@ describe('editor slug defaults', () => {
 
 describe('admin taxonomy document ids', () => {
   it('creates deterministic per-value ids so shared defaults are not overwritten', () => {
-    assert.equal(adminCategoryDocumentId('عام'), 'blog-category-عام');
-    assert.equal(adminCategoryDocumentId('تجميل'), 'blog-category-تجميل');
+    assert.match(adminCategoryDocumentId('عام'), /^blog-category-[0-9a-f]{16}$/);
+    assert.match(adminAuthorDocumentId('فريق بيوتي كورنر'), /^blog-author-[0-9a-f]{16}$/);
+    assert.equal(adminCategoryDocumentId('عام'), adminCategoryDocumentId(' عام '));
     assert.notEqual(adminCategoryDocumentId('تجميل'), adminCategoryDocumentId('أسنان'));
-
-    assert.equal(adminAuthorDocumentId('فريق بيوتي كورنر'), 'blog-author-فريق-بيوتي-كورنر');
     assert.notEqual(adminAuthorDocumentId('د. أحمد'), adminAuthorDocumentId('فريق بيوتي كورنر'));
   });
 });
