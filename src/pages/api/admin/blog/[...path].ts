@@ -10,8 +10,8 @@ import {
   setAdminPostStatus,
   uploadAdminImage,
   importAdminImageFromUrl,
-  type AdminPostInput,
 } from '../../../../lib/admin/blog-admin.ts';
+import { readAdminImportUrlBody, readAdminPostPayload } from '../../../../lib/admin/blog-admin-helpers.ts';
 import { requireAdminApiAccess } from '../../../../lib/staff-access/admin-auth.ts';
 import { adminApiError, hasSameOrigin } from '../../../../lib/staff-access/http.ts';
 
@@ -28,20 +28,9 @@ function mutationError(error: unknown, fallback: string): Response {
   return json({ error: message, code: duplicate ? 'DUPLICATE_SLUG' : invalid ? 'INVALID_SLUG' : 'BLOG_MUTATION_FAILED' }, duplicate ? 409 : invalid ? 422 : 400);
 }
 
-async function readPayload(request: Request): Promise<AdminPostInput> {
-  const payload = await request.json() as Partial<AdminPostInput>;
-  return {
-    title: String(payload.title ?? ''), slug: String(payload.slug ?? ''), excerpt: String(payload.excerpt ?? ''), contentHtml: String(payload.contentHtml ?? ''), contentJson: typeof payload.contentJson === 'string' ? payload.contentJson : undefined,
-    category: typeof payload.category === 'string' ? payload.category : undefined,
-    author: typeof payload.author === 'string' ? payload.author : undefined,
-    coverUrl: typeof payload.coverUrl === 'string' ? payload.coverUrl : undefined,
-    coverAlt: typeof payload.coverAlt === 'string' ? payload.coverAlt : undefined,
-    coverAssetId: typeof payload.coverAssetId === 'string' ? payload.coverAssetId : undefined,
-    coverWidth: typeof payload.coverWidth === 'number' ? payload.coverWidth : undefined,
-    coverHeight: typeof payload.coverHeight === 'number' ? payload.coverHeight : undefined,
-    relatedServiceId: typeof payload.relatedServiceId === 'string' ? payload.relatedServiceId : undefined,
-    featured: payload.featured === true,
-  };
+async function readPayload(request: Request) {
+  const payload = await request.json() as Partial<Record<string, unknown>>;
+  return readAdminPostPayload(payload);
 }
 
 async function invalidateBlogCache(context: Parameters<APIRoute>[0], postId: string): Promise<void> {
@@ -74,9 +63,9 @@ export const POST: APIRoute = async (context) => {
   try {
     if (path[0] === 'assets') {
       if (path[1] === 'import') {
-        const payload = await request.json().catch(() => ({})) as { url?: unknown };
-        if (typeof payload.url !== 'string') return json({ error: 'أدخل رابط الصورة أولاً.' }, 400);
-        return json(await importAdminImageFromUrl(payload.url), 201);
+        const payload = await request.json().catch(() => ({})) as Partial<Record<string, unknown>>;
+        const { url } = readAdminImportUrlBody(payload);
+        return json(await importAdminImageFromUrl(url), 201);
       }
       const formData = await request.formData();
       const file = formData.get('file');

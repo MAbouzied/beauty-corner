@@ -42,6 +42,7 @@ export default defineConfig({
       SANITY_API_VERSION: envField.string({ context: 'server', access: 'secret', optional: true }),
       SANITY_API_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
       SANITY_WRITE_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
+      BLOG_REVALIDATE_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
       // Separate, private dataset used only for staff authorization and management.
       SANITY_AUTH_DATASET: envField.string({
         context: 'server',

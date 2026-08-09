@@ -8,7 +8,9 @@ import {
   adminAuthorDocumentId,
   adminCategoryDocumentId,
   assertAdminPublishCopy,
+  isSanityDraftId,
   resolveAdminPublishedAt,
+  resolveSanityAdminStatus,
 } from './blog-admin-helpers.ts';
 import { createBlogSlug, isValidBlogSlug } from '../../modules/blog/lib/slug.ts';
 
@@ -249,6 +251,7 @@ function sanityProjection(): string {
 }
 
 function mapSanityAdmin(raw: Record<string, unknown>): AdminPost {
+  const rawId = String(raw._id ?? '');
   const contentJson = typeof raw.contentJson === 'string' ? raw.contentJson : (typeof raw.bodyJson === 'string' ? raw.bodyJson : '');
   const contentHtml = typeof raw.contentHtml === 'string' && raw.contentHtml.trim()
     ? sanitizeBlogHtml(raw.contentHtml)
@@ -256,9 +259,9 @@ function mapSanityAdmin(raw: Record<string, unknown>): AdminPost {
       ? lexicalJsonToHtml(contentJson)
       : '';
   return {
-    id: String(raw._id ?? '').replace(/^drafts\./, ''),
+    id: rawId.replace(/^drafts\./, ''),
     title: String(raw.title ?? ''), slug: String(raw.slug ?? ''), excerpt: String(raw.excerpt ?? ''),
-    contentJson, contentHtml, status: raw.status === 'published' ? 'published' : 'draft',
+    contentJson, contentHtml, status: resolveSanityAdminStatus(rawId, raw.status),
     publishedAt: typeof raw.publishedAt === 'string' ? raw.publishedAt : null,
     updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : nowIso(), featured: raw.featured === true,
     category: String(raw.category ?? 'عام'), author: String(raw.author ?? 'فريق بيوتي كورنر'), coverUrl: String(raw.coverUrl ?? ''), coverAlt: String(raw.coverAlt ?? ''), coverAssetId: String(raw.coverAssetId ?? ''), coverWidth: typeof raw.coverWidth === 'number' ? raw.coverWidth : null, coverHeight: typeof raw.coverHeight === 'number' ? raw.coverHeight : null, relatedServiceId: String(raw.relatedServiceId ?? ''),
@@ -280,7 +283,7 @@ export async function listAdminPosts(options: AdminPostListOptions = {}): Promis
   for (const row of rows ?? []) {
     let mapped: AdminPost;
     try { mapped = mapSanityAdmin(row); } catch (error) { console.error(`[admin-blog] Skipping malformed Sanity document ${String(row._id ?? '')}.`, error); continue; }
-    if (String(row._id).startsWith('drafts.')) grouped.set(mapped.id, mapped);
+    if (isSanityDraftId(String(row._id))) grouped.set(mapped.id, mapped);
     else if (!grouped.has(mapped.id)) grouped.set(mapped.id, mapped);
   }
   return Array.from(grouped.values()).filter((post) => status === 'all' || post.status === status);
@@ -387,7 +390,9 @@ export async function uploadAdminImage(file: File): Promise<{ assetId: string; u
     throw new Error('رفع الصور يحتاج BLOG_PROVIDER=sanity مع إعدادات Sanity كاملة.');
   }
   const client = getSanityClient();
-  const asset = await client.assets.upload('image', file, {
+  // Sanity's Node client rejects browser File objects ("must be a string, buffer or stream").
+  const body = Buffer.from(await file.arrayBuffer());
+  const asset = await client.assets.upload('image', body, {
     filename: file.name || 'blog-cover',
     contentType: file.type || undefined,
   });
