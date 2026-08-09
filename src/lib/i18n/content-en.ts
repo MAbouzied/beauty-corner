@@ -44,11 +44,12 @@ export const uiEn = {
     licensedActivity: 'Licensed activity',
     viewCommercialRegistration: 'View commercial registration certificate',
     saudiBusinessCenter: 'Saudi Business Center',
+    followUs: 'Follow us',
   },
   booking: {
     eyebrow: 'Book your visit',
     title: 'Book quickly now',
-    subtitle: 'Enter your name and phone number, choose the department and service, then send via WhatsApp.',
+    subtitle: 'Enter your name and phone number, choose the department, then send via WhatsApp.',
     notice: 'Submitting will open WhatsApp with your booking details ready to send to the clinic.',
     statusInvalid: 'Please fill in the required fields before sending.',
     statusOpening: 'Opening WhatsApp to send your booking request...',
@@ -56,16 +57,15 @@ export const uiEn = {
       name: 'Please enter your full name (at least 3 characters).',
       phone: 'Please enter a Saudi mobile number as 05XXXXXXXX.',
       department: 'Please choose a department.',
-      service: 'Please choose a service.',
       consent: 'Consent is required to continue.',
     },
   },
   lead: {
     title: 'Book your appointment now',
     subtitle: 'Hafr Al-Batin branch — Al Muhammadiyah, King Faisal Road',
-    statusInvalid: 'Please fill in your name, phone number, and service.',
+    statusInvalid: 'Please fill in your name, phone number, and department.',
     statusOpening: 'Opening WhatsApp...',
-    chooseDental: 'Choose a dental service',
+    chooseDental: 'Choose a department',
   },
   home: {
     eyebrow: 'Beauty Corner · Hafr Al-Batin',
@@ -93,7 +93,7 @@ export const uiEn = {
     contactTitle: 'Contact Beauty Corner Clinic in Hafr Al-Batin',
     contactDescription: 'Contact Beauty Corner in Hafr Al-Batin, Al Muhammadiyah, King Faisal Road. Book an appointment or reach us by WhatsApp and phone.',
     bookTitle: 'Book an Appointment at Beauty Corner Hafr Al-Batin',
-    bookDescription: 'Book a dental or dermatology visit at Beauty Corner in Hafr Al-Batin in minutes — enter your name, phone, and service.',
+    bookDescription: 'Book a visit at Beauty Corner in Hafr Al-Batin in minutes — enter your name, phone, and department.',
     devicesTitle: 'Devices',
     devicesDescription: 'Explore the medical devices and technology used at Beauty Corner in Hafr Al-Batin.',
     devicesHeading: 'Technology inside the clinic',
@@ -113,6 +113,14 @@ export const departmentsEn = {
   أسنان: 'Dentistry',
   جلدية: 'Dermatology',
   'كل الخدمات': 'All services',
+  'قسم النحت و الاذابة': 'Body Contouring & Fat Dissolving',
+  'قسم الفيلر': 'Filler',
+  'قسم البوتكس': 'Botox',
+  'قسم النضارة': 'Skin Brightening',
+  'قسم الهيدرافيشل': 'Hydrafacial',
+  'قسم اللايت': 'Light Therapy',
+  'قسم علاج البشرة و الشعر': 'Skin & Hair Treatment',
+  'قسم الليزر': 'Laser',
 } as const;
 
 export const specialtiesEn = {
@@ -190,7 +198,7 @@ export const servicesEn: Record<
   'teeth-whitening': {
     title: 'Teeth whitening',
     description: 'Safe in-clinic whitening to brighten your smile under specialist care.',
-    heroImageAlt: 'Dental care session at the clinic',
+    heroImageAlt: 'Beyond Polus teeth whitening device at Beauty Corner',
     sections: [
       {
         title: 'A brighter smile',
@@ -287,7 +295,7 @@ export const servicesEn: Record<
   'gum-contouring': {
     title: 'Gum contouring (surgical & laser)',
     description: 'Reshape the gum line surgically or with laser for a balanced smile.',
-    heroImageAlt: 'Dental treatment room at Beauty Corner',
+    heroImageAlt: 'Woodpecker PT-B gum treatment device at Beauty Corner',
     sections: [
       {
         title: 'A more balanced gum line',
@@ -308,7 +316,7 @@ export const servicesEn: Record<
   'gum-depigmentation': {
     title: 'Laser gum depigmentation',
     description: 'Lighten dark gum pigmentation with medical laser technology.',
-    heroImageAlt: 'Dental treatment room at Beauty Corner',
+    heroImageAlt: 'Gum treatment device at Beauty Corner',
     sections: [
       {
         title: 'A naturally pinker gum look',
@@ -426,30 +434,6 @@ export const doctorsEn: Record<
       },
     ],
   },
-  'dentistry-mahmoud': {
-    name: 'Dr. Mahmoud Gomaa',
-    title: 'Dentist',
-    specialty: 'Cosmetic & restorative dentistry',
-    summary: 'A dentist focused on accurate diagnosis and functional and cosmetic treatment tailored to each case.',
-    sections: [
-      {
-        title: 'About the doctor',
-        paragraphs: [
-          'Dr. Mahmoud Gomaa provides integrated dental care that combines precision and clarity, with a plan based on case priorities.',
-        ],
-      },
-      {
-        title: 'Focus areas',
-        listItems: ['Restorative dentistry', 'Preventive care and follow-up', 'Smile aesthetics after medical assessment'],
-      },
-      {
-        title: 'Care approach',
-        paragraphs: [
-          'He starts with assessment, then chooses the most suitable option while explaining each step before treatment.',
-        ],
-      },
-    ],
-  },
   'dentistry-wissam': {
     name: 'Dr. Wissam Mandour',
     title: 'Oral & maxillofacial surgery and implants specialist',
@@ -478,34 +462,40 @@ export const doctorsEn: Record<
 
 export const devicesEn: Record<string, { name: string; description: string; imageAlt: string }> = {
   'beyond-whitening': {
-    name: 'Beyond whitening system',
-    description: 'Professional teeth-whitening device using advanced light technology for fast, safe in-clinic results.',
-    imageAlt: 'Beyond teeth whitening device at Beauty Corner',
+    name: 'Beyond Polus whitening system',
+    description:
+      'In-clinic whitening accelerator that uses advanced light technology to activate whitening gel safely for clearer results in one visit.',
+    imageAlt: 'Beyond Polus teeth whitening device at Beauty Corner',
   },
   'dental-unit-integrated': {
-    name: 'Integrated dental unit',
-    description: 'A modern treatment unit with a comfortable chair and precise instruments for diagnosis and care.',
-    imageAlt: 'Integrated dental treatment unit inside the clinic',
+    name: 'Fully equipped treatment room',
+    description:
+      'A complete operatory with a dental chair, medical lighting, and sterilized storage for examination and treatment.',
+    imageAlt: 'Fully equipped dental treatment room with chair and cabinetry',
   },
   'dental-unit-blue': {
     name: 'Advanced dental treatment chair',
-    description: 'A treatment chair with instrument delivery, medical lighting, and suction for comfort and precision.',
-    imageAlt: 'Blue dental treatment chair with instrument unit',
+    description:
+      'A comfortable treatment chair with instrument delivery, adjustable lighting, and suction for daily diagnosis and care.',
+    imageAlt: 'Blue dental treatment chair with instrument unit and medical light',
   },
   'dental-unit-led': {
-    name: 'LED dental treatment unit',
-    description: 'A treatment unit with high-clarity LED lighting and a modern control panel for cleaning and care.',
-    imageAlt: 'Dental treatment unit with LED light and control panel',
+    name: 'Mobile LED treatment unit',
+    description:
+      'A mobile instrument cart with high-clarity LED lighting for cleaning and treatment sessions with flexible room setup.',
+    imageAlt: 'Mobile dental treatment unit with LED light and blue chair',
   },
-  'treatment-room': {
-    name: 'Fully equipped treatment room',
-    description: 'A sterilized treatment room with a complete dental unit and medical storage for multiple procedures.',
-    imageAlt: 'Fully equipped dental treatment room',
+  'woodpecker-ptb': {
+    name: 'Woodpecker PT-B gum treatment system',
+    description:
+      'Ultrasonic scaling and air-polishing device for precise tartar removal and periodontal care inside the clinic.',
+    imageAlt: 'Woodpecker PT-B periodontal treatment device at Beauty Corner',
   },
   'dental-examination-unit': {
-    name: 'Advanced examination unit',
-    description: 'A modern examination unit with adjustable lighting and a multi-tool system for daily exams and care.',
-    imageAlt: 'Advanced teal dental examination unit',
+    name: 'Daily examination and treatment unit',
+    description:
+      'A modern examination unit with a comfortable chair, medical lighting, and multi-tool arm for everyday exams and care.',
+    imageAlt: 'Teal dental examination and treatment unit inside the clinic',
   },
 };
 

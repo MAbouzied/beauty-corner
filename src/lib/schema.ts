@@ -1,3 +1,4 @@
+import { clinicSocialLinks } from '../data/contact';
 import type { Doctor } from '../data/doctors';
 import type { FaqItem } from '../data/faq';
 import { clinicLicenses } from '../data/licenses';
@@ -65,6 +66,7 @@ export function buildOrganizationSchema(site: URL, locale: Locale = 'ar'): JsonL
     image: absoluteUrl(site, organization.imagePath),
     email: organization.email,
     telephone: organization.telephone,
+    sameAs: clinicSocialLinks.map((link) => link.href),
     address,
     geo: {
       '@type': 'GeoCoordinates',
@@ -100,14 +102,15 @@ export function buildOrganizationSchema(site: URL, locale: Locale = 'ar'): JsonL
     medicalSpecialty: [...organization.medicalSpecialties],
     availableLanguage: [...AVAILABLE_LANGUAGES],
     contactPoint: [
-      {
+      ...organization.contactLines.map((line) => ({
         '@type': 'ContactPoint',
-        contactType: 'customer service',
-        telephone: organization.telephone,
+        contactType: isEnglish ? line.labelEn : line.labelAr,
+        name: isEnglish ? line.labelEn : line.labelAr,
+        telephone: line.telephone,
         email: organization.email,
         availableLanguage: [...AVAILABLE_LANGUAGES],
-        url: organization.whatsappUrl,
-      },
+        url: line.whatsappUrl,
+      })),
       {
         '@type': 'ContactPoint',
         contactType: 'reservations',

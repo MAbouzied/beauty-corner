@@ -95,8 +95,8 @@ export const clinicServices: readonly ClinicService[] = [
     category: 'تجميل',
     department: 'أسنان',
     icon: '/assets/service-whitening.svg',
-    heroImage: '/assets/landing-blog-dental.jpg',
-    heroImageAlt: dentalHeroAlt,
+    heroImage: '/assets/devices/beyond-whitening.jpg',
+    heroImageAlt: 'جهاز Beyond Polus لتبييض الأسنان داخل عيادة بيوتي كورنر',
     doctorSpecialty: dentistrySpecialty,
     sections: [
       {
@@ -230,8 +230,8 @@ export const clinicServices: readonly ClinicService[] = [
     category: 'علاج وجراحة',
     department: 'أسنان',
     icon: '/assets/service-gum-contour.svg',
-    heroImage: '/assets/landing-blog-laser.jpg',
-    heroImageAlt: dentalHeroAlt,
+    heroImage: '/assets/devices/woodpecker-ptb.png',
+    heroImageAlt: 'جهاز Woodpecker PT-B لقص وعلاج اللثة داخل عيادة بيوتي كورنر',
     doctorSpecialty: dentistrySpecialty,
     sections: [
       {
@@ -257,8 +257,8 @@ export const clinicServices: readonly ClinicService[] = [
     category: 'تجميل',
     department: 'أسنان',
     icon: '/assets/service-gum-laser.svg',
-    heroImage: '/assets/landing-blog-laser.jpg',
-    heroImageAlt: dentalHeroAlt,
+    heroImage: '/assets/devices/woodpecker-ptb.png',
+    heroImageAlt: 'جهاز علاج اللثة داخل عيادة بيوتي كورنر',
     doctorSpecialty: dentistrySpecialty,
     sections: [
       {

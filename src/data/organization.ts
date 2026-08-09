@@ -1,4 +1,4 @@
-import { clinicContact } from './contact';
+import { clinicContact, clinicLines } from './contact';
 import { clinicServices } from './services';
 
 export const organization = {
@@ -8,8 +8,16 @@ export const organization = {
   description:
     'عيادة لطب الأسنان والجلدية في حفر الباطن — حي المحمدية، طريق الملك فيصل.',
   email: clinicContact.email,
-  telephone: `+${clinicContact.whatsappNumber}`,
-  whatsappUrl: `https://wa.me/${clinicContact.whatsappNumber}`,
+  /** Both clinic lines for Schema.org `telephone` (Text or array of Text). */
+  telephone: clinicLines.map((line) => `+${line.number}`),
+  contactLines: clinicLines.map((line) => ({
+    id: line.id,
+    telephone: `+${line.number}`,
+    whatsappUrl: `https://wa.me/${line.number}`,
+    labelAr: line.labelAr,
+    labelEn: line.labelEn,
+    departmentAr: line.departmentAr,
+  })),
   logoPath: '/assets/logo.png',
   imagePath: '/assets/landing-hero.jpg',
   addressCountry: 'SA',

@@ -1,16 +1,11 @@
 ---
-import { buildPhoneUrl, buildWhatsAppUrl, clinicContact } from '../../data/contact';
-import { clinicServices } from '../../data/services';
+import { bookingDepartments } from '../../data/booking-departments';
+import { clinicContact } from '../../data/contact';
 import AssetIcon from '../ui/AssetIcon.astro';
 import PillLabel from '../ui/PillLabel.astro';
+import ClinicLineButtons from './ClinicLineButtons.astro';
 
-const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر بيوتي كورنر.');
-const phoneHref = buildPhoneUrl();
-const departments = ['أسنان', 'جلدية'] as const;
-const servicesPayload = clinicServices.map((service) => ({
-  title: service.title,
-  department: service.department,
-}));
+const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كورنر.';
 ---
 
 <section id="booking" class="bg-surface py-16 sm:py-24" aria-labelledby="booking-heading">
@@ -19,31 +14,17 @@ const servicesPayload = clinicServices.map((service) => ({
       <PillLabel text="احجز موعدك" />
       <h2 id="booking-heading" class="text-display mt-3 font-black sm:mt-4">نموذج حجز سريع</h2>
       <p class="mt-4 max-w-lg text-sm leading-7 text-pretty text-muted">
-        املأ الاسم ورقم الجوال واختر القسم والخدمة، ثم أرسل الطلب عبر واتساب.
+        املأ الاسم ورقم الجوال واختر القسم، ثم أرسل الطلب عبر واتساب.
       </p>
-      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap" data-gtm-location="booking_contact_sidebar">
-        <a
-          href={whatsappHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-full border border-success/40 bg-success-soft px-5 text-xs font-bold whitespace-nowrap text-success transition-transform hover:-translate-y-0.5 sm:w-auto"
-        >
-          واتساب
-          <AssetIcon src="/assets/whatsapp.svg" size="sm" />
-        </a>
-        <a
-          href={phoneHref}
-          class="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-surface-accent px-5 text-xs font-bold whitespace-nowrap text-primary transition-transform hover:-translate-y-0.5 sm:w-auto"
-        >
-          اتصال
-          <AssetIcon src="/assets/phone.svg" size="sm" />
-        </a>
+      <div class="mt-6" data-gtm-location="booking_contact_sidebar">
+        <ClinicLineButtons
+          mode="both"
+          size="sm"
+          showPhone
+          whatsappMessage={contactMessage}
+        />
       </div>
       <ul class="mt-5 space-y-2 text-sm text-muted sm:mt-7 sm:space-y-3" data-gtm-location="booking_contact_sidebar">
-        <li class="flex items-center gap-2 sm:gap-3">
-          <AssetIcon src="/assets/phone.svg" size="sm" class="shrink-0" />
-          <a href={phoneHref} dir="ltr" class="hover:text-primary">{clinicContact.phoneDisplay}</a>
-        </li>
         <li class="flex items-center gap-2 sm:gap-3"><AssetIcon src="/assets/clock.svg" size="sm" class="shrink-0" /><span>{clinicContact.hours}</span></li>
         <li class="flex items-center gap-2 sm:gap-3"><AssetIcon src="/assets/location.svg" size="sm" class="shrink-0" />{clinicContact.location}</li>
       </ul>
@@ -54,7 +35,6 @@ const servicesPayload = clinicServices.map((service) => ({
       aria-describedby="contact-booking-notice"
       data-booking-form
       data-gtm-form="booking_contact"
-      data-services={JSON.stringify(servicesPayload)}
       novalidate
     >
       <p id="contact-booking-notice" class="mb-5 rounded-2xl bg-surface-soft px-4 py-3 text-sm leading-6 text-muted" role="note">
@@ -77,15 +57,9 @@ const servicesPayload = clinicServices.map((service) => ({
           القسم
           <select name="department" required data-department-select class="min-h-12 rounded-2xl border border-border bg-surface px-4 text-sm font-normal shadow-[var(--shadow-control)]">
             <option value="">اختر القسم</option>
-            {departments.map((department) => (
+            {bookingDepartments.map((department) => (
               <option value={department}>{department}</option>
             ))}
-          </select>
-        </label>
-        <label class="grid gap-2 text-xs font-bold">
-          الخدمة
-          <select name="service" required data-service-select class="min-h-12 rounded-2xl border border-border bg-surface px-4 text-sm font-normal shadow-[var(--shadow-control)]">
-            <option value="">اختر الخدمة</option>
           </select>
         </label>
       </div>
@@ -109,7 +83,12 @@ const servicesPayload = clinicServices.map((service) => ({
 </section>
 
 <script>
-  import { buildBookingWhatsAppMessage, buildWhatsAppUrl, clinicContact } from '../../data/contact';
+  import {
+    buildBookingWhatsAppMessage,
+    buildWhatsAppUrl,
+    clinicContact,
+    clinicLineFromDepartment,
+  } from '../../data/contact';
   import { saveCustomerLead } from '../../lib/customer-leads';
   import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
 
@@ -119,33 +98,7 @@ const servicesPayload = clinicServices.map((service) => ({
       form.dataset.bound = 'true';
 
       const status = form.querySelector<HTMLElement>('[data-booking-status]');
-      const departmentSelect = form.querySelector<HTMLSelectElement>('[data-department-select]');
-      const serviceSelect = form.querySelector<HTMLSelectElement>('[data-service-select]');
       const formId = form.dataset.gtmForm ?? 'booking_contact';
-
-      type ServiceOption = { title: string; department: string };
-      let services: ServiceOption[] = [];
-      try {
-        services = JSON.parse(form.dataset.services ?? '[]') as ServiceOption[];
-      } catch {
-        services = [];
-      }
-
-      const populateServices = () => {
-        if (!departmentSelect || !serviceSelect) return;
-        const department = departmentSelect.value;
-        const options = services.filter((service) => service.department === department);
-        serviceSelect.innerHTML = '<option value="">اختر الخدمة</option>';
-        options.forEach((service) => {
-          const option = document.createElement('option');
-          option.value = service.title;
-          option.textContent = service.title;
-          serviceSelect.append(option);
-        });
-      };
-
-      populateServices();
-      departmentSelect?.addEventListener('change', populateServices);
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -161,12 +114,10 @@ const servicesPayload = clinicServices.map((service) => ({
 
         const data = new FormData(form);
         const department = String(data.get('department') ?? '').trim();
-        const service = String(data.get('service') ?? '').trim();
         const message = buildBookingWhatsAppMessage({
           name: String(data.get('name') ?? '').trim(),
           phone: String(data.get('phone') ?? '').trim(),
           department,
-          service,
           branch: clinicContact.branch,
         });
 
@@ -179,20 +130,24 @@ const servicesPayload = clinicServices.map((service) => ({
           form_id: formId,
           method: 'whatsapp',
           department,
-          service,
+          service: department,
         });
 
         void saveCustomerLead({
           name: String(data.get('name') ?? '').trim(),
           phone: String(data.get('phone') ?? '').trim(),
           department,
-          service,
+          service: department,
           locale: 'ar',
           consent: data.has('consent'),
           website: String(data.get('website') ?? ''),
         }).catch((error) => console.error('Unable to save booking details.', error));
 
-        window.open(buildWhatsAppUrl(message), '_blank', 'noopener,noreferrer');
+        window.open(
+          buildWhatsAppUrl(message, clinicLineFromDepartment(department)),
+          '_blank',
+          'noopener,noreferrer',
+        );
       });
     });
   });

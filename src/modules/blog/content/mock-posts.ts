@@ -232,8 +232,8 @@ export const mockBlogPosts: BlogPost[] = [
       },
     },
     cover: {
-      src: '/assets/landing-blog-laser.jpg',
-      alt: 'جلسة ليزر تجميلية في بيئة عيادية',
+      src: '/assets/devices/woodpecker-ptb.png',
+      alt: 'جهاز علاج اللثة داخل عيادة بيوتي كورنر',
       width: 1600,
       height: 1067,
     },
@@ -318,7 +318,7 @@ export const mockBlogPosts: BlogPost[] = [
       name: 'فريق طب الأسنان',
       role: 'محتوى تثقيفي — قيد المراجعة السريرية',
       image: {
-        src: '/assets/doctor-mahmoud.png',
+        src: '/assets/doctor-wissam.png',
         alt: 'طبيب في فريق بيوتي كورنر',
         width: 800,
         height: 1000,

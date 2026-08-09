@@ -1,41 +1,29 @@
 ---
-import { buildPhoneUrl, buildWhatsAppUrl } from '../../data/contact';
-import { clinicServices } from '../../data/services';
+import { bookingDepartments } from '../../data/booking-departments';
 import type { Locale } from '../../lib/i18n/localize';
 import {
   isEnglish,
   localizeContact,
   localizeDepartment,
-  localizeService,
   ui,
 } from '../../lib/i18n/localize';
+import ClinicLineButtons from '../contact/ClinicLineButtons.astro';
 import AssetIcon from '../ui/AssetIcon.astro';
 import PillLabel from '../ui/PillLabel.astro';
 
 export interface Props {
   defaultDepartment?: string;
-  defaultService?: string;
   locale?: Locale;
 }
 
-const { defaultDepartment = '', defaultService = '', locale = 'ar' } = Astro.props;
+const { defaultDepartment = '', locale = 'ar' } = Astro.props;
 const en = isEnglish(locale);
 const copy = ui(locale);
 const contact = localizeContact(locale);
 
-const departments = ['أسنان', 'جلدية'] as const;
-const servicesPayload = clinicServices.map((service) => {
-  const localized = localizeService(service, locale);
-  return {
-    value: service.title,
-    label: localized.title,
-    department: service.department,
-  };
-});
-const phoneHref = buildPhoneUrl();
-const whatsappHref = buildWhatsAppUrl(
-  en ? 'Hello, I would like to book at Beauty Corner.' : 'مرحباً، أود الحجز عبر بيوتي كورنر.',
-);
+const contactMessage = en
+  ? 'Hello, I would like to book at Beauty Corner.'
+  : 'مرحباً، أود الحجز عبر بيوتي كورنر.';
 const fieldClass =
   'min-h-12 w-full rounded-[1.25rem] border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-muted/70 focus:border-primary aria-[invalid=true]:border-danger';
 
@@ -49,10 +37,7 @@ const labels = en
       name: copy!.common.fullName,
       phone: copy!.common.phone,
       department: copy!.common.department,
-      service: copy!.common.service,
       chooseDepartment: copy!.common.chooseDepartment,
-      chooseService: copy!.common.chooseService,
-      consent: copy!.common.consent,
       send: copy!.common.sendWhatsapp,
       namePh: copy!.common.namePlaceholder,
       phonePh: copy!.common.phonePlaceholder,
@@ -63,16 +48,13 @@ const labels = en
   : {
       eyebrow: 'احجز موعدك',
       title: 'احجز سريعا الآن',
-      subtitle: 'املأ الاسم ورقم الجوال واختر القسم والخدمة، ثم أرسل الطلب عبر واتساب.',
+      subtitle: 'املأ الاسم ورقم الجوال واختر القسم، ثم أرسل الطلب عبر واتساب.',
       whatsapp: 'واتساب',
       call: 'اتصال',
       name: 'الاسم الكامل',
       phone: 'رقم الجوال',
       department: 'القسم',
-      service: 'الخدمة',
       chooseDepartment: 'اختر القسم',
-      chooseService: 'اختر الخدمة',
-      consent: 'أوافق على سياسة الخصوصية والتواصل معي لتأكيد الحجز.',
       send: 'إرسال عبر واتساب',
       namePh: 'مثال: عبدالله محمد',
       phonePh: '05XXXXXXXX',
@@ -80,7 +62,6 @@ const labels = en
         name: 'يرجى إدخال الاسم الكامل (3 أحرف على الأقل).',
         phone: 'يرجى إدخال رقم جوال سعودي بصيغة 05XXXXXXXX.',
         department: 'يرجى اختيار القسم.',
-        service: 'يرجى اختيار الخدمة.',
         consent: 'الموافقة مطلوبة للمتابعة.',
       },
       statusInvalid: 'يرجى تصحيح الحقول الموضحة قبل المتابعة.',
@@ -96,30 +77,18 @@ const labels = en
         <h2 id="booking-heading" class="text-display mt-4 font-black text-ink">{labels.title}</h2>
         <p class="mt-4 max-w-lg text-sm leading-7 text-pretty text-muted">{labels.subtitle}</p>
 
-        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap" data-gtm-location="booking_section_sidebar">
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-success/40 bg-success-soft px-5 text-sm font-bold whitespace-nowrap text-success transition-transform hover:-translate-y-0.5 sm:w-auto"
-          >
-            {labels.whatsapp}
-            <AssetIcon src="/assets/whatsapp.svg" size="sm" />
-          </a>
-          <a
-            href={phoneHref}
-            class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-surface-accent px-5 text-sm font-bold whitespace-nowrap text-primary transition-transform hover:-translate-y-0.5 sm:w-auto"
-          >
-            {labels.call}
-            <AssetIcon src="/assets/phone.svg" size="sm" />
-          </a>
+        <div class="mt-6" data-gtm-location="booking_section_sidebar">
+          <ClinicLineButtons
+            locale={locale}
+            mode="both"
+            showPhone
+            whatsappMessage={contactMessage}
+            callLabel={labels.call}
+            whatsappLabel={labels.whatsapp}
+          />
         </div>
 
         <address class="mt-5 space-y-2 text-sm not-italic text-muted sm:mt-7 sm:space-y-3" aria-label={en ? 'Contact details' : 'بيانات التواصل'} data-gtm-location="booking_section_sidebar">
-          <p class="flex items-center gap-2 sm:gap-3" dir="ltr">
-            <AssetIcon src="/assets/phone.svg" size="sm" class="shrink-0" />
-            <a href={phoneHref} class="hover:text-primary">{contact.phoneDisplay}</a>
-          </p>
           <p class="flex items-center gap-2 sm:gap-3">
             <AssetIcon src="/assets/clock.svg" size="sm" class="shrink-0" />
             <span class="leading-5">{contact.hours}</span>
@@ -136,16 +105,13 @@ const labels = en
         class="rounded-[2rem] border border-border bg-surface p-4 shadow-[var(--shadow-card)] sm:p-8"
         novalidate
         data-gtm-form="booking_section"
-        data-services={JSON.stringify(servicesPayload)}
         data-locale={locale}
         data-msg-invalid={labels.statusInvalid}
         data-msg-opening={labels.statusOpening}
         data-msg-name={labels.errors.name}
         data-msg-phone={labels.errors.phone}
         data-msg-department={labels.errors.department}
-        data-msg-service={labels.errors.service}
         data-msg-consent={labels.errors.consent}
-        data-choose-service={labels.chooseService}
       >
         <label class="sr-only" aria-hidden="true">
           Website
@@ -166,20 +132,13 @@ const labels = en
             <label for="booking-department" class="block text-xs font-bold">{labels.department}</label>
             <select id="booking-department" name="department" class={fieldClass} required>
               <option value="">{labels.chooseDepartment}</option>
-              {departments.map((department) => (
+              {bookingDepartments.map((department) => (
                 <option value={department} selected={department === defaultDepartment}>
                   {localizeDepartment(department, locale)}
                 </option>
               ))}
             </select>
             <p class="hidden text-xs text-danger" data-error-for="booking-department"></p>
-          </div>
-          <div class="space-y-1.5">
-            <label for="booking-service" class="block text-xs font-bold">{labels.service}</label>
-            <select id="booking-service" name="service" class={fieldClass} required data-default-service={defaultService}>
-              <option value="">{labels.chooseService}</option>
-            </select>
-            <p class="hidden text-xs text-danger" data-error-for="booking-service"></p>
           </div>
         </div>
 
@@ -218,7 +177,12 @@ const labels = en
 </section>
 
 <script>
-  import { buildBookingWhatsAppMessage, buildWhatsAppUrl, clinicContact } from '../../data/contact';
+  import {
+    buildBookingWhatsAppMessage,
+    buildWhatsAppUrl,
+    clinicContact,
+    clinicLineFromDepartment,
+  } from '../../data/contact';
   import { saveCustomerLead } from '../../lib/customer-leads';
   import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
 
@@ -228,47 +192,15 @@ const labels = en
     bookingForm.dataset.bound = 'true';
 
     const bookingStatus = document.querySelector<HTMLElement>('#booking-status');
-    const departmentSelect = bookingForm.querySelector<HTMLSelectElement>('#booking-department');
-    const serviceSelect = bookingForm.querySelector<HTMLSelectElement>('#booking-service');
     const formId = bookingForm.dataset.gtmForm ?? 'booking_section';
     const requiredFields = [
       ...bookingForm.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input[required], select[required]'),
     ];
 
-    type ServiceOption = { value: string; label: string; department: string };
-    let services: ServiceOption[] = [];
-    try {
-      services = JSON.parse(bookingForm.dataset.services ?? '[]') as ServiceOption[];
-    } catch {
-      services = [];
-    }
-
-    const chooseService = bookingForm.dataset.chooseService ?? 'اختر الخدمة';
-
-    const populateServices = () => {
-      if (!departmentSelect || !serviceSelect) return;
-      const department = departmentSelect.value;
-      const defaultService = serviceSelect.dataset.defaultService ?? '';
-      const options = services.filter((service) => service.department === department);
-
-      serviceSelect.innerHTML = `<option value="">${chooseService}</option>`;
-      options.forEach((service) => {
-        const option = document.createElement('option');
-        option.value = service.value;
-        option.textContent = service.label;
-        if (service.value === defaultService || service.label === defaultService) option.selected = true;
-        serviceSelect.append(option);
-      });
-    };
-
-    populateServices();
-    departmentSelect?.addEventListener('change', populateServices);
-
     const messages: Readonly<Record<string, string>> = {
       'booking-name': bookingForm.dataset.msgName ?? '',
       'booking-phone': bookingForm.dataset.msgPhone ?? '',
       'booking-department': bookingForm.dataset.msgDepartment ?? '',
-      'booking-service': bookingForm.dataset.msgService ?? '',
       'booking-consent': bookingForm.dataset.msgConsent ?? '',
     };
 
@@ -309,12 +241,10 @@ const labels = en
 
       const data = new FormData(bookingForm);
       const department = String(data.get('department') ?? '').trim();
-      const service = String(data.get('service') ?? '').trim();
       const message = buildBookingWhatsAppMessage({
         name: String(data.get('name') ?? '').trim(),
         phone: String(data.get('phone') ?? '').trim(),
         department,
-        service,
         branch: clinicContact.branch,
       });
 
@@ -327,20 +257,24 @@ const labels = en
         form_id: formId,
         method: 'whatsapp',
         department,
-        service,
+        service: department,
       });
 
       void saveCustomerLead({
         name: String(data.get('name') ?? '').trim(),
         phone: String(data.get('phone') ?? '').trim(),
         department,
-        service,
+        service: department,
         locale: bookingForm.dataset.locale === 'en' ? 'en' : 'ar',
         consent: data.has('consent'),
         website: String(data.get('website') ?? ''),
       }).catch((error) => console.error('Unable to save booking details.', error));
 
-      window.open(buildWhatsAppUrl(message), '_blank', 'noopener,noreferrer');
+      window.open(
+        buildWhatsAppUrl(message, clinicLineFromDepartment(department)),
+        '_blank',
+        'noopener,noreferrer',
+      );
     });
   });
 </script>

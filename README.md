@@ -54,8 +54,10 @@ Connect the GitHub repo, then use:
 
 Optional public environment variables:
 
-- `PUBLIC_WHATSAPP_NUMBER` — WhatsApp and telephone number in international digits only (no `+`).
-  The current number is `966537633558` (`+966 53 763 3558`).
+- `PUBLIC_DENTAL_PHONE` — Dental clinic WhatsApp/telephone in international digits only (no `+`).
+  Default: `966552959863` (`055 295 9863`).
+- `PUBLIC_DERMATOLOGY_PHONE` — Dermatology clinic WhatsApp/telephone in international digits only (no `+`).
+  Default: `966559523784` (`055 952 3784`).
 - `PUBLIC_GTM_ID` — Google Tag Manager container ID (for example `GTM-ABC1234`). GTM stays off when unset.
 
 See [`.env.example`](./.env.example).

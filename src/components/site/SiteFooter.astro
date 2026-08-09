@@ -1,4 +1,6 @@
 ---
+import ClinicPhoneList from '../contact/ClinicPhoneList.astro';
+import SocialLinks from '../contact/SocialLinks.astro';
 import { clinicLicenses } from '../../data/licenses';
 import { clinicServices } from '../../data/services';
 import type { Locale } from '../../lib/i18n/localize';
@@ -75,6 +77,12 @@ const licenseCopy = en
             ? 'Dental and dermatology clinic in Hafr Al-Batin — Al Muhammadiyah, King Faisal Road.'
             : 'عيادة لطب الأسنان والجلدية في حفر الباطن — حي المحمدية، طريق الملك فيصل.'}
         </p>
+        <SocialLinks
+          locale={locale}
+          class="mt-5"
+          id="footer-social"
+          heading={en ? copy!.common.followUs : 'تابعنا'}
+        />
       </section>
       <section>
         <h2 class="mb-4 text-sm font-bold">{en ? copy!.common.importantLinks : 'روابط مهمة'}</h2>
@@ -97,7 +105,9 @@ const licenseCopy = en
       <section>
         <h2 class="mb-4 text-sm font-bold">{en ? copy!.nav.contact : 'تواصل معنا'}</h2>
         <ul class="space-y-2 text-sm text-muted">
-          <li><span dir="ltr">{contact.phoneDisplay}</span></li>
+          <li>
+            <ClinicPhoneList locale={locale} class="space-y-2" linkClass="hover:text-primary" />
+          </li>
           <li data-gtm-location="footer"><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
           <li>{contact.location}</li>
         </ul>

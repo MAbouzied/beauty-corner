@@ -1,43 +1,38 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import { bookingDepartments } from '../data/booking-departments.ts';
 import {
   createMemoryRateLimiter,
   parseCustomerLeadBody,
 } from './customer-api.ts';
 
-const services = [
-  { title: 'زراعة الأسنان', department: 'أسنان' },
-  { title: 'علاج حب الشباب', department: 'جلدية' },
-] as const;
-
 describe('parseCustomerLeadBody', () => {
-  it('accepts a valid lead and derives department from the matched service', () => {
+  it('accepts a valid lead with a known booking department', () => {
     const result = parseCustomerLeadBody({
       name: 'عبدالله محمد',
       phone: '0551234567',
-      department: 'spoofed',
-      service: 'زراعة الأسنان',
+      department: 'قسم الفيلر',
+      service: 'ignored',
       locale: 'en',
       consent: true,
-    }, { page: '/en/book', services });
+    }, { page: '/en/book', departments: bookingDepartments });
 
     assert.equal(result.ok, true);
     if (!result.ok || result.kind !== 'lead') throw new Error('expected lead');
-    assert.equal(result.lead.department, 'أسنان');
-    assert.equal(result.lead.service, 'زراعة الأسنان');
+    assert.equal(result.lead.department, 'قسم الفيلر');
+    assert.equal(result.lead.service, 'قسم الفيلر');
     assert.equal(result.lead.locale, 'en');
     assert.equal(result.lead.page, '/en/book');
   });
 
-  it('rejects unknown services even when department is present', () => {
+  it('rejects unknown departments', () => {
     const result = parseCustomerLeadBody({
       name: 'Abdullah',
       phone: '0551234567',
       department: 'أسنان',
-      service: 'Unknown Service',
       locale: 'ar',
       consent: true,
-    }, { services });
+    }, { departments: bookingDepartments });
 
     assert.deepEqual(result, { ok: false, status: 422 });
   });
@@ -46,10 +41,10 @@ describe('parseCustomerLeadBody', () => {
     const result = parseCustomerLeadBody({
       name: 'bot',
       phone: '0551234567',
-      service: 'زراعة الأسنان',
+      department: 'قسم الليزر',
       consent: true,
       website: 'https://spam.example',
-    }, { services });
+    }, { departments: bookingDepartments });
 
     assert.deepEqual(result, { ok: true, kind: 'honeypot' });
   });

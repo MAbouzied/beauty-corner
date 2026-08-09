@@ -1,25 +1,19 @@
 ---
+import ClinicLineButtons from '../../components/contact/ClinicLineButtons.astro';
+import ClinicPhoneList from '../../components/contact/ClinicPhoneList.astro';
 import AssetIcon from '../../components/ui/AssetIcon.astro';
-import { buildPhoneUrl, buildWhatsAppUrl } from '../../data/contact';
-import { clinicServices } from '../../data/services';
+import { bookingDepartments } from '../../data/booking-departments';
 import { organization } from '../../data/organization';
-import { localizeContact, localizeService, ui } from '../../lib/i18n/localize';
+import { localizeContact, localizeDepartment, ui } from '../../lib/i18n/localize';
 import {
   buildBreadcrumbSchema,
   buildWebPageSchema,
 } from '../../lib/schema';
 import Layout from '../../layouts/Layout.astro';
 
-const dentalServices = clinicServices
-  .filter((service) => service.department === 'أسنان')
-  .map((service) => ({
-    value: service.title,
-    label: localizeService(service, 'en').title,
-  }));
 const copy = ui('en')!;
 const contact = localizeContact('en');
-const whatsappHref = buildWhatsAppUrl('Hello, I would like to ask about Beauty Corner services.');
-const phoneHref = buildPhoneUrl();
+const contactMessage = 'Hello, I would like to ask about Beauty Corner services.';
 const site = Astro.site!;
 const title = copy.pages.bookTitle;
 const description = copy.pages.bookDescription;
@@ -76,11 +70,11 @@ const fieldClass =
             <input name="phone" type="tel" dir="ltr" required pattern="05[0-9]{8}" inputmode="numeric" autocomplete="tel" placeholder={copy.common.phonePlaceholder} class={fieldClass} />
           </label>
           <label class="grid gap-2 text-xs font-bold">
-            {copy.common.service}
-            <select name="service" required class={fieldClass}>
-              <option value="">{copy.lead.chooseDental}</option>
-              {dentalServices.map((service) => (
-                <option value={service.value}>{service.label}</option>
+            {copy.common.department}
+            <select name="department" required class={fieldClass}>
+              <option value="">{copy.common.chooseDepartment}</option>
+              {bookingDepartments.map((department) => (
+                <option value={department}>{localizeDepartment(department, 'en')}</option>
               ))}
             </select>
           </label>
@@ -107,33 +101,31 @@ const fieldClass =
         <p class="mt-3 min-h-5 text-center text-sm font-medium" role="status" aria-live="polite" data-lead-status></p>
       </form>
 
-      <div class="mt-6 flex flex-col gap-3 sm:flex-row" data-gtm-location="lead_quick">
-        <a
-          href={whatsappHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full border border-success/40 bg-success-soft px-5 text-sm font-bold text-success"
-        >
-          {copy.common.contactWhatsapp}
-          <AssetIcon src="/assets/whatsapp.svg" size="sm" />
-        </a>
-        <a
-          href={phoneHref}
-          class="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full border border-primary/30 bg-surface-accent px-5 text-sm font-bold text-primary"
-        >
-          {copy.common.callDirect}
-          <AssetIcon src="/assets/phone.svg" size="sm" />
-        </a>
+      <div class="mt-6" data-gtm-location="lead_quick">
+        <ClinicLineButtons
+          locale="en"
+          mode="both"
+          whatsappMessage={contactMessage}
+          callLabel={copy.common.callDirect}
+          whatsappLabel={copy.common.contactWhatsapp}
+        />
       </div>
 
       <p class="mt-6 text-center text-xs text-muted">{contact.location}</p>
-      <p class="mt-2 text-center text-xs text-muted" dir="ltr">{contact.phoneDisplay}</p>
+      <div class="mt-2 text-center text-xs text-muted">
+        <ClinicPhoneList locale="en" class="inline-flex flex-col items-center space-y-1" />
+      </div>
     </div>
   </section>
 </Layout>
 
 <script>
-  import { buildLeadWhatsAppMessage, buildWhatsAppUrl } from '../../data/contact';
+  import {
+    buildBookingWhatsAppMessage,
+    buildWhatsAppUrl,
+    clinicContact,
+    clinicLineFromDepartment,
+  } from '../../data/contact';
   import { saveCustomerLead } from '../../lib/customer-leads';
   import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
 
@@ -157,11 +149,12 @@ const fieldClass =
       }
 
       const data = new FormData(form);
-      const service = String(data.get('service') ?? '').trim();
-      const message = buildLeadWhatsAppMessage({
+      const department = String(data.get('department') ?? '').trim();
+      const message = buildBookingWhatsAppMessage({
         name: String(data.get('name') ?? '').trim(),
         phone: String(data.get('phone') ?? '').trim(),
-        service,
+        department,
+        branch: clinicContact.branch,
       });
 
       if (status) {
@@ -172,21 +165,25 @@ const fieldClass =
       pushGtmEvent(GtmEvents.formSubmit, {
         form_id: formId,
         method: 'whatsapp',
-        department: 'أسنان',
-        service,
+        department,
+        service: department,
       });
 
       void saveCustomerLead({
         name: String(data.get('name') ?? '').trim(),
         phone: String(data.get('phone') ?? '').trim(),
-        department: 'أسنان',
-        service,
+        department,
+        service: department,
         locale: 'en',
         consent: data.has('consent'),
         website: String(data.get('website') ?? ''),
       }).catch((error) => console.error('Unable to save booking details.', error));
 
-      window.open(buildWhatsAppUrl(message), '_blank', 'noopener,noreferrer');
+      window.open(
+        buildWhatsAppUrl(message, clinicLineFromDepartment(department)),
+        '_blank',
+        'noopener,noreferrer',
+      );
     });
   });
 </script>

@@ -7,7 +7,6 @@ import BookingSection from '../../components/services/BookingSection.astro';
 import SectionHeading from '../../components/ui/SectionHeading.astro';
 import { doctors, getDoctorById } from '../../data/doctors';
 import { faqItems } from '../../data/faq';
-import { clinicServices } from '../../data/services';
 import {
   buildBreadcrumbSchema,
   buildPhysicianSchema,
@@ -33,7 +32,6 @@ const doctorPath = `/doctors/${doctor.id}`;
 const mainEntityId = `${new URL(doctorPath, site).href}#physician`;
 const title = `${doctor.name} — طبيب أسنان في حفر الباطن | بيوتي كورنر`;
 const description = doctor.summary;
-const relatedService = clinicServices.find((service) => service.doctorSpecialty === doctor.specialty);
 const relatedDoctors = doctors
   .filter((item) => item.specialty === doctor.specialty && item.id !== doctor.id)
   .slice(0, 3);
@@ -69,10 +67,7 @@ const relatedDoctors = doctors
   />
   <DoctorDetailContent doctor={doctor} />
 
-  <BookingSection
-    defaultDepartment={doctor.specialty.includes('جلد') ? 'جلدية' : 'أسنان'}
-    defaultService={relatedService?.title}
-  />
+  <BookingSection />
 
   {relatedDoctors.length > 0 && (
     <section class="py-14 sm:py-24" aria-labelledby="related-doctors-heading">

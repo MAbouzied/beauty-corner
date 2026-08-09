@@ -26,7 +26,7 @@ function baseDoc(overrides: Partial<SanityBlogPostDoc> = {}): SanityBlogPostDoc 
       hotspot: { x: 0.4, y: 0.3 },
     },
     author: {
-      name: 'د. محمود',
+      name: 'د. فاطمة',
       role: 'طب أسنان',
     },
     category: {

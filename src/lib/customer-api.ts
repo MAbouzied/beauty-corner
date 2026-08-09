@@ -4,11 +4,6 @@ export const CUSTOMER_BODY_MAX_BYTES = 8_192;
 export const CUSTOMER_RATE_LIMIT = 10;
 export const CUSTOMER_RATE_WINDOW_MS = 60_000;
 
-export type ServiceLookup = {
-  title: string;
-  department: string;
-};
-
 export type ParsedCustomerLead = {
   name: string;
   phone: string;
@@ -30,7 +25,7 @@ export function parseCustomerLeadBody(
   body: Partial<CustomerLead>,
   options: {
     page?: string;
-    services: readonly ServiceLookup[];
+    departments: readonly string[];
   },
 ): CustomerLeadParseResult {
   const page = options.page ?? '';
@@ -41,13 +36,11 @@ export function parseCustomerLeadBody(
 
   const name = clean(body.name, 100);
   const phone = clean(body.phone, 20);
-  const submittedService = clean(body.service, 120);
-  const matchedService = options.services.find((item) => item.title === submittedService);
-  const service = matchedService?.title ?? '';
-  const department = matchedService?.department ?? '';
+  const submittedDepartment = clean(body.department, 120);
+  const department = options.departments.find((item) => item === submittedDepartment) ?? '';
   const locale = body.locale === 'en' ? 'en' : 'ar';
 
-  if (name.length < 3 || !/^05\d{8}$/.test(phone) || !service || body.consent !== true) {
+  if (name.length < 3 || !/^05\d{8}$/.test(phone) || !department || body.consent !== true) {
     return { ok: false, status: 422 };
   }
 
@@ -58,7 +51,8 @@ export function parseCustomerLeadBody(
       name,
       phone,
       department,
-      service,
+      // Booking forms are department-only; keep the column for sheet compatibility.
+      service: department,
       locale,
       page,
     },

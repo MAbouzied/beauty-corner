@@ -1,0 +1,40 @@
+---
+import { clinicSocialLinks } from '../../data/contact';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish } from '../../lib/i18n/localize';
+import AssetIcon from '../ui/AssetIcon.astro';
+
+export interface Props {
+  locale?: Locale;
+  class?: string;
+  /** Optional visible heading above the icons. */
+  heading?: string;
+  /** Unique id prefix when multiple SocialLinks appear on one page. */
+  id?: string;
+}
+
+const { locale = 'ar', class: className = '', heading, id = 'social-links' } = Astro.props;
+const en = isEnglish(locale);
+const resolvedHeading = heading ?? (en ? 'Follow us' : 'تابعنا');
+const headingId = `${id}-heading`;
+---
+
+<nav class:list={['space-y-3', className]} aria-labelledby={headingId}>
+  <h2 id={headingId} class="text-xs font-bold text-ink">{resolvedHeading}</h2>
+  <ul class="flex flex-wrap items-center gap-2">
+    {clinicSocialLinks.map((link) => (
+      <li>
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex size-11 items-center justify-center rounded-full border border-border bg-surface text-ink transition hover:border-primary/40 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          aria-label={en ? link.labelEn : link.labelAr}
+          data-gtm-location="social"
+        >
+          <AssetIcon src={link.icon} size="md" />
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

@@ -1,11 +1,12 @@
 ---
+import ClinicLineButtons from '../../components/contact/ClinicLineButtons.astro';
+import ClinicPhoneList from '../../components/contact/ClinicPhoneList.astro';
 import DoctorCard from '../../components/doctors/DoctorCard.astro';
 import DevicesSection from '../../components/landing/DevicesSection.astro';
 import ServiceCard from '../../components/services/ServiceCard.astro';
 import FaqSection from '../../components/sections/FaqSection.astro';
 import AssetIcon from '../../components/ui/AssetIcon.astro';
 import ButtonLink from '../../components/ui/ButtonLink.astro';
-import { buildPhoneUrl, buildWhatsAppUrl } from '../../data/contact';
 import { doctors } from '../../data/doctors';
 import { clinicServices } from '../../data/services';
 import { localizeContact, localizeFaq, ui } from '../../lib/i18n/localize';
@@ -22,8 +23,7 @@ const contact = localizeContact('en');
 const title = 'Dental & Dermatology Clinic in Hafr Al-Batin | Beauty Corner';
 const description =
   'Beauty Corner dental and dermatology clinic in Hafr Al-Batin — Al Muhammadiyah, King Faisal Road. Book via the website or WhatsApp.';
-const whatsappHref = buildWhatsAppUrl('Hello, I would like to book at Beauty Corner.');
-const phoneHref = buildPhoneUrl();
+const contactMessage = 'Hello, I would like to book at Beauty Corner.';
 const dentalServices = clinicServices.filter((service) => service.department === 'أسنان');
 const landingDoctors = doctors.slice(0, 3);
 const faqItems = localizeFaq('en');
@@ -51,16 +51,15 @@ const faqItems = localizeFaq('en');
         <p class="text-sm font-bold text-primary">{copy.home.eyebrow}</p>
         <h1 class="text-display-hero mt-4 font-black text-ink">{copy.home.heroTitle}</h1>
         <p class="mt-4 max-w-xl text-sm leading-7 text-muted sm:text-lg">{copy.home.heroText}</p>
-        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap" data-gtm-location="hero">
-          <ButtonLink href="/en/book" size="lg">{copy.nav.quickBook}</ButtonLink>
-          <ButtonLink href={whatsappHref} variant="outline" target="_blank" size="lg">
-            {copy.common.whatsapp}
-            <AssetIcon src="/assets/whatsapp.svg" size="sm" />
-          </ButtonLink>
-          <ButtonLink href={phoneHref} variant="outline" size="lg">
-            {copy.common.call}
-            <AssetIcon src="/assets/phone.svg" size="sm" />
-          </ButtonLink>
+        <div class="mt-6 flex flex-col gap-3" data-gtm-location="hero">
+          <ButtonLink href="/en/book" size="lg" class="w-full justify-center sm:w-auto">{copy.nav.quickBook}</ButtonLink>
+          <ClinicLineButtons
+            locale="en"
+            mode="both"
+            whatsappMessage={contactMessage}
+            callLabel={copy.common.call}
+            whatsappLabel={copy.common.whatsapp}
+          />
         </div>
       </div>
       <img
@@ -121,7 +120,10 @@ const faqItems = localizeFaq('en');
           <li><strong class="text-ink">{copy.common.branch}:</strong> {contact.branch}</li>
           <li><strong class="text-ink">{copy.common.address}:</strong> {contact.location}</li>
           <li><strong class="text-ink">{copy.common.hours}:</strong> {contact.hours}</li>
-          <li dir="ltr"><strong class="text-ink">Phone:</strong> {contact.phoneDisplay}</li>
+          <li>
+            <strong class="text-ink">Phone:</strong>
+            <ClinicPhoneList locale="en" class="mt-1 space-y-1" />
+          </li>
         </ul>
         <div class="mt-6 flex flex-col gap-3 sm:flex-row">
           <ButtonLink href="/en/contact">{copy.common.bookAppointment}</ButtonLink>

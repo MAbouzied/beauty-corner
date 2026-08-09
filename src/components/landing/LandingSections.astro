@@ -1,5 +1,5 @@
 ---
-import { buildPhoneUrl, buildWhatsAppUrl, clinicContact } from '../../data/contact';
+import { clinicContact } from '../../data/contact';
 import { doctors } from '../../data/doctors';
 import { faqItems } from '../../data/faq';
 import { clinicServices } from '../../data/services';
@@ -11,6 +11,8 @@ import {
   trustPoints,
 } from '../../data/landing';
 import { clinicMapUrl } from '../../data/seo';
+import ClinicLineButtons from '../contact/ClinicLineButtons.astro';
+import SocialLinks from '../contact/SocialLinks.astro';
 import DoctorCard from '../doctors/DoctorCard.astro';
 import FaqSection from '../sections/FaqSection.astro';
 import ServiceCard from '../services/ServiceCard.astro';
@@ -21,8 +23,7 @@ import DevicesSection from './DevicesSection.astro';
 
 const landingDoctors = doctors.slice(0, 3);
 const landingServices = clinicServices.filter((service) => service.department === 'أسنان');
-const whatsappHref = buildWhatsAppUrl('مرحباً، أود الحجز عبر بيوتي كورنر.');
-const phoneHref = buildPhoneUrl();
+const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كورنر.';
 ---
 
 <section class="border-b border-border bg-surface py-12 sm:py-16" aria-label="مزايا العيادة">
@@ -169,16 +170,9 @@ const phoneHref = buildPhoneUrl();
         <h3 class="text-xl font-black text-balance sm:text-2xl">احجز موعدك بسهولة</h3>
         <p class="mt-3 text-sm leading-7 text-pretty text-muted">قد تختلف مواعيد بعض الأطباء والخدمات حسب جدول الحجوزات. يرجى تأكيد الموعد قبل زيارة العيادة.</p>
         <ul class="mt-5 space-y-3 text-sm"><li>✓ حجز إلكتروني خلال دقيقة</li><li>✓ تأكيد فوري عبر واتساب</li><li>✓ إعادة جدولة مرنة</li></ul>
-        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap" data-gtm-location="hours_cta">
+        <div class="mt-6 flex flex-col gap-3" data-gtm-location="hours_cta">
           <ButtonLink href="/book" class="w-full justify-center sm:w-auto">احجز موعدك</ButtonLink>
-          <ButtonLink href={whatsappHref} variant="outline" target="_blank" class="w-full justify-center sm:w-auto">
-            واتساب
-            <AssetIcon src="/assets/whatsapp.svg" size="sm" />
-          </ButtonLink>
-          <ButtonLink href={phoneHref} variant="outline" class="w-full justify-center sm:w-auto">
-            اتصال
-            <AssetIcon src="/assets/phone.svg" size="sm" />
-          </ButtonLink>
+          <ClinicLineButtons mode="both" whatsappMessage={contactMessage} />
         </div>
       </aside>
     </div>
@@ -222,13 +216,15 @@ const phoneHref = buildPhoneUrl();
           <div><dt class="text-xs font-bold">أوقات العمل</dt><dd class="mt-1 text-sm text-muted">{clinicContact.hours}</dd></div>
           <div>
             <dt class="text-xs font-bold">الهاتف وواتساب</dt>
-            <dd class="mt-1 flex flex-wrap gap-3 text-sm text-muted" data-gtm-location="contact">
-              <a href={phoneHref} dir="ltr" class="hover:text-primary">{clinicContact.phoneDisplay}</a>
-              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="font-bold text-success hover:underline">واتساب</a>
-              <a href={phoneHref} class="font-bold text-primary hover:underline">اتصال</a>
+            <dd class="mt-2 text-sm text-muted" data-gtm-location="contact">
+              <ClinicLineButtons mode="both" size="sm" showPhone whatsappMessage={contactMessage} />
             </dd>
           </div>
           <div data-gtm-location="contact"><dt class="text-xs font-bold">البريد</dt><dd class="mt-1 text-sm text-muted"><a href={`mailto:${clinicContact.email}`}>{clinicContact.email}</a></dd></div>
+          <div>
+            <dt class="sr-only">وسائل التواصل</dt>
+            <dd class="mt-1"><SocialLinks id="contact-social" /></dd>
+          </div>
           <div><dt class="text-xs font-bold">مواقف السيارات</dt><dd class="mt-1 text-sm text-muted">متوفرة أمام الفرع</dd></div>
         </dl>
       </address>

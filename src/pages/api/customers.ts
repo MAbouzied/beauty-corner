@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { clinicServices } from '../../data/services';
+import { bookingDepartments } from '../../data/booking-departments';
 import {
   CUSTOMER_BODY_MAX_BYTES,
   customerRateLimiter,
@@ -54,7 +54,7 @@ export const POST = (async ({ request }) => {
     }
   }
 
-  const parsed = parseCustomerLeadBody(body, { page, services: clinicServices });
+  const parsed = parseCustomerLeadBody(body, { page, departments: bookingDepartments });
   if (!parsed.ok) return json({ ok: false }, parsed.status);
   if (parsed.kind === 'honeypot') return json({ ok: true }, 200);
 

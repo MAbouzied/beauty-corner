@@ -10,7 +10,7 @@
     "build": "astro build",
     "check": "astro check",
     "seo:verify": "node scripts/seo-verify.mjs",
-    "test": "node --experimental-strip-types --test \"src/lib/**/*.test.ts\" \"src/modules/**/*.test.ts\"",
+    "test": "node --experimental-strip-types --test \"src/data/**/*.test.ts\" \"src/lib/**/*.test.ts\" \"src/modules/**/*.test.ts\"",
     "verify": "npm run check && npm run test && npm run build && npm run seo:verify",
     "preview": "astro preview",
     "preview:cf": "npm run build && wrangler dev --config dist/server/wrangler.json",

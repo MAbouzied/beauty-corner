@@ -9,44 +9,50 @@ export interface ClinicDevice {
 export const clinicDevices: readonly ClinicDevice[] = [
   {
     id: 'beyond-whitening',
-    name: 'جهاز Beyond للتبييض',
-    description: 'جهاز تبييض أسنان احترافي بتقنية الإضاءة المتقدمة لنتائج سريعة وآمنة داخل العيادة.',
+    name: 'جهاز Beyond Polus للتبييض',
+    description:
+      'جهاز تبييض احترافي داخل العيادة يستخدم إضاءة متقدمة لتفعيل جل التبييض بأمان ونتائج أوضح خلال الجلسة.',
     image: '/assets/devices/beyond-whitening.jpg',
-    imageAlt: 'جهاز Beyond لتبييض الأسنان داخل عيادة بيوتي كورنر',
+    imageAlt: 'جهاز Beyond Polus لتبييض الأسنان داخل عيادة بيوتي كورنر',
   },
   {
     id: 'dental-unit-integrated',
-    name: 'وحدة علاج أسنان متكاملة',
-    description: 'وحدة علاج حديثة بكراسي مريحة وأدوات دقيقة، مع أجهزة مساعدة للتشخيص والعلاج.',
+    name: 'غرفة علاج متكاملة',
+    description:
+      'غرفة علاجية مجهزة بكرسي أسنان وإضاءة طبية وخزائن معقّمة لتنفيذ الفحص والعلاج في بيئة منظمة.',
     image: '/assets/devices/dental-unit-integrated.jpg',
-    imageAlt: 'وحدة علاج أسنان متكاملة داخل غرفة العلاج',
+    imageAlt: 'غرفة علاج أسنان متكاملة مع كرسي وخزائن طبية',
   },
   {
     id: 'dental-unit-blue',
     name: 'كرسي علاج أسنان متطور',
-    description: 'كرسي علاج مجهز بوحدة أدوات وإضاءة طبية ونظام شفط لضمان راحة المريض ودقة الإجراء.',
+    description:
+      'كرسي علاج مريح بوحدة أدوات وإضاءة قابلة للتوجيه ونظام شفط لدعم التشخيص والإجراءات اليومية.',
     image: '/assets/devices/dental-unit-blue.jpg',
-    imageAlt: 'كرسي علاج أسنان أزرق مع وحدة الأدوات',
+    imageAlt: 'كرسي علاج أسنان أزرق مع وحدة الأدوات والإضاءة الطبية',
   },
   {
     id: 'dental-unit-led',
-    name: 'وحدة علاج بإضاءة LED',
-    description: 'وحدة علاج مزوّدة بإضاءة LED عالية الوضوح ولوحة تحكم حديثة لجلسات تنظيف وعلاج دقيقة.',
+    name: 'وحدة علاج متنقلة بإضاءة LED',
+    description:
+      'وحدة أدوات متنقلة مع إضاءة LED عالية الوضوح لجلسات التنظيف والعلاج مع مرونة في ترتيب غرفة العيادة.',
     image: '/assets/devices/dental-unit-led.jpg',
-    imageAlt: 'وحدة علاج أسنان مع إضاءة LED ولوحة تحكم',
+    imageAlt: 'وحدة علاج أسنان متنقلة مع إضاءة LED وكرسي أزرق',
   },
   {
-    id: 'treatment-room',
-    name: 'غرفة علاج مجهزة بالكامل',
-    description: 'غرفة علاجية معقمة ومجهزة بوحدة أسنان كاملة وخزائن طبية لتنفيذ مختلف الإجراءات.',
-    image: '/assets/devices/treatment-room.jpg',
-    imageAlt: 'غرفة علاج أسنان مجهزة بالكامل داخل العيادة',
+    id: 'woodpecker-ptb',
+    name: 'جهاز قص وعلاج اللثة Woodpecker PT-B',
+    description:
+      'جهاز Woodpecker PT-B بالموجات فوق الصوتية والتلميع الهوائي لإزالة الجير والترسبات وعلاج اللثة بدقة داخل العيادة.',
+    image: '/assets/devices/woodpecker-ptb.png',
+    imageAlt: 'جهاز Woodpecker PT-B لقص وعلاج اللثة داخل عيادة بيوتي كورنر',
   },
   {
     id: 'dental-examination-unit',
-    name: 'وحدة فحص وعلاج متقدمة',
-    description: 'وحدة فحص حديثة بإضاءة قابلة للتوجيه ونظام أدوات متعدد للاستخدام في الفحص والعلاج اليومي.',
+    name: 'وحدة فحص وعلاج يومية',
+    description:
+      'وحدة فحص حديثة بكرسي مريح وإضاءة طبية وذراع أدوات متعددة للاستخدام في الفحص والعلاج اليومي.',
     image: '/assets/devices/dental-examination-unit.jpg',
-    imageAlt: 'وحدة فحص وعلاج أسنان متقدمة بلون تركوازي',
+    imageAlt: 'وحدة فحص وعلاج أسنان بلون تركوازي داخل العيادة',
   },
 ] as const;
