@@ -10,8 +10,16 @@
     "build": "astro build",
     "check": "astro check",
     "seo:verify": "node scripts/seo-verify.mjs",
+    "seo:verify:static": "node scripts/seo-verify.mjs",
+    "seo:test:e2e": "playwright test --project=seo",
     "test": "node --experimental-strip-types --test \"src/data/**/*.test.ts\" \"src/lib/**/*.test.ts\" \"src/modules/**/*.test.ts\"",
-    "verify": "npm run check && npm run test && npm run build && npm run seo:verify",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test --project=a11y",
+    "test:perf": "lhci autorun",
+    "security:audit": "npm audit --omit=dev",
+    "studio:verify": "npm --prefix studio run typecheck && npm --prefix studio run build",
+    "verify": "npm run check && npm run test && npm run build && npm run seo:verify:static && npm run test:e2e",
+    "verify:release": "npm run verify && npm run studio:verify && npm run security:audit && npm run test:perf",
     "preview": "astro preview",
     "preview:cf": "npm run build && wrangler dev --config dist/server/wrangler.json",
     "deploy": "npm run build && wrangler deploy --config dist/server/wrangler.json",
@@ -38,12 +46,25 @@
     "lexical": "^0.49.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "sanitize-html": "2.17.6",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "@axe-core/playwright": "4.12.1",
+    "@lhci/cli": "0.15.1",
+    "@playwright/test": "1.62.1",
     "@types/node": "^26.1.2",
+    "@types/sanitize-html": "2.16.1",
     "typescript": "^6.0.3",
-    "wrangler": "^4.114.0"
+    "wrangler": "^4.120.0"
+  },
+  "overrides": {
+    "undici": "7.29.0",
+    "js-yaml": "4.3.1",
+    "postcss": "8.5.26",
+    "nanoid": "3.3.18",
+    "wrangler": "$wrangler",
+    "miniflare": "5.20260801.1-alpha"
   }
 }
