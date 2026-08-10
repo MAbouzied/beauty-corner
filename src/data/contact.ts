@@ -1,3 +1,5 @@
+import { clinicFacts, formatClinicHours, formatClinicLocation } from './clinic-facts.ts';
+
 export type ClinicLineId = 'dental' | 'dermatology';
 
 export interface ClinicLine {
@@ -75,13 +77,13 @@ export function clinicLineFromDepartment(department: string): ClinicLineId {
 
 export const clinicContact = {
   phones: clinicLines,
-  email: 'info@beautycorner.sa',
-  hours: 'السبت – الخميس · 10:00 ص – 10:00 م',
-  branch: 'حفر الباطن',
-  district: 'حي المحمدية',
-  street: 'طريق الملك فيصل',
-  city: 'حفر الباطن',
-  location: 'حفر الباطن، حي المحمدية، طريق الملك فيصل',
+  email: clinicFacts.email,
+  hours: formatClinicHours('ar'),
+  branch: clinicFacts.cityAr,
+  district: clinicFacts.districtAr,
+  street: clinicFacts.streetAr,
+  city: clinicFacts.cityAr,
+  location: formatClinicLocation('ar'),
 } as const;
 
 export type ClinicSocialId = 'instagram' | 'tiktok' | 'snapchat';

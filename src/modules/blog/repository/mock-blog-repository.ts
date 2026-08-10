@@ -1,4 +1,4 @@
-import { filterPublishedPosts } from '../lib/blog-selectors.ts';
+import { filterPublishedPosts, selectRelatedPosts } from '../lib/blog-selectors.ts';
 import { isValidBlogSlug, normalizeBlogSlug } from '../lib/slug.ts';
 import type { BlogPost } from '../model/blog-types.ts';
 import type { BlogRepository } from './blog-repository.ts';
@@ -19,6 +19,9 @@ export function createMockBlogRepository(): BlogRepository {
       if (!isValidBlogSlug(canonicalSlug)) return null;
       const published = getMockPublishedPostsSync();
       return published.find((post) => post.slug === canonicalSlug) ?? null;
+    },
+    async getRelatedPosts(post, limit = 3) {
+      return selectRelatedPosts(getMockPublishedPostsSync(), post, limit);
     },
   };
 }

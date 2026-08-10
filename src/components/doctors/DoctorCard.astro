@@ -7,9 +7,10 @@ import ButtonLink from '../ui/ButtonLink.astro';
 export interface Props {
   doctor: Doctor;
   locale?: Locale;
+  headingLevel?: 2 | 3;
 }
 
-const { doctor: rawDoctor, locale = 'ar' } = Astro.props;
+const { doctor: rawDoctor, locale = 'ar', headingLevel = 2 } = Astro.props;
 const doctor = localizeDoctor(rawDoctor, locale);
 const en = isEnglish(locale);
 const copy = ui(locale);
@@ -17,6 +18,7 @@ const profileHref = en ? `/en/doctors/${doctor.id}` : `/doctors/${doctor.id}`;
 const viewLabel = en ? copy!.common.viewProfile : 'عرض الملف';
 const bookLabel = en ? copy!.common.bookWithDoctor : 'احجز مع الطبيب';
 const specialtyLabel = doctor.specialtyLabel || localizeSpecialty(doctor.specialty, locale);
+const HeadingTag = headingLevel === 3 ? 'h3' : 'h2';
 ---
 
 <article
@@ -37,9 +39,9 @@ const specialtyLabel = doctor.specialtyLabel || localizeSpecialty(doctor.special
     </span>
   </div>
   <div class="p-5 sm:p-6">
-    <h2 class="text-base font-bold tracking-tight text-balance sm:text-lg">
+    <HeadingTag class="text-base font-bold tracking-tight text-balance sm:text-lg">
       <a href={profileHref} class="hover:text-primary">{doctor.name}</a>
-    </h2>
+    </HeadingTag>
     <p class="mt-1 min-h-10 text-sm leading-5 text-pretty text-muted">{doctor.title}</p>
     <div class="mt-4 flex flex-col gap-2 border-t border-border pt-4">
       <ButtonLink href={profileHref} variant="outline" class="w-full text-center">{viewLabel}</ButtonLink>

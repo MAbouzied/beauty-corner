@@ -21,6 +21,12 @@ export type { BlogValidationIssue } from './model/blog-schema.ts';
 export type { BlogProvider, BlogRepository } from './repository/blog-repository.ts';
 export { createBlogRepository, resolveBlogProvider } from './repository/create-blog-repository.ts';
 export { getMockPublishedPostsSync } from './repository/mock-blog-repository.ts';
+export {
+  loadPublicBlogList,
+  loadPublicBlogPost,
+  loadPublicRelatedPosts,
+} from './lib/load-public-blog.ts';
+export type { PublicBlogResult } from './lib/load-public-blog.ts';
 
 export {
   filterPublishedPosts,

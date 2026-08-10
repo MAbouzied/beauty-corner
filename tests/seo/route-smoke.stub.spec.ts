@@ -1,12 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { createFakeRateLimiter, createFakeSheetsBinding } from '../fixtures/fake-bindings';
 import { getPublishedMockPosts } from '../fixtures/mock-blog';
+import { buildRobotsTxt } from '../../src/lib/seo/robots';
+import { buildSitemapXml, sitemapUnavailableResponse } from '../../src/lib/seo/sitemap-xml';
 
 /**
- * Placeholder SEO / route smoke coverage.
- * Phase 3 adds live 503/404/robots assertions against a preview build.
+ * SEO / route contract stubs.
+ * Live preview coverage can later hit a built Worker; these assert Phase 3 helpers.
  */
-test.describe('Route smoke stubs (Phase 1 scaffolding)', () => {
+test.describe('SEO route contracts', () => {
   test('fake Sheets binding accepts a booking row', async () => {
     const sheets = createFakeSheetsBinding();
     const result = await sheets.append({
@@ -29,5 +31,46 @@ test.describe('Route smoke stubs (Phase 1 scaffolding)', () => {
   test('published mock posts are ready for sitemap/listing stubs', () => {
     const posts = getPublishedMockPosts();
     expect(posts.map((post) => post.slug)).toEqual(['mock-published-post']);
+  });
+
+  test('robots.txt allows production only when indexable', () => {
+    const allowed = buildRobotsTxt({
+      indexable: true,
+      host: 'beautycorner.sa',
+      sitemapUrl: 'https://beautycorner.sa/sitemap.xml',
+    });
+    expect(allowed).toContain('Allow: /');
+    expect(allowed).toContain('Sitemap:');
+
+    const blocked = buildRobotsTxt({
+      indexable: false,
+      host: 'beautycorner.sa',
+      sitemapUrl: 'https://beautycorner.sa/sitemap.xml',
+    });
+    expect(blocked).toContain('Disallow: /');
+    expect(blocked).not.toContain('Sitemap:');
+  });
+
+  test('sitemap unavailable response is plain-text 503 with noindex', async () => {
+    const response = sitemapUnavailableResponse(120);
+    expect(response.status).toBe(503);
+    expect(response.headers.get('X-Robots-Tag')).toBe('noindex, nofollow');
+    expect(await response.text()).toMatch(/unavailable/i);
+  });
+
+  test('sitemap XML excludes private paths by construction', () => {
+    const xml = buildSitemapXml(new URL('https://beautycorner.sa'), [
+      {
+        id: 'home',
+        ar: '/',
+        en: '/en',
+        indexable: true,
+        inSitemap: true,
+        priority: 1,
+      },
+    ]);
+    expect(xml).toContain('https://beautycorner.sa/');
+    expect(xml).not.toContain('/admin');
+    expect(xml).not.toContain('/login');
   });
 });

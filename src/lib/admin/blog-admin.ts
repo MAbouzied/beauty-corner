@@ -211,13 +211,23 @@ function listMock(options: AdminPostListOptions = {}): AdminPost[] {
     .sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
 }
 
-function assertPublishFields(input: { title: string; excerpt: string; contentHtml: string; contentJson?: string; slug: string }): void {
+function assertPublishFields(input: {
+  title: string;
+  excerpt: string;
+  contentHtml: string;
+  contentJson?: string;
+  slug: string;
+  coverUrl?: string;
+  coverAlt?: string;
+}): void {
   assertAdminPublishCopy(input);
   const contentText = input.contentJson ? lexicalJsonToPlainText(input.contentJson) : htmlToPlainText(input.contentHtml);
   if (!contentText.trim()) {
     throw new Error('المقال يحتاج عنواناً ومقدمة ومحتوى قبل النشر.');
   }
   if (!isValidBlogSlug(input.slug)) throw new Error(`الرابط المختصر غير صالح: ${input.slug || 'أدخل رابطاً مختصراً صالحاً.'}`);
+  if (!input.coverUrl?.trim()) throw new Error('صورة الغلاف مطلوبة قبل النشر.');
+  if (!input.coverAlt?.trim()) throw new Error('النص البديل لصورة الغلاف مطلوب قبل النشر.');
 }
 
 function assertMockUniqueSlug(slug: string, id?: string): void {

@@ -1,87 +1,39 @@
 import type { APIRoute } from 'astro';
+import {
+  BLOG_CACHE_MAX_AGE_SECONDS,
+  BLOG_CACHE_SWR_SECONDS,
+  blogListingCacheTags,
+} from '../modules/blog/cache';
 import { getSitemapRoutePairs } from '../lib/i18n/routes';
+import { buildSitemapXml, sitemapUnavailableResponse } from '../lib/seo/sitemap-xml';
 
-function escapeXml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&apos;');
-}
+export const prerender = false;
 
-export const GET: APIRoute = async ({ site }) => {
+export const GET: APIRoute = async (context) => {
+  const site = context.site;
   if (!site) {
     return new Response('Astro site URL must be configured.', { status: 500 });
   }
 
-  const pairs = await getSitemapRoutePairs();
+  try {
+    const pairs = await getSitemapRoutePairs();
+    if (context.cache?.enabled) {
+      context.cache.set({
+        maxAge: BLOG_CACHE_MAX_AGE_SECONDS,
+        swr: BLOG_CACHE_SWR_SECONDS,
+        tags: blogListingCacheTags(),
+      });
+    }
 
-  const urls = pairs.flatMap((pair) => {
-    const arabicLoc = new URL(pair.ar, site).href;
-    const englishLoc = pair.en ? new URL(pair.en, site).href : null;
-    const lastmod = pair.lastmod;
-
-    const arabicEntry = {
-      loc: arabicLoc,
-      changefreq: pair.changefreq ?? 'monthly',
-      priority: pair.priority,
-      lastmod,
-      alternates: {
-        ar: arabicLoc,
-        en: englishLoc,
+    const body = buildSitemapXml(site, pairs);
+    return new Response(body, {
+      headers: {
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': `public, max-age=${BLOG_CACHE_MAX_AGE_SECONDS}`,
       },
-    };
-
-    if (!englishLoc) return [arabicEntry];
-
-    return [
-      arabicEntry,
-      {
-        loc: englishLoc,
-        changefreq: pair.changefreq ?? 'monthly',
-        priority: pair.priority,
-        lastmod,
-        alternates: {
-          ar: arabicLoc,
-          en: englishLoc,
-        },
-      },
-    ];
-  });
-
-  const body = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${urls
-  .map((entry) => {
-    const priority =
-      entry.priority !== undefined ? `\n    <priority>${entry.priority.toFixed(1)}</priority>` : '';
-    const lastmod = entry.lastmod
-      ? `\n    <lastmod>${escapeXml(entry.lastmod)}</lastmod>`
-      : '';
-    const alternateLinks = entry.alternates.en
-      ? `
-    <xhtml:link rel="alternate" hreflang="ar" href="${escapeXml(entry.alternates.ar)}" />
-    <xhtml:link rel="alternate" hreflang="en" href="${escapeXml(entry.alternates.en)}" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(entry.alternates.ar)}" />`
-      : `
-    <xhtml:link rel="alternate" hreflang="ar" href="${escapeXml(entry.alternates.ar)}" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(entry.alternates.ar)}" />`;
-
-    return `  <url>
-    <loc>${escapeXml(entry.loc)}</loc>
-    <changefreq>${entry.changefreq}</changefreq>${priority}${lastmod}${alternateLinks}
-  </url>`;
-  })
-  .join('\n')}
-</urlset>
-`;
-
-  return new Response(body, {
-    headers: {
-      'Content-Type': 'application/xml; charset=utf-8',
-      'Cache-Control': 'public, max-age=3600',
-    },
-  });
+    });
+  } catch (error) {
+    console.error('[sitemap] Failed to build sitemap.', error);
+    return sitemapUnavailableResponse();
+  }
 };

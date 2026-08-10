@@ -86,6 +86,7 @@ export function localizeDoctor(doctor: Doctor, locale: Locale = 'ar'): Doctor & 
     ...doctor,
     name: copy.name,
     title: copy.title,
+    seoRole: copy.seoRole,
     summary: copy.summary,
     sections: copy.sections,
     specialtyLabel: copy.specialty,

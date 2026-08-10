@@ -1,3 +1,5 @@
+import { formatClinicHours, formatClinicHoursFaq, formatClinicLocation } from '../../data/clinic-facts.ts';
+
 export const uiEn = {
   nav: {
     services: 'Services',
@@ -100,8 +102,8 @@ export const uiEn = {
   },
   location: {
     branch: 'Hafr Al-Batin',
-    full: 'Hafr Al-Batin, Al Muhammadiyah, King Faisal Road',
-    hours: 'Saturday – Thursday · 10:00 AM – 10:00 PM',
+    full: formatClinicLocation('en'),
+    hours: formatClinicHours('en'),
   },
   faq: {
     eyebrow: 'FAQ',
@@ -405,6 +407,7 @@ export const doctorsEn: Record<
   {
     name: string;
     title: string;
+    seoRole: string;
     specialty: string;
     summary: string;
     sections: { title: string; paragraphs?: string[]; listItems?: string[] }[];
@@ -413,6 +416,7 @@ export const doctorsEn: Record<
   'dentistry-fatima': {
     name: 'Dr. Fatima Nidal',
     title: 'Dentist',
+    seoRole: 'Dentist at Beauty Corner in Hafr Al-Batin',
     specialty: 'Cosmetic & restorative dentistry',
     summary: 'A dentist providing comprehensive oral and gum care, with clear treatment plans from the first visit.',
     sections: [
@@ -437,6 +441,7 @@ export const doctorsEn: Record<
   'dentistry-wissam': {
     name: 'Dr. Wissam Mandour',
     title: 'Oral & maxillofacial surgery and implants specialist',
+    seoRole: 'Oral & maxillofacial surgery and implants specialist at Beauty Corner in Hafr Al-Batin',
     specialty: 'Cosmetic & restorative dentistry',
     summary: 'A specialist in oral and maxillofacial surgery and dental implants, focused on precise assessment and safe surgical plans.',
     sections: [
@@ -517,12 +522,11 @@ export const faqEn = [
   },
   {
     question: 'Where is the Hafr Al-Batin branch?',
-    answer: 'Beauty Corner is in Hafr Al-Batin, Al Muhammadiyah district, King Faisal Road.',
+    answer: `Beauty Corner is in ${formatClinicLocation('en')}.`,
   },
   {
     question: 'What are the working hours?',
-    answer:
-      'Saturday to Thursday, 10:00 AM to 10:00 PM. Closed on Friday. Hours may change during Ramadan and official holidays.',
+    answer: formatClinicHoursFaq('en'),
   },
   {
     question: 'Can I reschedule or cancel?',

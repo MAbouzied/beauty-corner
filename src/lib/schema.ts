@@ -261,7 +261,7 @@ export function buildPhysicianSchema(
     description: doctor.summary,
     url,
     image: absoluteUrl(site, doctor.image),
-    jobTitle: doctor.title,
+    jobTitle: doctor.seoRole || doctor.title,
     medicalSpecialty: specialtyLabel,
     worksFor: { '@id': organizationId(site) },
     hospitalAffiliation: { '@id': organizationId(site) },

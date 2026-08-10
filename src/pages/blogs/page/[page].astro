@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
 
+import BlogUnavailable from '../../../components/blog/BlogUnavailable.astro';
 import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
 import BookingSection from '../../../components/services/BookingSection.astro';
 import Layout from '../../../layouts/Layout.astro';
@@ -13,28 +14,33 @@ import {
   paginatePosts,
   selectListing,
 } from '../../../modules/blog';
-import { getBlogRepository } from '../../../modules/blog/repository/get-blog-repository';
 import {
   BLOG_CACHE_MAX_AGE_SECONDS,
   BLOG_CACHE_SWR_SECONDS,
   blogListingCacheTags,
 } from '../../../modules/blog/cache';
+import { loadPublicBlogList } from '../../../modules/blog/lib/load-public-blog';
 
 const pageNumber = Number.parseInt(Astro.params.page ?? '', 10);
 if (!Number.isInteger(pageNumber) || pageNumber < 2) {
   return new Response(null, { status: 404, statusText: 'Not Found' });
 }
 
-const repository = getBlogRepository();
-const posts = await repository.getPublishedPosts();
-const listing = selectListing(posts);
-const recentPage = paginatePosts(listing.recent, pageNumber, BLOG_PAGE_SIZE);
+const result = await loadPublicBlogList();
+if (!result.ok) {
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '120');
+  Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+}
 
-if (!recentPage) {
+const listing = result.ok ? selectListing(result.data) : null;
+const recentPage = listing ? paginatePosts(listing.recent, pageNumber, BLOG_PAGE_SIZE) : null;
+
+if (result.ok && !recentPage) {
   return new Response(null, { status: 404, statusText: 'Not Found' });
 }
 
-if (Astro.cache.enabled) {
+if (result.ok && Astro.cache.enabled) {
   Astro.cache.set({
     maxAge: BLOG_CACHE_MAX_AGE_SECONDS,
     swr: BLOG_CACHE_SWR_SECONDS,
@@ -49,33 +55,37 @@ const description =
   'مقالات عربية إضافية من عيادة بيوتي كورنر في حفر الباطن حول صحة الأسنان والبشرة والعناية الوقائية.';
 ---
 
-<Layout
-  title={title}
-  description={description}
-  canonicalPath={path}
-  schemas={buildBlogCollectionSchemas({
-    site,
-    path,
-    name: title,
-    description,
-    posts: recentPage.items,
-  })}
->
-  <Breadcrumbs
-    items={[
-      { name: 'الرئيسية', href: '/' },
-      { name: 'المدونة', href: '/blogs' },
-      { name: `صفحة ${pageNumber}` },
-    ]}
-  />
-  <BlogListing
-    featured={null}
-    recent={recentPage.items}
-    totalPublished={listing.allPublished.length}
-    page={pageNumber}
-    totalPages={recentPage.totalPages}
-    labels={DEFAULT_BLOG_LISTING_LABELS}
+{result.ok && listing && recentPage ? (
+  <Layout
+    title={title}
+    description={description}
+    canonicalPath={path}
+    schemas={buildBlogCollectionSchemas({
+      site,
+      path,
+      name: title,
+      description,
+      posts: recentPage.items,
+    })}
   >
-    <BookingSection slot="cta" />
-  </BlogListing>
-</Layout>
+    <Breadcrumbs
+      items={[
+        { name: 'الرئيسية', href: '/' },
+        { name: 'المدونة', href: '/blogs' },
+        { name: `صفحة ${pageNumber}` },
+      ]}
+    />
+    <BlogListing
+      featured={null}
+      recent={recentPage.items}
+      totalPublished={listing.allPublished.length}
+      page={pageNumber}
+      totalPages={recentPage.totalPages}
+      labels={DEFAULT_BLOG_LISTING_LABELS}
+    >
+      <BookingSection slot="cta" />
+    </BlogListing>
+  </Layout>
+) : (
+  <BlogUnavailable />
+)}

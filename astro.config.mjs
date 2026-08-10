@@ -82,6 +82,12 @@ export default defineConfig({
         optional: true,
         default: 'cdn.sanity.io',
       }),
+      SEO_INDEXABLE: envField.boolean({
+        context: 'server',
+        access: 'public',
+        optional: true,
+        default: false,
+      }),
       PUBLIC_SANITY_STUDIO_URL: envField.string({
         context: 'client',
         access: 'public',

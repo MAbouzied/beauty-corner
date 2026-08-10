@@ -22,6 +22,8 @@ export interface Doctor {
   id: string;
   name: string;
   title: string;
+  /** SEO-oriented role used in titles/JSON-LD when distinct from short card title. */
+  seoRole: string;
   specialty: Exclude<Specialty, 'كل الأطباء'>;
   branch: Branch;
   services: readonly Service[];
@@ -36,6 +38,7 @@ export const doctors: readonly Doctor[] = [
     id: 'dentistry-fatima',
     name: 'د. فاطمة نضال',
     title: 'طبيبة أسنان',
+    seoRole: 'طبيبة أسنان في بيوتي كورنر بحفر الباطن',
     specialty: 'طب وتجميل الأسنان',
     branch: 'حفر الباطن',
     services: ['استشارة', 'جلسة علاج', 'متابعة'],
@@ -69,6 +72,7 @@ export const doctors: readonly Doctor[] = [
     id: 'dentistry-wissam',
     name: 'د. وسام مندور',
     title: 'أخصائي جراحة وجه وفكين وزراعة',
+    seoRole: 'أخصائي جراحة وجه وفكين وزراعة أسنان في بيوتي كورنر بحفر الباطن',
     specialty: 'طب وتجميل الأسنان',
     branch: 'حفر الباطن',
     services: ['استشارة', 'جلسة علاج', 'متابعة'],

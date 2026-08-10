@@ -7,6 +7,7 @@ import SiteFooter from '../components/site/SiteFooter.astro';
 import SiteHeader from '../components/site/SiteHeader.astro';
 import { organization } from '../data/organization';
 import { imageMimeType, socialCard } from '../data/seo';
+import { SEO_INDEXABLE } from 'astro:env/server';
 import { isGtmConfigured } from '../lib/gtm';
 import {
   getAlternatePaths,
@@ -90,7 +91,11 @@ const isPreviewHost =
   host === '127.0.0.1';
 
 const routePair = findRoutePair(pathname);
-const effectiveNoindex = noindex || isPreviewHost || routePair?.indexable === false;
+const effectiveNoindex =
+  noindex ||
+  SEO_INDEXABLE !== true ||
+  isPreviewHost ||
+  routePair?.indexable === false;
 
 const resolvedCanonicalPath = normalizePathname(canonicalPath ?? pathname);
 const canonicalUrl = new URL(resolvedCanonicalPath, site);

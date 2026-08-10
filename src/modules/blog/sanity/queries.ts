@@ -1,4 +1,54 @@
-/** Shared projection for collection and detail queries. */
+/** Listing/summary projection — excludes heavy body fields. */
+export const blogPostSummaryProjection = `{
+  _id,
+  title,
+  "slug": slug.current,
+  locale,
+  excerpt,
+  coverUrl,
+  coverUrlAlt,
+  cover{
+    asset->{
+      _id,
+      url,
+      metadata{ dimensions }
+    },
+    alt,
+    caption,
+    hotspot,
+    crop
+  },
+  author->{
+    name,
+    role,
+    image{
+      asset->{
+        _id,
+        url,
+        metadata{ dimensions }
+      },
+      alt,
+      caption,
+      hotspot,
+      crop
+    }
+  },
+  category->{
+    "categoryId": categoryId.current,
+    label
+  },
+  publishedAt,
+  updatedAt,
+  featured,
+  seo,
+  relatedServiceId,
+  "relatedPosts": relatedPosts[]->{
+    "slug": slug.current
+  },
+  readingTimeMinutes
+}`;
+
+/** Full article projection including body payloads. */
 export const blogPostProjection = `{
   _id,
   title,
@@ -81,20 +131,26 @@ export const blogPostProjection = `{
   readingTimeMinutes
 }`;
 
-export const publishedPostsQuery = `*[
+const publishedFilter = `
   _type == "blogPost"
   && locale == "ar"
   && defined(slug.current)
   && !(_id in path("drafts.**"))
   && defined(publishedAt)
   && publishedAt <= now()
-] | order(featured desc, publishedAt desc) ${blogPostProjection}`;
+`;
+
+export const publishedPostsQuery = `*[${publishedFilter}] | order(featured desc, publishedAt desc) ${blogPostSummaryProjection}`;
 
 export const publishedPostBySlugQuery = `*[
-  _type == "blogPost"
-  && locale == "ar"
+  ${publishedFilter}
   && slug.current == $slug
-  && !(_id in path("drafts.**"))
-  && defined(publishedAt)
-  && publishedAt <= now()
 ][0] ${blogPostProjection}`;
+
+export const relatedPostsQuery = `*[
+  ${publishedFilter}
+  && slug.current != $slug
+] | order(
+  select(category->categoryId.current == $categoryId => 0, 1) asc,
+  publishedAt desc
+)[0...$limit] ${blogPostSummaryProjection}`;

@@ -1,3 +1,5 @@
+import { clinicOpeningHoursRows } from './clinic-facts.ts';
+
 export const trustPoints = ['أطباء متخصصون', 'أجهزة وتقنيات حديثة', 'خصوصية وراحة', 'خطط علاجية مخصصة'] as const;
 
 export const serviceGroups = [
@@ -31,12 +33,4 @@ export const experiencePoints = [
   ['مساحات انتظار مريحة', 'بيئة هادئة تحفظ خصوصيتك.'],
 ] as const;
 
-export const openingHours = [
-  ['السبت', '10:00 ص – 10:00 م'],
-  ['الأحد', '10:00 ص – 10:00 م'],
-  ['الاثنين', '10:00 ص – 10:00 م'],
-  ['الثلاثاء', '10:00 ص – 10:00 م'],
-  ['الأربعاء', '10:00 ص – 10:00 م'],
-  ['الخميس', '10:00 ص – 10:00 م'],
-  ['الجمعة', 'مغلق'],
-] as const;
+export const openingHours = clinicOpeningHoursRows('ar');

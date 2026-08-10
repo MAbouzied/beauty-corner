@@ -30,7 +30,7 @@ if (!doctor) {
 const site = Astro.site!;
 const doctorPath = `/doctors/${doctor.id}`;
 const mainEntityId = `${new URL(doctorPath, site).href}#physician`;
-const title = `${doctor.name} — طبيب أسنان في حفر الباطن | بيوتي كورنر`;
+const title = `${doctor.name} — ${doctor.seoRole} | بيوتي كورنر`;
 const description = doctor.summary;
 const relatedDoctors = doctors
   .filter((item) => item.specialty === doctor.specialty && item.id !== doctor.id)

@@ -1,10 +1,11 @@
-import { clinicContact, clinicLines } from './contact';
-import { clinicServices } from './services';
+import { clinicFacts } from './clinic-facts.ts';
+import { clinicContact, clinicLines } from './contact.ts';
+import { clinicServices } from './services.ts';
 
 export const organization = {
-  name: 'بيوتي كورنر',
-  alternateName: 'Beauty Corner',
-  legalName: 'بيوتي كورنر',
+  name: clinicFacts.nameAr,
+  alternateName: clinicFacts.nameEn,
+  legalName: clinicFacts.nameAr,
   description:
     'عيادة لطب الأسنان والجلدية في حفر الباطن — حي المحمدية، طريق الملك فيصل.',
   email: clinicContact.email,
@@ -21,13 +22,13 @@ export const organization = {
   logoPath: '/assets/logo.png',
   imagePath: '/assets/landing-hero.jpg',
   addressCountry: 'SA',
-  addressRegion: 'المنطقة الشرقية',
+  addressRegion: clinicFacts.regionAr,
   addressLocality: clinicContact.city,
   streetAddress: `${clinicContact.district}، ${clinicContact.street}`,
   openingHours: {
-    days: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'] as const,
-    opens: '10:00',
-    closes: '22:00',
+    days: clinicFacts.openDays,
+    opens: clinicFacts.opens,
+    closes: clinicFacts.closes,
   },
   medicalSpecialties: [
     'Dentistry',

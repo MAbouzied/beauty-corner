@@ -3,9 +3,11 @@ import { mapSanityPostToBlogPost, mapSanityPosts } from '../sanity/map-sanity-po
 import {
   publishedPostBySlugQuery,
   publishedPostsQuery,
+  relatedPostsQuery,
 } from '../sanity/queries.ts';
 import type { SanityBlogPostDoc } from '../sanity/types.ts';
 import { isValidBlogSlug, normalizeBlogSlug } from '../lib/slug.ts';
+import type { BlogPost } from '../model/blog-types.ts';
 import type { BlogRepository } from './blog-repository.ts';
 
 export interface SanityBlogConfig {
@@ -25,7 +27,7 @@ export function createSanityBlogRepository(config: SanityBlogConfig = {}): BlogR
   return {
     async getPublishedPosts() {
       const docs = await client.fetch<SanityBlogPostDoc[]>(publishedPostsQuery);
-      return mapSanityPosts(docs ?? [], imageConfig);
+      return mapSanityPosts(docs ?? [], imageConfig, undefined, { summary: true });
     },
     async getPostBySlug(slug: string) {
       const canonicalSlug = normalizeBlogSlug(slug);
@@ -35,6 +37,14 @@ export function createSanityBlogRepository(config: SanityBlogConfig = {}): BlogR
       });
       if (!doc) return null;
       return mapSanityPostToBlogPost(doc, imageConfig);
+    },
+    async getRelatedPosts(post: BlogPost, limit = 3) {
+      const docs = await client.fetch<SanityBlogPostDoc[]>(relatedPostsQuery, {
+        slug: post.slug,
+        categoryId: post.category.id,
+        limit,
+      });
+      return mapSanityPosts(docs ?? [], imageConfig, undefined, { summary: true });
     },
   };
 }

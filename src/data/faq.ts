@@ -1,3 +1,5 @@
+import { formatClinicHoursFaq, formatClinicLocation } from './clinic-facts.ts';
+
 export interface FaqItem {
   question: string;
   answer: string;
@@ -20,11 +22,11 @@ export const faqItems: readonly FaqItem[] = [
   },
   {
     question: 'أين يقع فرع حفر الباطن؟',
-    answer: 'عيادة بيوتي كورنر في حفر الباطن، حي المحمدية، طريق الملك فيصل.',
+    answer: `عيادة بيوتي كورنر في ${formatClinicLocation('ar')}.`,
   },
   {
     question: 'ما أوقات العمل؟',
-    answer: 'نعمل من السبت إلى الخميس من الساعة 10:00 صباحًا حتى 10:00 مساءً، والجمعة مغلق. قد تختلف المواعيد خلال رمضان والإجازات الرسمية.',
+    answer: formatClinicHoursFaq('ar'),
   },
   {
     question: 'هل يمكن تعديل أو إلغاء الموعد؟',

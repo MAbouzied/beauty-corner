@@ -40,8 +40,10 @@ function requireString(
 export function mapSanityPostToBlogPost(
   doc: SanityBlogPostDoc,
   imageConfig: SanityImageUrlConfig,
+  options: { summary?: boolean } = {},
 ): BlogPost {
   const documentId = doc._id;
+  const summary = options.summary === true;
 
   try {
     const slug = requireString(doc.slug, documentId, 'slug');
@@ -55,12 +57,17 @@ export function mapSanityPostToBlogPost(
 
     const lexicalPost = doc.bodyFormat === 'lexical' && Boolean(doc.bodyJson?.trim());
     const lexicalJson = lexicalPost ? normalizeLexicalJson(doc.bodyJson!.trim()) : '';
-    const adminHtmlPost = Boolean(doc.bodyHtml?.trim()) || lexicalPost;
+    const adminHtmlPost = Boolean(doc.bodyHtml?.trim()) || lexicalPost || summary;
     const categoryId = adminHtmlPost ? (doc.category?.categoryId?.trim() || 'general') : requireString(doc.category?.categoryId, documentId, 'category.categoryId');
     const categoryLabel = adminHtmlPost ? (doc.category?.label?.trim() || 'عام') : requireString(doc.category?.label, documentId, 'category.label');
     const authorName = adminHtmlPost ? (doc.author?.name?.trim() || 'فريق بيوتي كورنر') : requireString(doc.author?.name, documentId, 'author.name');
 
-    if ((!Array.isArray(doc.body) || doc.body.length === 0) && !doc.bodyHtml?.trim() && !doc.bodyJson?.trim()) {
+    if (
+      !summary &&
+      (!Array.isArray(doc.body) || doc.body.length === 0) &&
+      !doc.bodyHtml?.trim() &&
+      !doc.bodyJson?.trim()
+    ) {
       throw new Error(`Sanity document ${documentId}: body is empty`);
     }
 
@@ -103,7 +110,9 @@ export function mapSanityPostToBlogPost(
         ...(doc.seo?.focusKeyword?.trim() ? { focusKeyword: doc.seo.focusKeyword.trim() } : {}),
         ...(doc.seo?.canonicalUrl?.trim() ? { canonicalUrl: doc.seo.canonicalUrl.trim() } : {}),
       },
-      body: lexicalPost
+      body: summary
+        ? { format: 'html' as const, html: '<p>·</p>' }
+        : lexicalPost
         ? { format: 'lexical' as const, version: 1, json: lexicalJson }
         : doc.bodyHtml?.trim()
         ? { format: 'html' as const, html: sanitizeBlogHtml(doc.bodyHtml) }
@@ -132,12 +141,13 @@ export function mapSanityPosts(
   docs: readonly SanityBlogPostDoc[],
   imageConfig: SanityImageUrlConfig,
   onInvalidDocument: SanityPostMappingIssueLogger = logSkippedSanityDocument,
+  options: { summary?: boolean } = {},
 ): BlogPost[] {
   const posts: BlogPost[] = [];
 
   for (const doc of docs) {
     try {
-      posts.push(mapSanityPostToBlogPost(doc, imageConfig));
+      posts.push(mapSanityPostToBlogPost(doc, imageConfig, options));
     } catch (error) {
       const mappingError = error instanceof SanityBlogPostMappingError
         ? error
