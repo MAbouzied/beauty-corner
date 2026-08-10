@@ -1,7 +1,8 @@
 import { defineMiddleware } from 'astro:middleware';
-import { ADMIN_AUTH_DISABLED } from 'astro:env/server';
 import { assertStaffAccess, sanitizeReturnUrl } from './lib/auth/authorization.ts';
+import { adminAuthBypassEnabled } from './lib/staff-access/admin-auth.ts';
 import { adminApiError } from './lib/staff-access/http.ts';
+import { withPrivateSecurityHeaders, withSecurityHeaders } from './lib/security/headers.ts';
 
 function isAdminPage(pathname: string): boolean {
   return pathname === '/admin' || pathname.startsWith('/admin/');
@@ -21,20 +22,9 @@ function isAuthSurface(pathname: string): boolean {
   );
 }
 
-function withPrivateHeaders(response: Response): Response {
-  const headers = new Headers(response.headers);
-  headers.set('Cache-Control', 'private, no-store');
-  headers.set('X-Robots-Tag', 'noindex, nofollow');
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
-}
-
 function unavailableResponse(isApi: boolean): Response {
-  if (isApi) return adminApiError('STAFF_STORE_UNAVAILABLE');
-  return withPrivateHeaders(
+  if (isApi) return withPrivateSecurityHeaders(adminApiError('STAFF_STORE_UNAVAILABLE'));
+  return withPrivateSecurityHeaders(
     new Response('Staff access is temporarily unavailable. Please try again later.', {
       status: 503,
       headers: { 'Content-Type': 'text/plain; charset=utf-8' },
@@ -43,8 +33,8 @@ function unavailableResponse(isApi: boolean): Response {
 }
 
 function forbiddenResponse(isApi: boolean): Response {
-  if (isApi) return adminApiError('FORBIDDEN');
-  return withPrivateHeaders(
+  if (isApi) return withPrivateSecurityHeaders(adminApiError('FORBIDDEN'));
+  return withPrivateSecurityHeaders(
     new Response('Access denied. This Google account is not authorized for staff admin.', {
       status: 403,
       headers: { 'Content-Type': 'text/plain; charset=utf-8' },
@@ -65,7 +55,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Load Better Auth only on dynamic auth surfaces so prerendering public pages
   // does not pull staff-only runtime dependencies into their render path.
-  if (authSurface && !ADMIN_AUTH_DISABLED) {
+  if (authSurface && !adminAuthBypassEnabled) {
     try {
       const { getAuth } = await import('./lib/auth/server.ts');
       const auth = getAuth();
@@ -101,11 +91,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  if (!ADMIN_AUTH_DISABLED && protectedSurface) {
+  if (!adminAuthBypassEnabled && protectedSurface) {
     if (!context.locals.user) {
-      if (adminApi) return adminApiError('UNAUTHENTICATED');
+      if (adminApi) return withPrivateSecurityHeaders(adminApiError('UNAUTHENTICATED'));
       const returnTo = sanitizeReturnUrl(`${pathname}${context.url.search}`);
-      return withPrivateHeaders(
+      return withPrivateSecurityHeaders(
         context.redirect(`/login?returnTo=${encodeURIComponent(returnTo)}`),
       );
     }
@@ -120,5 +110,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   const response = await next();
-  return authSurface ? withPrivateHeaders(response) : response;
+  if (authSurface) return withPrivateSecurityHeaders(response);
+  return withSecurityHeaders(response);
 });

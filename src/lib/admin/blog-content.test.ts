@@ -1,6 +1,33 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { lexicalJsonToHtml, lexicalJsonToPlainText, normalizeLexicalJson } from './blog-content.ts';
+import {
+  lexicalJsonToHtml,
+  lexicalJsonToPlainText,
+  normalizeLexicalJson,
+  sanitizeBlogHtml,
+} from './blog-content.ts';
+
+describe('sanitizeBlogHtml', () => {
+  it('canonicalizes anchor rel and drops scripts', () => {
+    const html = sanitizeBlogHtml(
+      '<a href="https://example.com" target="_blank" rel="opener">Link</a><script>alert(1)</script>',
+    );
+    assert.match(html, /rel="noopener noreferrer"/);
+    assert.doesNotMatch(html, /rel="opener"/);
+    assert.doesNotMatch(html, /script|alert/);
+  });
+
+  it('is idempotent for safe markup', () => {
+    const once = sanitizeBlogHtml('<p>مرحبا <strong>بك</strong></p>');
+    assert.equal(sanitizeBlogHtml(once), once);
+  });
+
+  it('rejects javascript URLs and keeps text when links are unsafe', () => {
+    const html = sanitizeBlogHtml('<a href="javascript:alert(1)">خطر</a>');
+    assert.doesNotMatch(html, /javascript|href=/);
+    assert.match(html, /خطر/);
+  });
+});
 
 describe('Lexical blog content', () => {
   it('normalizes supported formatting and serializes safe HTML', () => {
@@ -42,7 +69,10 @@ describe('Lexical blog content', () => {
     const normalized = normalizeLexicalJson(json);
     assert.match(normalized, /"align":"left"/);
     assert.match(normalized, /"width":50/);
-    assert.match(lexicalJsonToHtml(normalized), /style="width:50%;margin-inline:auto 0"/);
+    assert.match(
+      lexicalJsonToHtml(normalized),
+      /class="blog-body__image blog-body__image--w50 blog-body__image--left"/,
+    );
   });
 
   it('keeps supported video alignment and width controls', () => {
@@ -52,6 +82,9 @@ describe('Lexical blog content', () => {
     const normalized = normalizeLexicalJson(json);
     assert.match(normalized, /"align":"right"/);
     assert.match(normalized, /"width":75/);
-    assert.match(lexicalJsonToHtml(normalized), /<figure class="blog-body__embed" style="width:75%;margin-inline:0 auto"/);
+    assert.match(
+      lexicalJsonToHtml(normalized),
+      /class="blog-body__embed blog-body__embed--w75 blog-body__embed--right"/,
+    );
   });
 });

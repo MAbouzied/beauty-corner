@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { bookingDepartments } from '../data/booking-departments.ts';
 import {
+  assertCustomerRequestAllowed,
   createMemoryRateLimiter,
+  enforceCustomerRateLimit,
   parseCustomerLeadBody,
 } from './customer-api.ts';
 
@@ -47,6 +49,53 @@ describe('parseCustomerLeadBody', () => {
     }, { departments: bookingDepartments });
 
     assert.deepEqual(result, { ok: true, kind: 'honeypot' });
+  });
+});
+
+describe('assertCustomerRequestAllowed', () => {
+  it('requires exact Origin and blocks cross-site Fetch Metadata', () => {
+    const url = new URL('https://beautycorner.sa/api/customers');
+    const ok = new Request(url, {
+      headers: {
+        Origin: 'https://beautycorner.sa',
+        'Sec-Fetch-Site': 'same-origin',
+      },
+    });
+    assert.equal(assertCustomerRequestAllowed(ok, url), true);
+
+    const cross = new Request(url, {
+      headers: {
+        Origin: 'https://beautycorner.sa',
+        'Sec-Fetch-Site': 'cross-site',
+      },
+    });
+    assert.equal(assertCustomerRequestAllowed(cross, url), false);
+
+    const missing = new Request(url, {
+      headers: { 'Sec-Fetch-Site': 'same-origin' },
+    });
+    assert.equal(assertCustomerRequestAllowed(missing, url), false);
+  });
+});
+
+describe('enforceCustomerRateLimit', () => {
+  it('fails closed when the binding is missing in production mode', async () => {
+    assert.equal(
+      await enforceCustomerRateLimit(null, 'customers:1', { failClosed: true }),
+      'unavailable',
+    );
+  });
+
+  it('honors Cloudflare-style limiter results', async () => {
+    const limiter = {
+      async limit() {
+        return { success: false };
+      },
+    };
+    assert.equal(
+      await enforceCustomerRateLimit(limiter, 'customers:1', { failClosed: true }),
+      'limited',
+    );
   });
 });
 

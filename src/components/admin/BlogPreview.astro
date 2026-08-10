@@ -1,5 +1,6 @@
 ---
 import type { AdminPost } from '../../lib/admin/blog-admin.ts';
+import { sanitizeBlogHtml } from '../../lib/admin/blog-content.ts';
 import '../../modules/blog/styles/blog.css';
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
+const previewHtml = sanitizeBlogHtml(post.contentHtml || '<p>لا يوجد محتوى بعد.</p>');
 ---
 
 <section class="preview-view">
@@ -21,7 +23,7 @@ const { post } = Astro.props;
     <p>{post.excerpt || 'لا توجد مقدمة مختصرة لهذا المقال بعد.'}</p>
     {post.coverUrl && <img class="preview-cover" src={post.coverUrl} alt={post.coverAlt || post.title} />}
     <hr />
-    <div class="blog-body preview-body" set:html={post.contentHtml || '<p>لا يوجد محتوى بعد.</p>'}></div>
+    <div class="blog-body preview-body" set:html={previewHtml}></div>
   </article>
 </section>
 

@@ -37,6 +37,8 @@ const fieldClass =
 
       <form
         class="rounded-[2rem] border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-8"
+        method="post"
+        action="/api/customers"
         data-lead-form
         data-gtm-form="lead_quick"
         novalidate
@@ -48,11 +50,11 @@ const fieldClass =
         <div class="grid gap-4">
           <label class="grid gap-2 text-xs font-bold">
             الاسم
-            <input name="name" type="text" required minlength="3" autocomplete="name" placeholder="اسمك الكامل" class={fieldClass} />
+            <input name="name" type="text" required minlength="3" maxlength="100" autocomplete="name" placeholder="اسمك الكامل" class={fieldClass} />
           </label>
           <label class="grid gap-2 text-xs font-bold">
             رقم الجوال
-            <input name="phone" type="tel" dir="ltr" required pattern="05[0-9]{8}" inputmode="numeric" autocomplete="tel" placeholder="05XXXXXXXX" class={fieldClass} />
+            <input name="phone" type="tel" dir="ltr" required minlength="10" maxlength="20" pattern="05[0-9]{8}" inputmode="numeric" autocomplete="tel" placeholder="05XXXXXXXX" class={fieldClass} />
           </label>
           <label class="grid gap-2 text-xs font-bold">
             القسم
@@ -139,34 +141,35 @@ const fieldClass =
         department,
         branch: clinicContact.branch,
       });
-
-      if (status) {
-        status.textContent = 'جارٍ فتح واتساب...';
-        status.className = 'mt-3 min-h-5 text-center text-sm font-medium text-success';
-      }
+      const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(department));
 
       pushGtmEvent(GtmEvents.formSubmit, {
         form_id: formId,
         method: 'whatsapp',
-        department,
-        service: department,
       });
 
-      void saveCustomerLead({
-        name: String(data.get('name') ?? '').trim(),
-        phone: String(data.get('phone') ?? '').trim(),
-        department,
-        service: department,
-        locale: 'ar',
-        consent: data.has('consent'),
-        website: String(data.get('website') ?? ''),
-      }).catch((error) => console.error('Unable to save booking details.', error));
+      void (async () => {
+        const result = await saveCustomerLead({
+          name: String(data.get('name') ?? '').trim(),
+          phone: String(data.get('phone') ?? '').trim(),
+          department,
+          service: department,
+          locale: 'ar',
+          consent: data.has('consent'),
+          website: String(data.get('website') ?? ''),
+        });
 
-      window.open(
-        buildWhatsAppUrl(message, clinicLineFromDepartment(department)),
-        '_blank',
-        'noopener,noreferrer',
-      );
+        if (status) {
+          status.textContent = result.ok
+            ? 'جارٍ فتح واتساب...'
+            : 'تعذر حفظ السجل الإلكتروني. سيتم فتح واتساب لإرسال الطلب للعيادة.';
+          status.className = result.ok
+            ? 'mt-3 min-h-5 text-center text-sm font-medium text-success'
+            : 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
+        }
+
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      })();
     });
   });
 </script>

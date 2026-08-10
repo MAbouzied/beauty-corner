@@ -103,11 +103,16 @@ const labels = en
       <form
         id="booking-form"
         class="rounded-[2rem] border border-border bg-surface p-4 shadow-[var(--shadow-card)] sm:p-8"
+        method="post"
+        action="/api/customers"
         novalidate
         data-gtm-form="booking_section"
         data-locale={locale}
         data-msg-invalid={labels.statusInvalid}
         data-msg-opening={labels.statusOpening}
+        data-msg-sheets-failed={en
+          ? 'We could not save the online record. WhatsApp will still open so the clinic receives your request.'
+          : 'تعذر حفظ السجل الإلكتروني. سيتم فتح واتساب حتى يصل طلبك للعيادة.'}
         data-msg-name={labels.errors.name}
         data-msg-phone={labels.errors.phone}
         data-msg-department={labels.errors.department}
@@ -120,12 +125,12 @@ const labels = en
         <div class="grid gap-4">
           <div class="space-y-1.5">
             <label for="booking-name" class="block text-xs font-bold">{labels.name}</label>
-            <input id="booking-name" name="name" type="text" class={fieldClass} placeholder={labels.namePh} autocomplete="name" minlength="3" required />
+            <input id="booking-name" name="name" type="text" class={fieldClass} placeholder={labels.namePh} autocomplete="name" minlength="3" maxlength="100" required />
             <p class="hidden text-xs text-danger" data-error-for="booking-name"></p>
           </div>
           <div class="space-y-1.5">
             <label for="booking-phone" class="block text-xs font-bold">{labels.phone}</label>
-            <input id="booking-phone" name="phone" type="tel" dir="ltr" class={fieldClass} placeholder={labels.phonePh} autocomplete="tel" inputmode="numeric" pattern="05[0-9]{8}" required />
+            <input id="booking-phone" name="phone" type="tel" dir="ltr" class={fieldClass} placeholder={labels.phonePh} autocomplete="tel" inputmode="numeric" minlength="10" maxlength="20" pattern="05[0-9]{8}" required />
             <p class="hidden text-xs text-danger" data-error-for="booking-phone"></p>
           </div>
           <div class="space-y-1.5">
@@ -247,34 +252,35 @@ const labels = en
         department,
         branch: clinicContact.branch,
       });
-
-      if (bookingStatus) {
-        bookingStatus.textContent = bookingForm.dataset.msgOpening ?? '';
-        bookingStatus.className = 'mt-4 min-h-5 text-center text-sm font-medium text-success';
-      }
+      const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(department));
 
       pushGtmEvent(GtmEvents.formSubmit, {
         form_id: formId,
         method: 'whatsapp',
-        department,
-        service: department,
       });
 
-      void saveCustomerLead({
-        name: String(data.get('name') ?? '').trim(),
-        phone: String(data.get('phone') ?? '').trim(),
-        department,
-        service: department,
-        locale: bookingForm.dataset.locale === 'en' ? 'en' : 'ar',
-        consent: data.has('consent'),
-        website: String(data.get('website') ?? ''),
-      }).catch((error) => console.error('Unable to save booking details.', error));
+      void (async () => {
+        const result = await saveCustomerLead({
+          name: String(data.get('name') ?? '').trim(),
+          phone: String(data.get('phone') ?? '').trim(),
+          department,
+          service: department,
+          locale: bookingForm.dataset.locale === 'en' ? 'en' : 'ar',
+          consent: data.has('consent'),
+          website: String(data.get('website') ?? ''),
+        });
 
-      window.open(
-        buildWhatsAppUrl(message, clinicLineFromDepartment(department)),
-        '_blank',
-        'noopener,noreferrer',
-      );
+        if (bookingStatus) {
+          bookingStatus.textContent = result.ok
+            ? (bookingForm.dataset.msgOpening ?? '')
+            : (bookingForm.dataset.msgSheetsFailed ?? '');
+          bookingStatus.className = result.ok
+            ? 'mt-4 min-h-5 text-center text-sm font-medium text-success'
+            : 'mt-4 min-h-5 text-center text-sm font-medium text-danger';
+        }
+
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      })();
     });
   });
 </script>

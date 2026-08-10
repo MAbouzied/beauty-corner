@@ -27,7 +27,7 @@ export function createFakeSheetsBinding() {
 export function createFakeRateLimiter(limit = 5) {
   let hits = 0;
   return {
-    async limit(): Promise<FakeRateLimitResult> {
+    async limit(_options?: { key: string }): Promise<FakeRateLimitResult> {
       hits += 1;
       const remaining = Math.max(0, limit - hits);
       return {

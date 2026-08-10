@@ -1,9 +1,16 @@
 import { createClient, type IdentifiedSanityDocumentStub, type SanityClient } from '@sanity/client';
-import { BLOG_PROVIDER, SANITY_API_VERSION, SANITY_DATASET, SANITY_PROJECT_ID, SANITY_WRITE_TOKEN } from 'astro:env/server';
+import {
+  ADMIN_IMAGE_IMPORT_HOSTS,
+  BLOG_PROVIDER,
+  SANITY_API_VERSION,
+  SANITY_DATASET,
+  SANITY_PROJECT_ID,
+  SANITY_WRITE_TOKEN,
+} from 'astro:env/server';
 import { clinicServices } from '../../data/services.ts';
 import { calculateReadingTimeMinutes } from '../../modules/blog/lib/reading-time.ts';
 import type { BlogPost } from '../../modules/blog/model/blog-types.ts';
-import { sanitizeBlogHtml, htmlToPlainText, lexicalJsonToHtml, lexicalJsonToPlainText, normalizeLexicalJson } from './blog-content.ts';
+import { createBlogSlug, isValidBlogSlug } from '../../modules/blog/lib/slug.ts';
 import {
   adminAuthorDocumentId,
   adminCategoryDocumentId,
@@ -12,7 +19,17 @@ import {
   resolveAdminPublishedAt,
   resolveSanityAdminStatus,
 } from './blog-admin-helpers.ts';
-import { createBlogSlug, isValidBlogSlug } from '../../modules/blog/lib/slug.ts';
+import { sanitizeBlogHtml, htmlToPlainText, lexicalJsonToHtml, lexicalJsonToPlainText, normalizeLexicalJson } from './blog-content.ts';
+import {
+  ADMIN_IMAGE_MAX_BYTES,
+  ADMIN_IMAGE_MAX_REDIRECTS,
+  assertImageMimeMatches,
+  assertSafeRemoteImageUrl,
+  parseAdminImageImportHosts,
+  readLimitedArrayBuffer,
+} from './remote-image.ts';
+
+export { assertSafeRemoteImageUrl } from './remote-image.ts';
 
 export type AdminPostStatus = 'draft' | 'published';
 export type AdminPostListStatus = AdminPostStatus | 'all';
@@ -404,38 +421,38 @@ export async function uploadAdminImage(file: File): Promise<{ assetId: string; u
   };
 }
 
-function assertSafeRemoteImageUrl(raw: string): URL {
-  let url: URL;
-  try { url = new URL(raw); } catch { throw new Error('رابط الصورة غير صالح.'); }
-  if (url.protocol !== 'https:') throw new Error('يجب أن يبدأ رابط الصورة بـ https.');
-  if (url.username || url.password) throw new Error('لا يمكن استخدام رابط يحتوي بيانات دخول.');
-  const host = url.hostname.toLowerCase();
-  if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local') || host === '0.0.0.0' || host === '::1' || /^(10|127|169\.254|192\.168)\./.test(host) || /^172\.(1[6-9]|2\d|3[0-1])\./.test(host)) {
-    throw new Error('لا يمكن استيراد صورة من هذا المضيف.');
-  }
-  return url;
+function allowedImageImportHosts(): Set<string> {
+  return parseAdminImageImportHosts(ADMIN_IMAGE_IMPORT_HOSTS);
 }
 
 export async function importAdminImageFromUrl(rawUrl: string): Promise<{ assetId: string; url: string; width: number | null; height: number | null }> {
-  let url = assertSafeRemoteImageUrl(rawUrl);
+  const hosts = allowedImageImportHosts();
+  let url = assertSafeRemoteImageUrl(rawUrl, hosts);
   let response: Response | null = null;
-  for (let attempt = 0; attempt < 4; attempt += 1) {
-    response = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(12_000), headers: { Accept: 'image/*' } });
+  for (let attempt = 0; attempt <= ADMIN_IMAGE_MAX_REDIRECTS; attempt += 1) {
+    response = await fetch(url, {
+      redirect: 'manual',
+      signal: AbortSignal.timeout(12_000),
+      headers: { Accept: 'image/*' },
+    });
     if (response.status >= 300 && response.status < 400) {
+      if (attempt === ADMIN_IMAGE_MAX_REDIRECTS) {
+        throw new Error('تجاوز رابط الصورة عدد إعادة التوجيه المسموح.');
+      }
       const location = response.headers.get('location');
       if (!location) throw new Error('رابط الصورة أعاد إعادة توجيه غير صالح.');
-      url = assertSafeRemoteImageUrl(new URL(location, url).toString());
+      url = assertSafeRemoteImageUrl(new URL(location, url).toString(), hosts);
       continue;
     }
     break;
   }
   if (!response || !response.ok) throw new Error('تعذر تحميل الصورة من الرابط.');
-  const contentType = response.headers.get('content-type')?.split(';')[0].trim().toLowerCase() || '';
-  if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(contentType)) throw new Error('الرابط لا يشير إلى صورة مدعومة.');
-  const contentLength = Number(response.headers.get('content-length') || 0);
-  if (contentLength > 10 * 1024 * 1024) throw new Error('حجم الصورة يجب ألا يتجاوز 10 ميجابايت.');
-  const bytes = await response.arrayBuffer();
-  if (bytes.byteLength > 10 * 1024 * 1024) throw new Error('حجم الصورة يجب ألا يتجاوز 10 ميجابايت.');
-  const file = new File([bytes], `blog-import.${contentType.split('/')[1] || 'image'}`, { type: contentType });
+  const declaredType = response.headers.get('content-type')?.split(';')[0].trim().toLowerCase() || '';
+  if (declaredType && !['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(declaredType)) {
+    throw new Error('الرابط لا يشير إلى صورة مدعومة.');
+  }
+  const bytes = await readLimitedArrayBuffer(response, ADMIN_IMAGE_MAX_BYTES);
+  const mime = assertImageMimeMatches(declaredType, new Uint8Array(bytes));
+  const file = new File([bytes], `blog-import.${mime.split('/')[1] || 'image'}`, { type: mime });
   return uploadAdminImage(file);
 }

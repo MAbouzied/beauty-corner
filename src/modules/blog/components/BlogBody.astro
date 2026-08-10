@@ -6,7 +6,7 @@ import {
   type RenderableBlock,
 } from '../content/content-renderers';
 import type { BlogBody } from '../model/blog-types';
-import { lexicalJsonToHtml } from '../../../lib/admin/blog-content.ts';
+import { lexicalJsonToHtml, sanitizeBlogHtml } from '../../../lib/admin/blog-content.ts';
 
 export interface Props {
   body?: BlogBody;
@@ -28,9 +28,9 @@ if (body?.format === 'portableText') {
   body?.format === 'portableText' ? (
     <BlogPortableText value={body.value} />
   ) : body?.format === 'html' ? (
-    <div class="blog-body blog-body--html" set:html={body.html} />
+    <div class="blog-body blog-body--html" set:html={sanitizeBlogHtml(body.html)} />
   ) : body?.format === 'lexical' ? (
-    <div class="blog-body blog-body--lexical" set:html={lexicalJsonToHtml(body.json)} />
+    <div class="blog-body blog-body--lexical" set:html={sanitizeBlogHtml(lexicalJsonToHtml(body.json))} />
   ) : (
     <div class="blog-body">
       <BlogBlocks

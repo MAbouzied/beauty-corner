@@ -23,6 +23,30 @@ export default defineConfig({
   adapter: cloudflare(),
   integrations: [react()],
   cache: { provider: cacheCloudflare() },
+  security: {
+    csp: {
+      scriptDirective: {
+        resources: ["'self'", 'https://www.googletagmanager.com'],
+        strictDynamic: true,
+      },
+      styleDirective: {
+        resources: ["'self'"],
+      },
+      directives: [
+        "default-src 'self'",
+        "base-uri 'self'",
+        "object-src 'none'",
+        "form-action 'self'",
+        "font-src 'self' data:",
+        "img-src 'self' data: blob: https://cdn.sanity.io https://lh3.googleusercontent.com https://*.googleusercontent.com https://www.googletagmanager.com https://*.google-analytics.com",
+        "connect-src 'self' https://*.sanity.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
+        "frame-src https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
+        "media-src 'self' https://cdn.sanity.io",
+        "worker-src 'self' blob:",
+        'upgrade-insecure-requests',
+      ],
+    },
+  },
   env: {
     schema: {
       GOOGLE_SERVICE_ACCOUNT_EMAIL: envField.string({ context: 'server', access: 'secret', optional: true }),
@@ -52,6 +76,12 @@ export default defineConfig({
       }),
       SANITY_AUTH_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
       ADMIN_AUTH_DISABLED: envField.boolean({ context: 'server', access: 'secret', optional: true, default: false }),
+      ADMIN_IMAGE_IMPORT_HOSTS: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+        default: 'cdn.sanity.io',
+      }),
       PUBLIC_SANITY_STUDIO_URL: envField.string({
         context: 'client',
         access: 'public',

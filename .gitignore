@@ -12,6 +12,8 @@ node_modules/
 .dev.vars*
 fine-advantage-504306-c9-f4eb5ae91393.json
 *-service-account*.json
+*service_account*.json
+*gcp-key*.json
 
 # local browser / Studio generated artifacts
 .playwright-mcp/

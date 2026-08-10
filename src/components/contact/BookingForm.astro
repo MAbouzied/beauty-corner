@@ -32,6 +32,8 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
 
     <form
       class="rounded-[var(--radius-card)] border border-border bg-surface p-4 shadow-[var(--shadow-card)] sm:p-8"
+      method="post"
+      action="/api/customers"
       aria-describedby="contact-booking-notice"
       data-booking-form
       data-gtm-form="booking_contact"
@@ -47,11 +49,11 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
       <div class="grid gap-4">
         <label class="grid gap-2 text-xs font-bold">
           الاسم الكامل
-          <input name="name" autocomplete="name" required minlength="3" placeholder="مثال: عبدالله محمد" class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
+          <input name="name" autocomplete="name" required minlength="3" maxlength="100" placeholder="مثال: عبدالله محمد" class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
         </label>
         <label class="grid gap-2 text-xs font-bold">
           رقم الجوال
-          <input name="phone" type="tel" dir="ltr" inputmode="numeric" autocomplete="tel" required pattern="05[0-9]{8}" placeholder="05XXXXXXXX" class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
+          <input name="phone" type="tel" dir="ltr" inputmode="numeric" autocomplete="tel" required minlength="10" maxlength="20" pattern="05[0-9]{8}" placeholder="05XXXXXXXX" class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
         </label>
         <label class="grid gap-2 text-xs font-bold">
           القسم
@@ -120,34 +122,35 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
           department,
           branch: clinicContact.branch,
         });
-
-        if (status) {
-          status.textContent = 'جارٍ فتح واتساب لإرسال طلب الحجز...';
-          status.className = 'mt-3 min-h-5 text-center text-sm font-medium text-success';
-        }
+        const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(department));
 
         pushGtmEvent(GtmEvents.formSubmit, {
           form_id: formId,
           method: 'whatsapp',
-          department,
-          service: department,
         });
 
-        void saveCustomerLead({
-          name: String(data.get('name') ?? '').trim(),
-          phone: String(data.get('phone') ?? '').trim(),
-          department,
-          service: department,
-          locale: 'ar',
-          consent: data.has('consent'),
-          website: String(data.get('website') ?? ''),
-        }).catch((error) => console.error('Unable to save booking details.', error));
+        void (async () => {
+          const result = await saveCustomerLead({
+            name: String(data.get('name') ?? '').trim(),
+            phone: String(data.get('phone') ?? '').trim(),
+            department,
+            service: department,
+            locale: 'ar',
+            consent: data.has('consent'),
+            website: String(data.get('website') ?? ''),
+          });
 
-        window.open(
-          buildWhatsAppUrl(message, clinicLineFromDepartment(department)),
-          '_blank',
-          'noopener,noreferrer',
-        );
+          if (status) {
+            status.textContent = result.ok
+              ? 'جارٍ فتح واتساب لإرسال طلب الحجز...'
+              : 'تعذر حفظ السجل الإلكتروني. سيتم فتح واتساب لإرسال الطلب للعيادة.';
+            status.className = result.ok
+              ? 'mt-3 min-h-5 text-center text-sm font-medium text-success'
+              : 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
+          }
+
+          window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+        })();
       });
     });
   });

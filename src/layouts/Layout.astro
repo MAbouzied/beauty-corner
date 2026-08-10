@@ -1,12 +1,13 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import AnalyticsConsent from '../components/analytics/AnalyticsConsent.astro';
 import Gtm from '../components/analytics/Gtm.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
 import SiteHeader from '../components/site/SiteHeader.astro';
 import { organization } from '../data/organization';
 import { imageMimeType, socialCard } from '../data/seo';
-import { GTM_ID, isGtmEnabled } from '../lib/gtm';
+import { isGtmConfigured } from '../lib/gtm';
 import {
   getAlternatePaths,
   htmlLang,
@@ -100,7 +101,7 @@ const brandName = isEnglish ? organization.alternateName : organization.name;
 const fullTitle = title;
 const resolvedImageAlt = imageAlt ?? (isEnglish ? socialCard.altEn : socialCard.altAr);
 const structuredData = omitStructuredData ? null : buildGraph(site, schemas, locale);
-const analyticsEnabled = isGtmEnabled && !disableAnalytics;
+const analyticsEnabled = isGtmConfigured && !disableAnalytics;
 
 const alternates =
   omitAlternates || effectiveNoindex ? null : getAlternatePaths(resolvedCanonicalPath);
@@ -270,25 +271,11 @@ const robotsContent = effectiveNoindex
     </script>
   </head>
   <body class="flex min-h-screen flex-col bg-surface text-ink">
-    {analyticsEnabled && (
-      <>
-        <!-- Google Tag Manager (noscript) -->
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-            height="0"
-            width="0"
-            style="display:none;visibility:hidden"
-            title="Google Tag Manager"
-          ></iframe>
-        </noscript>
-        <!-- End Google Tag Manager (noscript) -->
-      </>
-    )}
     {!hideChrome && <SiteHeader locale={locale} />}
     <main class="flex-1" transition:animate="fade" id="main-content">
       <slot />
     </main>
     {!hideChrome && <SiteFooter locale={locale} />}
+    {analyticsEnabled && <AnalyticsConsent locale={locale} />}
   </body>
 </html>

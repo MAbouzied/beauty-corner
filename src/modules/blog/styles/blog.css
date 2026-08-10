@@ -600,6 +600,27 @@
   }
 }
 
+.blog-root .blog-body__image,
+.blog-root .blog-body__embed {
+  max-width: 100%;
+}
+
+.blog-root .blog-body__image--w25,
+.blog-root .blog-body__embed--w25 { width: 25%; }
+.blog-root .blog-body__image--w50,
+.blog-root .blog-body__embed--w50 { width: 50%; }
+.blog-root .blog-body__image--w75,
+.blog-root .blog-body__embed--w75 { width: 75%; }
+.blog-root .blog-body__image--w100,
+.blog-root .blog-body__embed--w100 { width: 100%; }
+
+.blog-root .blog-body__image--center,
+.blog-root .blog-body__embed--center { margin-inline: auto; }
+.blog-root .blog-body__image--left,
+.blog-root .blog-body__embed--left { margin-inline: auto 0; }
+.blog-root .blog-body__image--right,
+.blog-root .blog-body__embed--right { margin-inline: 0 auto; }
+
 .blog-root .blog-body__embed {
   margin-block: 0.75rem;
   padding: 0;
