@@ -2,6 +2,7 @@
 import type { Locale } from '../../lib/i18n/localize';
 import { isEnglish, localizeDevices, ui } from '../../lib/i18n/localize';
 import SectionHeading from '../ui/SectionHeading.astro';
+import SitePicture from '../ui/SitePicture.astro';
 
 export interface Props {
   locale?: Locale;
@@ -28,14 +29,12 @@ const copy = ui(locale);
       {devices.map((device) => (
         <li>
           <article class="h-full overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]">
-            <img
+            <SitePicture
               src={device.image}
               alt={device.imageAlt}
-              width="640"
-              height="480"
+              widths={[320, 480, 640, 800]}
+              sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 50vw, 33vw"
               class="aspect-[4/3] w-full object-cover"
-              loading="lazy"
-              decoding="async"
             />
             <div class="p-5 sm:p-6">
               <h3 class="text-lg font-bold tracking-tight text-balance text-ink">{device.name}</h3>

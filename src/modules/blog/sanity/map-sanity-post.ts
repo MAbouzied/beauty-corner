@@ -74,7 +74,7 @@ export function mapSanityPostToBlogPost(
     const cover = doc.cover
       ? mapSanityImage(imageConfig, doc.cover, title, documentId, 'cover')
       : adminHtmlPost
-      ? { src: doc.coverUrl?.trim() || '/assets/landing-blog-dental.jpg', alt: doc.coverUrlAlt?.trim() || title, width: 1600, height: 1067 }
+      ? { src: doc.coverUrl?.trim() || '/assets/devices/dental-unit-led.jpg', alt: doc.coverUrlAlt?.trim() || title, width: 1600, height: 1067 }
         : mapSanityImage(imageConfig, doc.cover, title, documentId, 'cover');
 
     const authorImage = doc.author?.image?.asset

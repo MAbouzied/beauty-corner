@@ -28,7 +28,7 @@ export interface ClinicService {
   sections: readonly ServiceDetailSection[];
 }
 
-const dentalHero = '/assets/service-detail-dentistry.jpg';
+const dentalHero = '/assets/landing-hero.jpg';
 const dentalHeroAlt = 'غرفة علاج أسنان حديثة داخل عيادة بيوتي كورنر';
 const dentistrySpecialty = 'طب وتجميل الأسنان' as const;
 
@@ -122,8 +122,8 @@ export const clinicServices: readonly ClinicService[] = [
     category: 'تجميل',
     department: 'أسنان',
     icon: '/assets/service-cleaning.svg',
-    heroImage: '/assets/landing-waiting-area.jpg',
-    heroImageAlt: dentalHeroAlt,
+    heroImage: '/assets/devices/dental-unit-blue.jpg',
+    heroImageAlt: 'كرسي علاج أسنان داخل غرفة علاجية في بيوتي كورنر',
     doctorSpecialty: dentistrySpecialty,
     sections: [
       {
@@ -203,8 +203,8 @@ export const clinicServices: readonly ClinicService[] = [
     category: 'تجميل',
     department: 'أسنان',
     icon: '/assets/service-fillings.svg',
-    heroImage: '/assets/landing-blog-dental.jpg',
-    heroImageAlt: dentalHeroAlt,
+    heroImage: '/assets/devices/dental-unit-led.jpg',
+    heroImageAlt: 'وحدة علاج أسنان بإضاءة LED داخل العيادة',
     doctorSpecialty: dentistrySpecialty,
     sections: [
       {
@@ -311,8 +311,8 @@ export const clinicServices: readonly ClinicService[] = [
     category: 'تجميل',
     department: 'جلدية',
     icon: '/assets/service-dermatology.svg',
-    heroImage: '/assets/landing-blog-skin.jpg',
-    heroImageAlt: 'عناية بالبشرة داخل عيادة بيوتي كورنر',
+    heroImage: '/assets/devices/dental-examination-unit.jpg',
+    heroImageAlt: 'غرفة علاج مجهزة داخل عيادة بيوتي كورنر',
     doctorSpecialty: 'الأمراض الجلدية والتجميل',
     sections: [
       {
@@ -338,8 +338,8 @@ export const clinicServices: readonly ClinicService[] = [
     category: 'تجميل',
     department: 'جلدية',
     icon: '/assets/service-dermatology.svg',
-    heroImage: '/assets/landing-blog-skin.jpg',
-    heroImageAlt: 'جلسة عناية بالتصبغات داخل العيادة',
+    heroImage: '/assets/devices/dental-examination-unit.jpg',
+    heroImageAlt: 'جلسة عناية تجميلية داخل العيادة',
     doctorSpecialty: 'الأمراض الجلدية والتجميل',
     sections: [
       {
@@ -357,7 +357,7 @@ export const clinicServices: readonly ClinicService[] = [
     category: 'تجميل',
     department: 'جلدية',
     icon: '/assets/service-dermatology.svg',
-    heroImage: '/assets/landing-blog-skin.jpg',
+    heroImage: '/assets/devices/dental-examination-unit.jpg',
     heroImageAlt: 'إجراءات تجميلية غير جراحية داخل العيادة',
     doctorSpecialty: 'الأمراض الجلدية والتجميل',
     sections: [

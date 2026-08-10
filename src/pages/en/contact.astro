@@ -5,6 +5,7 @@ import BookingSection from '../../components/services/BookingSection.astro';
 import FaqSection from '../../components/sections/FaqSection.astro';
 import SectionHeading from '../../components/ui/SectionHeading.astro';
 import AssetIcon from '../../components/ui/AssetIcon.astro';
+import SitePicture from '../../components/ui/SitePicture.astro';
 import { localizeContact, localizeFaq, ui } from '../../lib/i18n/localize';
 import {
   buildBreadcrumbSchema,
@@ -68,7 +69,13 @@ const contactMessage = 'Hello, I would like to book at Beauty Corner.';
         </div>
         <SocialLinks locale="en" class="mt-6" id="contact-page-social" />
       </div>
-      <img src="/assets/landing-clinic-gallery.jpg" alt="Beauty Corner clinic" class="aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)]" />
+      <SitePicture
+        src="/assets/landing-clinic-gallery.jpg"
+        alt="Dental treatment room inside Beauty Corner clinic"
+        widths={[640, 960, 1280]}
+        sizes="(max-width: 1024px) calc(100vw - 2rem), 50vw"
+        class="aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)]"
+      />
     </div>
   </section>
 

@@ -175,7 +175,7 @@ function toPublicPost(post: AdminPost): BlogPost | null {
     category: { id: 'general', label: post.category || 'عام' },
     author: { name: post.author || 'فريق بيوتي كورنر' },
     cover: {
-      src: post.coverUrl || '/assets/landing-blog-dental.jpg',
+      src: post.coverUrl || '/assets/devices/dental-unit-led.jpg',
       alt: post.coverAlt || post.title,
       width: post.coverWidth ?? 1600,
       height: post.coverHeight ?? 1067,
@@ -255,7 +255,7 @@ function saveMock(id: string | undefined, input: AdminPostInput, publish: boolea
     featured: input.featured === true,
     category: input.category?.trim() || existing?.category || 'عام',
     author: input.author?.trim() || existing?.author || 'فريق بيوتي كورنر',
-    coverUrl: input.coverUrl?.trim() || existing?.coverUrl || '/assets/landing-blog-dental.jpg',
+    coverUrl: input.coverUrl?.trim() || existing?.coverUrl || '/assets/devices/dental-unit-led.jpg',
     coverAlt: input.coverAlt?.trim() || existing?.coverAlt || input.title.trim(),
     coverAssetId: input.coverAssetId?.trim() || existing?.coverAssetId || '',
     coverWidth: input.coverWidth ?? existing?.coverWidth ?? null,

@@ -25,7 +25,7 @@ const contactMessage = en
   ? 'Hello, I would like to book at Beauty Corner.'
   : 'مرحباً، أود الحجز عبر بيوتي كورنر.';
 const fieldClass =
-  'min-h-12 w-full rounded-[1.25rem] border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-muted/70 focus:border-primary aria-[invalid=true]:border-danger';
+  'min-h-12 w-full rounded-[1.25rem] border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-placeholder focus:border-primary aria-[invalid=true]:border-danger';
 
 const labels = en
   ? {
@@ -125,17 +125,17 @@ const labels = en
         <div class="grid gap-4">
           <div class="space-y-1.5">
             <label for="booking-name" class="block text-xs font-bold">{labels.name}</label>
-            <input id="booking-name" name="name" type="text" class={fieldClass} placeholder={labels.namePh} autocomplete="name" minlength="3" maxlength="100" required />
-            <p class="hidden text-xs text-danger" data-error-for="booking-name"></p>
+            <input id="booking-name" name="name" type="text" class={fieldClass} placeholder={labels.namePh} autocomplete="name" minlength="3" maxlength="100" required aria-describedby="booking-name-error" aria-invalid="false" />
+            <p id="booking-name-error" class="hidden text-xs text-danger" data-error-for="booking-name" role="status"></p>
           </div>
           <div class="space-y-1.5">
             <label for="booking-phone" class="block text-xs font-bold">{labels.phone}</label>
-            <input id="booking-phone" name="phone" type="tel" dir="ltr" class={fieldClass} placeholder={labels.phonePh} autocomplete="tel" inputmode="numeric" minlength="10" maxlength="20" pattern="05[0-9]{8}" required />
-            <p class="hidden text-xs text-danger" data-error-for="booking-phone"></p>
+            <input id="booking-phone" name="phone" type="tel" dir="ltr" class={fieldClass} placeholder={labels.phonePh} autocomplete="tel" inputmode="numeric" minlength="10" maxlength="20" pattern="05[0-9]{8}" required aria-describedby="booking-phone-error" aria-invalid="false" />
+            <p id="booking-phone-error" class="hidden text-xs text-danger" data-error-for="booking-phone" role="status"></p>
           </div>
           <div class="space-y-1.5">
             <label for="booking-department" class="block text-xs font-bold">{labels.department}</label>
-            <select id="booking-department" name="department" class={fieldClass} required>
+            <select id="booking-department" name="department" class={fieldClass} required aria-describedby="booking-department-error" aria-invalid="false">
               <option value="">{labels.chooseDepartment}</option>
               {bookingDepartments.map((department) => (
                 <option value={department} selected={department === defaultDepartment}>
@@ -143,12 +143,12 @@ const labels = en
                 </option>
               ))}
             </select>
-            <p class="hidden text-xs text-danger" data-error-for="booking-department"></p>
+            <p id="booking-department-error" class="hidden text-xs text-danger" data-error-for="booking-department" role="status"></p>
           </div>
         </div>
 
         <label class="mt-5 flex cursor-pointer items-start gap-3 text-xs leading-5 text-muted">
-          <input id="booking-consent" name="consent" type="checkbox" class="mt-0.5 size-4 accent-primary" required />
+          <input id="booking-consent" name="consent" type="checkbox" class="mt-0.5 size-4 accent-primary" required aria-describedby="booking-consent-error" aria-invalid="false" />
           <span>
             {en ? (
               <>
@@ -169,7 +169,7 @@ const labels = en
             )}
           </span>
         </label>
-        <p class="mt-1 hidden text-xs text-danger" data-error-for="booking-consent"></p>
+        <p id="booking-consent-error" class="mt-1 hidden text-xs text-danger" data-error-for="booking-consent" role="status"></p>
 
         <button type="submit" class="mt-6 inline-flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-full bg-gold-gradient px-7 text-sm font-bold whitespace-nowrap text-ink-button shadow-[var(--shadow-gold)] transition-transform hover:-translate-y-0.5 sm:text-base">
           {labels.send}
@@ -191,9 +191,8 @@ const labels = en
   import { saveCustomerLead } from '../../lib/customer-leads';
   import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
 
-  document.addEventListener('astro:page-load', () => {
-    const bookingForm = document.querySelector<HTMLFormElement>('#booking-form');
-    if (!bookingForm || bookingForm.dataset.bound === 'true') return;
+  const bookingForm = document.querySelector<HTMLFormElement>('#booking-form');
+  if (bookingForm && bookingForm.dataset.bound !== 'true') {
     bookingForm.dataset.bound = 'true';
 
     const bookingStatus = document.querySelector<HTMLElement>('#booking-status');
@@ -282,5 +281,5 @@ const labels = en
         window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
       })();
     });
-  });
+  }
 </script>

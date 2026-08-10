@@ -43,10 +43,10 @@ const brandLabel = isEnglish ? 'Beauty Corner - Home' : 'بيوتي كورنر -
   <div class="page-container flex min-h-20 items-center justify-between gap-3 sm:gap-4">
     <a href={homeHref} class="flex min-w-0 shrink-0 items-center gap-2" aria-label={brandLabel}>
       <img
-        src="/assets/logo.png"
+        src="/assets/logo.svg"
         alt=""
-        width="1320"
-        height="1215"
+        width="50"
+        height="42"
         class="h-12 w-auto sm:h-14"
         decoding="async"
       />
@@ -138,11 +138,8 @@ const brandLabel = isEnglish ? 'Beauty Corner - Home' : 'بيوتي كورنر -
     });
   };
 
-  document.addEventListener('astro:before-preparation', closeMobileNav);
-  document.addEventListener('astro:page-load', () => {
-    closeMobileNav();
-    syncLanguageSwitchHrefs();
-  });
+  closeMobileNav();
+  syncLanguageSwitchHrefs();
   window.addEventListener('hashchange', syncLanguageSwitchHrefs);
 
   document.addEventListener('click', (event) => {

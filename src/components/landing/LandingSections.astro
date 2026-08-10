@@ -19,6 +19,7 @@ import ServiceCard from '../services/ServiceCard.astro';
 import AssetIcon from '../ui/AssetIcon.astro';
 import ButtonLink from '../ui/ButtonLink.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
+import SitePicture from '../ui/SitePicture.astro';
 import DevicesSection from './DevicesSection.astro';
 
 const landingDoctors = doctors.slice(0, 3);
@@ -114,11 +115,12 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
 <section class="bg-surface-soft py-12 sm:py-24" aria-labelledby="gallery-heading">
   <div class="page-container">
     <div id="gallery-heading"><SectionHeading eyebrow="نماذج من العيادة" title="لمحة من داخل العيادة" /></div>
-    <img
+    <SitePicture
       src="/assets/landing-clinic-gallery.jpg"
-      alt="منطقة الاستقبال والانتظار المضيئة داخل عيادة بيوتي كورنر"
+      alt="غرفة علاج أسنان مضيئة داخل عيادة بيوتي كورنر"
+      widths={[640, 960, 1280, 1600]}
+      sizes="(max-width: 1024px) calc(100vw - 2rem), 76rem"
       class="mt-6 aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)] sm:mt-8 sm:aspect-[16/9]"
-      loading="lazy"
     />
   </div>
 </section>
@@ -181,15 +183,12 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
 
 <section class="bg-surface py-12 sm:py-24" aria-labelledby="experience-heading">
   <div class="page-container grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-    <img
-      src="/assets/landing-waiting-area.jpg"
-      alt="غرفة انتظار مريحة ومضيئة داخل عيادة بيوتي كورنر"
-      width="187"
-      height="256"
-      sizes="(max-width: 1024px) 100vw, 50vw"
+    <SitePicture
+      src="/assets/devices/dental-unit-blue.jpg"
+      alt="كرسي علاج أسنان داخل غرفة علاجية في بيوتي كورنر"
+      widths={[480, 768, 960, 1200]}
+      sizes="(max-width: 1024px) calc(100vw - 2rem), 50vw"
       class="aspect-[7/5] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)]"
-      loading="lazy"
-      decoding="async"
     />
     <div>
       <div id="experience-heading"><SectionHeading eyebrow="التجربة داخل العيادة" title="بيئة طبية بلمسة هادئة وخاصة" /></div>

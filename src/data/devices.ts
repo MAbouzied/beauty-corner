@@ -20,7 +20,7 @@ export const clinicDevices: readonly ClinicDevice[] = [
     name: 'غرفة علاج متكاملة',
     description:
       'غرفة علاجية مجهزة بكرسي أسنان وإضاءة طبية وخزائن معقّمة لتنفيذ الفحص والعلاج في بيئة منظمة.',
-    image: '/assets/devices/dental-unit-integrated.jpg',
+    image: '/assets/landing-hero.jpg',
     imageAlt: 'غرفة علاج أسنان متكاملة مع كرسي وخزائن طبية',
   },
   {

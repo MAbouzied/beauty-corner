@@ -24,7 +24,7 @@ export const mockBlogPosts: BlogPost[] = [
       },
     },
     cover: {
-      src: '/assets/landing-blog-dental.jpg',
+      src: '/assets/devices/dental-unit-led.jpg',
       alt: 'ابتسامة مشرقة بعد جلسة عناية بالأسنان',
       width: 1600,
       height: 1067,
@@ -83,7 +83,7 @@ export const mockBlogPosts: BlogPost[] = [
         {
           type: 'image',
           image: {
-            src: '/assets/service-detail-dentistry.jpg',
+            src: '/assets/landing-hero.jpg',
             alt: 'بيئة علاج أسنان حديثة داخل العيادة',
             width: 1600,
             height: 1067,
@@ -179,7 +179,7 @@ export const mockBlogPosts: BlogPost[] = [
       role: 'محتوى تثقيفي — قيد المراجعة السريرية',
     },
     cover: {
-      src: '/assets/landing-blog-skin.jpg',
+      src: '/assets/devices/dental-examination-unit.jpg',
       alt: 'عناية بالبشرة في بيئة عيادية هادئة',
       width: 1600,
       height: 1067,
@@ -372,7 +372,7 @@ export const mockBlogPosts: BlogPost[] = [
       role: 'محتوى تثقيفي — قيد المراجعة السريرية',
     },
     cover: {
-      src: '/assets/landing-waiting-area.jpg',
+      src: '/assets/devices/dental-unit-blue.jpg',
       alt: 'منطقة انتظار هادئة في عيادة بيوتي كورنر',
       width: 1600,
       height: 1067,
@@ -415,7 +415,7 @@ export const mockBlogPosts: BlogPost[] = [
     category: { id: 'dentistry', label: 'طب الأسنان' },
     author: { name: 'فريق التحرير' },
     cover: {
-      src: '/assets/landing-blog-dental.jpg',
+      src: '/assets/devices/dental-unit-led.jpg',
       alt: 'صورة غلاف للمسودة',
       width: 1600,
       height: 1067,
@@ -438,7 +438,7 @@ export const mockBlogPosts: BlogPost[] = [
     category: { id: 'preventive', label: 'العناية الوقائية' },
     author: { name: 'فريق التحرير' },
     cover: {
-      src: '/assets/landing-blog-skin.jpg',
+      src: '/assets/devices/dental-examination-unit.jpg',
       alt: 'صورة غلاف لمقال مجدول',
       width: 1600,
       height: 1067,

@@ -125,19 +125,30 @@ const copy = en
     writeAnalyticsConsent,
   } from '../../lib/analytics/consent';
 
-  const root = document.querySelector<HTMLElement>('[data-analytics-consent]');
-  if (root && !readAnalyticsConsent()) {
-    root.hidden = false;
+  const initAnalyticsConsent = () => {
+    const root = document.querySelector<HTMLElement>('[data-analytics-consent]');
+    if (!root || root.dataset.bound === 'true') return;
+    root.dataset.bound = 'true';
+
+    if (!readAnalyticsConsent()) {
+      root.hidden = false;
+    }
+
+    root.querySelector('[data-analytics-consent-accept]')?.addEventListener('click', () => {
+      writeAnalyticsConsent('granted');
+      root.hidden = true;
+      window.dispatchEvent(new Event(ANALYTICS_CONSENT_GRANTED_EVENT));
+    });
+
+    root.querySelector('[data-analytics-consent-reject]')?.addEventListener('click', () => {
+      writeAnalyticsConsent('denied');
+      root.hidden = true;
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAnalyticsConsent, { once: true });
+  } else {
+    initAnalyticsConsent();
   }
-
-  root?.querySelector('[data-analytics-consent-accept]')?.addEventListener('click', () => {
-    writeAnalyticsConsent('granted');
-    root.hidden = true;
-    window.dispatchEvent(new Event(ANALYTICS_CONSENT_GRANTED_EVENT));
-  });
-
-  root?.querySelector('[data-analytics-consent-reject]')?.addEventListener('click', () => {
-    writeAnalyticsConsent('denied');
-    root.hidden = true;
-  });
 </script>

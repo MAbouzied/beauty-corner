@@ -13,7 +13,7 @@ const title = 'احجز موعدك في عيادة بيوتي كورنر بحف�
 const description =
   'احجز موعدك في بيوتي كورنر بحفر الباطن خلال دقائق — أدخل اسمك ورقم جوالك واختر القسم.';
 const fieldClass =
-  'min-h-12 w-full rounded-2xl border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-muted/70 focus:border-primary';
+  'min-h-12 w-full rounded-2xl border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-placeholder focus:border-primary aria-[invalid=true]:border-danger';
 ---
 
 <Layout
@@ -27,7 +27,7 @@ const fieldClass =
   <section class="relative overflow-hidden border-b border-border bg-gradient-to-bl from-surface-accent via-surface to-surface-soft py-10 sm:py-16">
     <div class="page-container mx-auto max-w-xl">
       <div class="mb-8 text-center">
-        <img src={organization.logoPath} alt="" class="mx-auto h-16 w-auto" />
+        <img src="/assets/logo.svg" alt="" width="50" height="42" class="mx-auto h-16 w-auto" />
         <p class="mt-4 text-sm font-bold text-primary">{organization.name}</p>
         <h1 class="text-display mt-3 font-black text-ink">احجز موعدك الآن</h1>
         <p class="mt-3 text-sm leading-7 text-muted">
@@ -50,25 +50,28 @@ const fieldClass =
         <div class="grid gap-4">
           <label class="grid gap-2 text-xs font-bold">
             الاسم
-            <input name="name" type="text" required minlength="3" maxlength="100" autocomplete="name" placeholder="اسمك الكامل" class={fieldClass} />
+            <input id="lead-name" name="name" type="text" required minlength="3" maxlength="100" autocomplete="name" placeholder="اسمك الكامل" class={fieldClass} aria-describedby="lead-name-error" aria-invalid="false" />
+            <p id="lead-name-error" class="hidden text-xs text-danger" role="status" data-error-for="lead-name"></p>
           </label>
           <label class="grid gap-2 text-xs font-bold">
             رقم الجوال
-            <input name="phone" type="tel" dir="ltr" required minlength="10" maxlength="20" pattern="05[0-9]{8}" inputmode="numeric" autocomplete="tel" placeholder="05XXXXXXXX" class={fieldClass} />
+            <input id="lead-phone" name="phone" type="tel" dir="ltr" required minlength="10" maxlength="20" pattern="05[0-9]{8}" inputmode="numeric" autocomplete="tel" placeholder="05XXXXXXXX" class={fieldClass} aria-describedby="lead-phone-error" aria-invalid="false" />
+            <p id="lead-phone-error" class="hidden text-xs text-danger" role="status" data-error-for="lead-phone"></p>
           </label>
           <label class="grid gap-2 text-xs font-bold">
             القسم
-            <select name="department" required class={fieldClass}>
+            <select id="lead-department" name="department" required class={fieldClass} aria-describedby="lead-department-error" aria-invalid="false">
               <option value="">اختر القسم</option>
               {bookingDepartments.map((department) => (
                 <option value={department}>{department}</option>
               ))}
             </select>
+            <p id="lead-department-error" class="hidden text-xs text-danger" role="status" data-error-for="lead-department"></p>
           </label>
         </div>
 
         <label class="mt-5 flex items-start gap-3 text-xs leading-6 text-muted">
-          <input name="consent" type="checkbox" required class="mt-1 size-4 shrink-0 accent-primary" />
+          <input id="lead-consent" name="consent" type="checkbox" required class="mt-1 size-4 shrink-0 accent-primary" aria-describedby="lead-consent-error" aria-invalid="false" />
           <span>
             أوافق على
             {' '}
@@ -77,6 +80,7 @@ const fieldClass =
             وحفظ بيانات الحجز والتواصل معي لتأكيد الموعد.
           </span>
         </label>
+        <p id="lead-consent-error" class="mt-1 hidden text-xs text-danger" role="status" data-error-for="lead-consent"></p>
 
         <button
           type="submit"
@@ -114,22 +118,51 @@ const fieldClass =
   import { saveCustomerLead } from '../lib/customer-leads';
   import { GtmEvents, pushGtmEvent } from '../lib/gtm';
 
-  document.addEventListener('astro:page-load', () => {
-    const form = document.querySelector<HTMLFormElement>('[data-lead-form]');
-    if (!form || form.dataset.bound === 'true') return;
+  const form = document.querySelector<HTMLFormElement>('[data-lead-form]');
+  if (form && form.dataset.bound !== 'true') {
     form.dataset.bound = 'true';
 
     const status = form.querySelector<HTMLElement>('[data-lead-status]');
     const formId = form.dataset.gtmForm ?? 'lead_quick';
+    const requiredFields = [
+      ...form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input[required], select[required]'),
+    ];
+    const messages: Readonly<Record<string, string>> = {
+      'lead-name': 'يرجى إدخال الاسم الكامل (3 أحرف على الأقل).',
+      'lead-phone': 'يرجى إدخال رقم جوال سعودي بصيغة 05XXXXXXXX.',
+      'lead-department': 'يرجى اختيار القسم.',
+      'lead-consent': 'الموافقة مطلوبة للمتابعة.',
+    };
+    const showFieldState = (field: HTMLInputElement | HTMLSelectElement) => {
+      const error = form.querySelector<HTMLElement>(`[data-error-for="${field.id}"]`);
+      const isValid = field.checkValidity();
+      field.setAttribute('aria-invalid', String(!isValid));
+      if (error) {
+        error.textContent = isValid ? '' : messages[field.id] ?? '';
+        error.classList.toggle('hidden', isValid);
+      }
+      return isValid;
+    };
+    requiredFields.forEach((field) => {
+      field.addEventListener('blur', () => showFieldState(field));
+      field.addEventListener('input', () => {
+        if (field.getAttribute('aria-invalid') === 'true') showFieldState(field);
+      });
+      field.addEventListener('change', () => {
+        if (field.getAttribute('aria-invalid') === 'true') showFieldState(field);
+      });
+    });
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
-      if (!form.reportValidity()) {
+      const isValid = requiredFields.every(showFieldState);
+      if (!isValid) {
         pushGtmEvent(GtmEvents.formError, { form_id: formId, method: 'whatsapp' });
         if (status) {
           status.textContent = 'يرجى تعبئة الاسم ورقم الجوال والقسم.';
           status.className = 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
         }
+        requiredFields.find((field) => !field.checkValidity())?.focus();
         return;
       }
 
@@ -171,5 +204,5 @@ const fieldClass =
         window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
       })();
     });
-  });
+  }
 </script>

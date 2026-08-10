@@ -3,6 +3,7 @@ import type { ClinicService } from '../../data/services';
 import type { Locale } from '../../lib/i18n/localize';
 import { localizeDepartment, localizeService } from '../../lib/i18n/localize';
 import PillLabel from '../ui/PillLabel.astro';
+import SitePicture from '../ui/SitePicture.astro';
 
 export interface Props {
   service: ClinicService;
@@ -45,14 +46,13 @@ const service = localizeService(rawService, locale);
       </div>
 
       <div class="order-1 overflow-hidden rounded-[var(--radius-section)] lg:order-2">
-        <img
+        <SitePicture
           src={service.heroImage}
           alt={service.heroImageAlt}
-          width="630"
-          height="417"
+          widths={[480, 630, 800, 960]}
+          sizes="(max-width: 1024px) calc(100vw - 2rem), 50vw"
           class="aspect-[630/417] w-full object-cover"
           loading="eager"
-          decoding="async"
         />
       </div>
     </div>

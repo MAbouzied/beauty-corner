@@ -94,7 +94,7 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
   import { saveCustomerLead } from '../../lib/customer-leads';
   import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
 
-  document.addEventListener('astro:page-load', () => {
+  (() => {
     document.querySelectorAll<HTMLFormElement>('[data-booking-form]').forEach((form) => {
       if (form.dataset.bound === 'true') return;
       form.dataset.bound = 'true';
@@ -153,5 +153,5 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
         })();
       });
     });
-  });
+  })();
 </script>

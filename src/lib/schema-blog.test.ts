@@ -15,7 +15,7 @@ const post: BlogPost = {
   category: { id: 'dentistry', label: 'طب الأسنان' },
   author: { name: 'مؤلف' },
   cover: {
-    src: '/assets/landing-blog-dental.jpg',
+    src: '/assets/devices/dental-unit-led.jpg',
     alt: 'غلاف',
     width: 1600,
     height: 1067,

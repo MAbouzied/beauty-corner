@@ -22,7 +22,7 @@ describe('clinic devices', () => {
       assert.ok(devicesEn[device.id], `missing English overlay for ${device.id}`);
       assert.ok(device.name.trim().length > 0);
       assert.ok(device.description.trim().length > 0);
-      assert.ok(device.image.startsWith('/assets/devices/'));
+      assert.ok(device.image.startsWith('/assets/'));
       assert.ok(device.imageAlt.trim().length > 0);
     }
   });

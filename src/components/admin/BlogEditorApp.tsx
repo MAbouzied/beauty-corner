@@ -231,11 +231,21 @@ function Toolbar({ onImage, onVideo, disabled }: { onImage: () => void; onVideo:
   const block = (tag: 'h2' | 'h3' | 'p' | 'quote') => editor.update(() => { const selection = $getSelection(); if (!$isRangeSelection(selection)) return; $setBlocksType(selection, () => tag === 'p' ? $createParagraphNode() : tag === 'quote' ? new QuoteNode() : $createHeadingNode(tag)); });
   const link = () => { const url = window.prompt('أدخل الرابط'); if (url) editor.dispatchCommand(TOGGLE_LINK_COMMAND, url); };
   return <div className="rich-toolbar" role="toolbar" aria-label="تنسيق النص">
-    <button type="button" onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)} disabled={disabled}>↶</button><button type="button" onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)} disabled={disabled}>↷</button><i />
-    <button type="button" aria-pressed={active.block === 'p'} onClick={() => block('p')} disabled={disabled}>نص</button><button type="button" aria-pressed={active.block === 'h2'} onClick={() => block('h2')} disabled={disabled}>H2</button><button type="button" aria-pressed={active.block === 'h3'} onClick={() => block('h3')} disabled={disabled}>H3</button><button type="button" aria-pressed={active.block === 'quote'} onClick={() => block('quote')} disabled={disabled}>❝ اقتباس</button><i />
-    <button type="button" aria-pressed={active.bold} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')} disabled={disabled}><strong>B</strong></button><button type="button" aria-pressed={active.italic} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')} disabled={disabled}><em>I</em></button><button type="button" aria-pressed={active.underline} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')} disabled={disabled}><u>U</u></button><button type="button" aria-pressed={active.strike} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')} disabled={disabled}><s>S</s></button><i />
-    <button type="button" aria-pressed={active.block === 'ul'} onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)} disabled={disabled}>• قائمة</button><button type="button" aria-pressed={active.block === 'ol'} onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)} disabled={disabled}>1. قائمة</button><i />
-    <button type="button" aria-pressed={active.link} onClick={link} disabled={disabled}>رابط</button><button type="button" onClick={onImage} disabled={disabled}>صورة</button><button type="button" onClick={onVideo} disabled={disabled}>فيديو</button>
+    <button type="button" aria-label="تراجع" title="تراجع" onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)} disabled={disabled}>↶</button>
+    <button type="button" aria-label="إعادة" title="إعادة" onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)} disabled={disabled}>↷</button><i />
+    <button type="button" aria-pressed={active.block === 'p'} onClick={() => block('p')} disabled={disabled}>نص</button>
+    <button type="button" aria-pressed={active.block === 'h2'} onClick={() => block('h2')} disabled={disabled}>H2</button>
+    <button type="button" aria-pressed={active.block === 'h3'} onClick={() => block('h3')} disabled={disabled}>H3</button>
+    <button type="button" aria-pressed={active.block === 'quote'} onClick={() => block('quote')} disabled={disabled}>❝ اقتباس</button><i />
+    <button type="button" aria-label="عريض" title="عريض" aria-pressed={active.bold} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')} disabled={disabled}><strong>B</strong></button>
+    <button type="button" aria-label="مائل" title="مائل" aria-pressed={active.italic} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')} disabled={disabled}><em>I</em></button>
+    <button type="button" aria-label="تسطير" title="تسطير" aria-pressed={active.underline} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')} disabled={disabled}><u>U</u></button>
+    <button type="button" aria-label="يتوسطه خط" title="يتوسطه خط" aria-pressed={active.strike} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')} disabled={disabled}><s>S</s></button><i />
+    <button type="button" aria-pressed={active.block === 'ul'} onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)} disabled={disabled}>• قائمة</button>
+    <button type="button" aria-pressed={active.block === 'ol'} onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)} disabled={disabled}>1. قائمة</button><i />
+    <button type="button" aria-label="رابط" title="رابط" aria-pressed={active.link} onClick={link} disabled={disabled}>رابط</button>
+    <button type="button" onClick={onImage} disabled={disabled}>صورة</button>
+    <button type="button" onClick={onVideo} disabled={disabled}>فيديو</button>
   </div>;
 }
 
@@ -302,6 +312,8 @@ export default function BlogEditorApp({ post, services }: Props) {
   const [inlineCaption, setInlineCaption] = useState('');
   const [inlineError, setInlineError] = useState('');
   const editorRef = useRef<LexicalEditor | null>(null);
+  const inlineDialogRef = useRef<HTMLDialogElement | null>(null);
+  const imageTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => { const handler = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); (event as unknown as { returnValue: string }).returnValue = ''; } }; window.addEventListener('beforeunload', handler); return () => window.removeEventListener('beforeunload', handler); }, [dirty]);
   const notify = (text: string, error = false) => { setMessage({ text, error }); window.setTimeout(() => setMessage(null), 5000); };
@@ -370,10 +382,31 @@ export default function BlogEditorApp({ post, services }: Props) {
         const selection = $getSelection();
         if ($isRangeSelection(selection)) selection.insertNodes([node]); else $getRoot().append(node);
       });
-      setInlineOpen(false); setInlineFile(null); setInlineUrl(''); setInlineAlt(''); setInlineCaption(''); setDirty(true);
+      closeImageDialog(); setInlineFile(null); setInlineUrl(''); setInlineAlt(''); setInlineCaption(''); setDirty(true);
     } catch (error) { setInlineError(error instanceof Error ? error.message : 'تعذر إضافة الصورة.'); } finally { setAction(null); }
   }
-  function openImageDialog() { setInlineOpen(true); setInlineError(''); }
+  function openImageDialog() {
+    imageTriggerRef.current = document.activeElement instanceof HTMLButtonElement
+      ? document.activeElement
+      : null;
+    setInlineError('');
+    setInlineOpen(true);
+  }
+  function closeImageDialog() {
+    inlineDialogRef.current?.close();
+    setInlineOpen(false);
+    imageTriggerRef.current?.focus();
+  }
+  useEffect(() => {
+    const dialog = inlineDialogRef.current;
+    if (!dialog) return;
+    if (inlineOpen && !dialog.open) {
+      dialog.showModal();
+      const first = dialog.querySelector<HTMLElement>('button, input, textarea, select');
+      first?.focus();
+    }
+    if (!inlineOpen && dialog.open) dialog.close();
+  }, [inlineOpen]);
   function addVideo() { const raw = window.prompt('رابط فيديو YouTube أو Vimeo'); if (!raw) return; try { const parsed = new URL(raw); const embed = parsed.hostname.includes('youtu.be') ? `https://www.youtube-nocookie.com/embed/${parsed.pathname.slice(1)}` : parsed.hostname.includes('youtube.com') ? `https://www.youtube-nocookie.com/embed/${parsed.searchParams.get('v') || parsed.pathname.split('/').pop()}` : parsed.hostname.includes('vimeo.com') ? `https://player.vimeo.com/video/${parsed.pathname.split('/').filter(Boolean).pop()}` : ''; if (!embed) throw new Error(); const editor = editorRef.current; if (!editor) throw new Error(); editor.update(() => { const selection = $getSelection(); const node = new BlogVideoNode(embed); if ($isRangeSelection(selection)) selection.insertNodes([node]); else $getRoot().append(node); }); setDirty(true); } catch { notify('أدخل رابط فيديو صالحاً من YouTube أو Vimeo.', true); } }
 
   return <section className="editor-view" dir="rtl">
@@ -392,6 +425,38 @@ export default function BlogEditorApp({ post, services }: Props) {
         <button type="button" className="button button-preview" disabled={Boolean(action)} onClick={() => save('preview')}>{action === 'preview' ? <><Spinner /> جارٍ تجهيز المعاينة…</> : 'معاينة المقال'}</button>
       </aside></div>
     </form>
-    {inlineOpen ? <div className="editor-modal-backdrop" role="presentation"><div className="editor-modal" role="dialog" aria-modal="true" aria-labelledby="inline-image-title"><h2 id="inline-image-title">إضافة صورة داخل المقال</h2><div className="modal-tabs"><button type="button" className={inlineMode === 'device' ? 'is-active' : ''} onClick={() => setInlineMode('device')}>من الجهاز</button><button type="button" className={inlineMode === 'url' ? 'is-active' : ''} onClick={() => setInlineMode('url')}>من رابط</button></div>{inlineMode === 'device' ? <label>اختر صورة<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => setInlineFile(e.target.files?.[0] || null)} /></label> : <label>رابط الصورة<input value={inlineUrl} onChange={(e) => setInlineUrl(e.target.value)} placeholder="https://…" /></label>}<label>الوصف البديل<input value={inlineAlt} onChange={(e) => setInlineAlt(e.target.value)} required /></label><label>تعليق اختياري<input value={inlineCaption} onChange={(e) => setInlineCaption(e.target.value)} /></label>{inlineError ? <div className="image-upload-status error">{inlineError}</div> : null}<div className="modal-actions"><button type="button" className="button button-secondary" disabled={action === 'inline'} onClick={() => setInlineOpen(false)}>إلغاء</button><button type="button" className="button button-primary" disabled={action === 'inline'} onClick={insertInlineImage}>{action === 'inline' ? <><Spinner /> جارٍ رفع الصورة…</> : 'إضافة الصورة'}</button></div></div></div> : null}
+    <dialog
+      ref={inlineDialogRef}
+      className="editor-modal"
+      aria-labelledby="inline-image-title"
+      onClose={() => {
+        setInlineOpen(false);
+        imageTriggerRef.current?.focus();
+      }}
+      onCancel={(event) => {
+        event.preventDefault();
+        closeImageDialog();
+      }}
+    >
+      <h2 id="inline-image-title">إضافة صورة داخل المقال</h2>
+      <div className="modal-tabs">
+        <button type="button" className={inlineMode === 'device' ? 'is-active' : ''} onClick={() => setInlineMode('device')}>من الجهاز</button>
+        <button type="button" className={inlineMode === 'url' ? 'is-active' : ''} onClick={() => setInlineMode('url')}>من رابط</button>
+      </div>
+      {inlineMode === 'device' ? (
+        <label>اختر صورة<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => setInlineFile(e.target.files?.[0] || null)} /></label>
+      ) : (
+        <label>رابط الصورة<input value={inlineUrl} onChange={(e) => setInlineUrl(e.target.value)} placeholder="https://…" /></label>
+      )}
+      <label>الوصف البديل<input value={inlineAlt} onChange={(e) => setInlineAlt(e.target.value)} required /></label>
+      <label>تعليق اختياري<input value={inlineCaption} onChange={(e) => setInlineCaption(e.target.value)} /></label>
+      {inlineError ? <div className="image-upload-status error">{inlineError}</div> : null}
+      <div className="modal-actions">
+        <button type="button" className="button button-secondary" disabled={action === 'inline'} onClick={closeImageDialog}>إلغاء</button>
+        <button type="button" className="button button-primary" disabled={action === 'inline'} onClick={insertInlineImage}>
+          {action === 'inline' ? <><Spinner /> جارٍ رفع الصورة…</> : 'إضافة الصورة'}
+        </button>
+      </div>
+    </dialog>
   </section>;
 }

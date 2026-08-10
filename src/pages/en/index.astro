@@ -7,6 +7,7 @@ import ServiceCard from '../../components/services/ServiceCard.astro';
 import FaqSection from '../../components/sections/FaqSection.astro';
 import AssetIcon from '../../components/ui/AssetIcon.astro';
 import ButtonLink from '../../components/ui/ButtonLink.astro';
+import SitePicture from '../../components/ui/SitePicture.astro';
 import { doctors } from '../../data/doctors';
 import { clinicServices } from '../../data/services';
 import { localizeContact, localizeFaq, ui } from '../../lib/i18n/localize';
@@ -62,15 +63,14 @@ const faqItems = localizeFaq('en');
           />
         </div>
       </div>
-      <img
+      <SitePicture
         src="/assets/landing-hero.jpg"
         alt="Modern dental treatment room at Beauty Corner clinic in Hafr Al-Batin"
-        width="167"
-        height="256"
-        sizes="(max-width: 1024px) 100vw, 45vw"
+        widths={[480, 768, 960, 1280]}
+        sizes="(max-width: 1024px) calc(100vw - 2rem), 45vw"
         class="aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)]"
+        loading="eager"
         fetchpriority="high"
-        decoding="async"
       />
     </div>
   </section>
@@ -130,11 +130,12 @@ const faqItems = localizeFaq('en');
           <ButtonLink href="/en/book" variant="outline">{copy.nav.quickBook}</ButtonLink>
         </div>
       </div>
-      <img
+      <SitePicture
         src="/assets/landing-clinic-gallery.jpg"
-        alt="Beauty Corner clinic interior"
+        alt="Dental treatment room inside Beauty Corner clinic"
+        widths={[640, 960, 1280]}
+        sizes="(max-width: 1024px) calc(100vw - 2rem), 50vw"
         class="aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)]"
-        loading="lazy"
       />
     </div>
   </section>

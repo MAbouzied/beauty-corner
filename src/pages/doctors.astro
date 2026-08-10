@@ -57,7 +57,7 @@ const description =
 </Layout>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  (() => {
     const searchInput = document.querySelector<HTMLInputElement>('#doctor-search');
     const specialtyInputs = [...document.querySelectorAll<HTMLInputElement>('input[name="specialty"]')];
     const cards = [...document.querySelectorAll<HTMLElement>('[data-doctor-card]')];
@@ -104,5 +104,5 @@ const description =
     document.querySelectorAll<HTMLElement>('#reset-filters, [data-reset-filters]').forEach((button) => {
       button.addEventListener('click', resetFilters);
     });
-  });
+  })();
 </script>

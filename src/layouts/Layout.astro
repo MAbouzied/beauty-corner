@@ -1,5 +1,4 @@
 ---
-import { ClientRouter } from 'astro:transitions';
 import AnalyticsConsent from '../components/analytics/AnalyticsConsent.astro';
 import Gtm from '../components/analytics/Gtm.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
@@ -122,6 +121,8 @@ const robotsContent = effectiveNoindex
     ? 'noindex, follow'
     : 'noindex, nofollow'
   : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+
+const skipLabel = isEnglish ? 'Skip to main content' : 'تجاوز إلى المحتوى الرئيسي';
 ---
 
 <!doctype html>
@@ -187,100 +188,32 @@ const robotsContent = effectiveNoindex
     )}
 
     {structuredData && <JsonLd data={structuredData} />}
-    <ClientRouter />
-    <script is:inline>
-      (() => {
-        if (window.__bcScrollTopBound) return;
-        window.__bcScrollTopBound = true;
-
-        const SCROLL_DURATION_MS = 750;
-        let previousScrollY = 0;
-        let shouldAnimateTop = false;
-        let animationFrameId = 0;
-
-        const maxScrollY = () =>
-          Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-
-        const jumpScroll = (top) => {
-          const html = document.documentElement;
-          const previousBehavior = html.style.scrollBehavior;
-          html.style.scrollBehavior = 'auto';
-          window.scrollTo({ top, left: 0, behavior: 'instant' });
-          html.style.scrollBehavior = previousBehavior;
-        };
-
-        const restoreStartScroll = () => {
-          jumpScroll(Math.min(previousScrollY, maxScrollY()));
-        };
-
-        const animateScrollToTop = (durationMs) => {
-          if (animationFrameId) cancelAnimationFrame(animationFrameId);
-
-          const startY = window.scrollY;
-          if (startY <= 0) return;
-
-          const startTime = performance.now();
-          const easeOutCubic = (t) => 1 - (1 - t) ** 3;
-
-          const step = (now) => {
-            const progress = Math.min(1, (now - startTime) / durationMs);
-            jumpScroll(Math.round(startY * (1 - easeOutCubic(progress))));
-            if (progress < 1) {
-              animationFrameId = requestAnimationFrame(step);
-            } else {
-              animationFrameId = 0;
-            }
-          };
-
-          animationFrameId = requestAnimationFrame(step);
-        };
-
-        document.addEventListener('astro:before-preparation', () => {
-          previousScrollY = window.scrollY;
-          shouldAnimateTop = previousScrollY > 0 && !window.location.hash;
-          if (animationFrameId) {
-            cancelAnimationFrame(animationFrameId);
-            animationFrameId = 0;
-          }
-        });
-
-        document.addEventListener('astro:after-swap', () => {
-          const active = document.activeElement;
-          if (active instanceof HTMLElement && active !== document.body) {
-            active.blur();
-          }
-
-          if (!shouldAnimateTop) return;
-          restoreStartScroll();
-        });
-
-        document.addEventListener('astro:page-load', () => {
-          if (!shouldAnimateTop) return;
-          shouldAnimateTop = false;
-
-          if (window.location.hash) return;
-
-          restoreStartScroll();
-
-          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            jumpScroll(0);
-            return;
-          }
-
-          requestAnimationFrame(() => {
-            restoreStartScroll();
-            animateScrollToTop(SCROLL_DURATION_MS);
-          });
-        });
-      })();
-    </script>
   </head>
   <body class="flex min-h-screen flex-col bg-surface text-ink">
+    <a
+      href="#main-content"
+      class="sr-only fixed start-2 top-2 z-[100] rounded-lg bg-surface px-4 py-2 text-sm font-bold text-primary shadow-[var(--shadow-card)] focus:not-sr-only focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-focus"
+    >
+      {skipLabel}
+    </a>
     {!hideChrome && <SiteHeader locale={locale} />}
-    <main class="flex-1" transition:animate="fade" id="main-content">
+    <main id="main-content" tabindex="-1" class="flex-1">
       <slot />
     </main>
     {!hideChrome && <SiteFooter locale={locale} />}
     {analyticsEnabled && <AnalyticsConsent locale={locale} />}
   </body>
 </html>
+
+<style is:global>
+  @view-transition {
+    navigation: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+    }
+  }
+</style>

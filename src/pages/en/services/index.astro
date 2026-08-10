@@ -102,7 +102,7 @@ const localizedServices = clinicServices.map((service) => localizeService(servic
 </Layout>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  (() => {
     const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-service-filter]')];
     const serviceCards = [...document.querySelectorAll<HTMLElement>('[data-service-card]')];
     const servicesPanel = document.querySelector<HTMLElement>('#services-panel');
@@ -138,5 +138,5 @@ const localizedServices = clinicServices.map((service) => localizeService(servic
         }
       });
     });
-  });
+  })();
 </script>
