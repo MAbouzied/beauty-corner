@@ -177,79 +177,53 @@ function main() {
     if (list.length > 1) errors.push(`Duplicate description "${desc.slice(0, 48)}…" on: ${list.join(', ')}`);
   }
 
-  const sitemapPath = join(DIST, 'sitemap.xml');
-  if (!existsSync(sitemapPath)) {
-    errors.push('sitemap.xml missing from dist');
+  // Sitemap and robots are SSR routes (prerender = false). Content is covered by
+  // unit tests + live staging smoke; static verify only asserts the route wiring.
+  const sitemapRoutePath = join(ROOT, 'src/pages/sitemap.xml.ts');
+  if (!existsSync(sitemapRoutePath)) {
+    errors.push('src/pages/sitemap.xml.ts missing (SSR sitemap route)');
   } else {
-    const sitemap = readFileSync(sitemapPath, 'utf8');
-    if (sitemap.includes('/api/') || sitemap.includes('/404')) {
-      errors.push('sitemap includes excluded routes');
+    const sitemapRoute = readFileSync(sitemapRoutePath, 'utf8');
+    if (!sitemapRoute.includes('prerender = false')) {
+      errors.push('sitemap.xml.ts must set prerender = false');
     }
-    if (sitemap.includes('/en/blogs')) {
-      errors.push('sitemap includes nonexistent /en/blogs routes');
+    if (!sitemapRoute.includes('buildSitemapXml')) {
+      errors.push('sitemap.xml.ts must build XML via buildSitemapXml');
     }
-    const locs = extract(sitemap, /<loc>([^<]+)<\/loc>/);
-    for (const loc of locs) {
-      if (!loc.startsWith('https://beautycorner.sa')) {
-        errors.push(`sitemap loc not production: ${loc}`);
-      }
-    }
-    const urlBlocks = sitemap.split('<url>').slice(1);
-    for (const block of urlBlocks) {
-      const loc = extract(block, /<loc>([^<]+)<\/loc>/)[0];
-      const ar =
-        extract(block, /hreflang="ar"\s+href="([^"]+)"/)[0] ||
-        extract(block, /href="([^"]+)"\s+hreflang="ar"/)[0];
-      const en =
-        extract(block, /hreflang="en"\s+href="([^"]+)"/)[0] ||
-        extract(block, /href="([^"]+)"\s+hreflang="en"/)[0];
-      const xDefault =
-        extract(block, /hreflang="x-default"\s+href="([^"]+)"/)[0] ||
-        extract(block, /href="([^"]+)"\s+hreflang="x-default"/)[0];
-      const isArabicOnlyBlog = loc?.includes('/blogs');
-      if (isArabicOnlyBlog) {
-        if (!ar || !xDefault) errors.push(`sitemap Arabic-only entry missing ar/x-default: ${loc}`);
-        if (en) errors.push(`sitemap Arabic-only entry must not include en alternate: ${loc}`);
-        if (!block.includes('<lastmod>')) {
-          // Listing may omit lastmod; article URLs should include content dates.
-          if (loc && /\/blogs\/[^/]+$/.test(new URL(loc).pathname)) {
-            errors.push(`sitemap blog article missing lastmod: ${loc}`);
-          }
-        }
-      } else if (!ar || !en || !xDefault) {
-        errors.push(`sitemap entry missing alternates: ${loc}`);
-      }
-      if (xDefault && ar && xDefault !== ar) errors.push(`sitemap x-default != ar for ${loc}`);
-    }
-
-    // Bilingual site URLs + Arabic blog listing + article/pagination URLs from the active provider.
-    const blogArticleLocs = locs.filter((loc) => {
-      try {
-        return /\/blogs\/[^/]+$/.test(new URL(loc).pathname) && !loc.includes('/blogs/page/');
-      } catch {
-        return false;
-      }
-    });
-    const blogPageLocs = locs.filter((loc) => loc.includes('/blogs/page/'));
-    if (!locs.some((loc) => loc.endsWith('/blogs') || loc.endsWith('/blogs/'))) {
-      errors.push('sitemap missing Arabic blog listing /blogs');
-    }
-    if (blogArticleLocs.length === 0) {
-      warnings.push('sitemap has no blog article URLs (empty provider dataset is allowed)');
-    }
-    if (blogPageLocs.length > 0) {
-      warnings.push(`sitemap includes ${blogPageLocs.length} blog pagination URL(s)`);
+    if (!sitemapRoute.includes('sitemapUnavailableResponse')) {
+      errors.push('sitemap.xml.ts must return sitemapUnavailableResponse on failure');
     }
   }
+  if (existsSync(join(DIST, 'sitemap.xml'))) {
+    warnings.push('dist/sitemap.xml present; prefer SSR-only sitemap.xml.ts');
+  }
 
-  const robotsPath = join(ROOT, 'public/robots.txt');
-  if (existsSync(robotsPath)) {
-    const robots = readFileSync(robotsPath, 'utf8');
-    if (!robots.includes('https://beautycorner.sa/sitemap.xml')) {
-      errors.push('robots.txt missing production sitemap URL');
-    }
+  const robotsRoutePath = join(ROOT, 'src/pages/robots.txt.ts');
+  const robotsHelperPath = join(ROOT, 'src/lib/seo/robots.ts');
+  if (!existsSync(robotsRoutePath)) {
+    errors.push('src/pages/robots.txt.ts missing (SSR robots route)');
   } else {
-    errors.push('public/robots.txt missing');
+    const robotsRoute = readFileSync(robotsRoutePath, 'utf8');
+    if (!robotsRoute.includes('prerender = false')) {
+      errors.push('robots.txt.ts must set prerender = false');
+    }
+    if (!robotsRoute.includes('buildRobotsTxt')) {
+      errors.push('robots.txt.ts must use buildRobotsTxt');
+    }
+    if (!robotsRoute.includes('/sitemap.xml')) {
+      errors.push('robots.txt.ts missing sitemap URL wiring');
+    }
+  }
+  if (!existsSync(robotsHelperPath)) {
+    errors.push('src/lib/seo/robots.ts missing');
+  } else {
+    const robotsHelper = readFileSync(robotsHelperPath, 'utf8');
+    if (!robotsHelper.includes('Sitemap: ${options.sitemapUrl}')) {
+      errors.push('robots.ts must emit Sitemap line from sitemapUrl when indexable');
+    }
+  }
+  if (existsSync(join(ROOT, 'public/robots.txt'))) {
+    errors.push('public/robots.txt must not exist; robots is served by src/pages/robots.txt.ts');
   }
 
   const landing = readFileSync(join(ROOT, 'src/data/landing.ts'), 'utf8');
