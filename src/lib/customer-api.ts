@@ -96,8 +96,13 @@ export async function enforceCustomerRateLimit(
   if (!limiter) {
     return options.failClosed ? 'unavailable' : 'allow';
   }
-  const result = await limiter.limit({ key });
-  return result.success ? 'allow' : 'limited';
+  try {
+    const result = await limiter.limit({ key });
+    return result.success ? 'allow' : 'limited';
+  } catch (error) {
+    console.error('Customer rate limiter failed.', error);
+    return options.failClosed ? 'unavailable' : 'allow';
+  }
 }
 
 /** Best-effort per-isolate limiter retained for local/unit tests only. */

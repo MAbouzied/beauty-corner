@@ -60,7 +60,7 @@ const specialties = ['كل الأطباء', ...new Set(doctors.map((doctor) => d
 </aside>
 
 <script>
-  (() => {
+  const bindDoctorFilters = () => {
     const responsiveFilterDisclosure = document.querySelector<HTMLDetailsElement>('.doctor-filters');
     if (!responsiveFilterDisclosure || responsiveFilterDisclosure.dataset.bound === 'true') return;
     responsiveFilterDisclosure.dataset.bound = 'true';
@@ -73,5 +73,7 @@ const specialties = ['كل الأطباء', ...new Set(doctors.map((doctor) => d
 
     syncFilterDisclosure(desktopFilterQuery);
     desktopFilterQuery.addEventListener('change', syncFilterDisclosure);
-  })();
+  };
+
+  document.addEventListener('astro:page-load', bindDoctorFilters);
 </script>

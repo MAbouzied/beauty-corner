@@ -1,11 +1,17 @@
 import type { APIRoute } from 'astro';
+import { SEO_INDEXABLE } from 'astro:env/server';
 import {
   BLOG_CACHE_MAX_AGE_SECONDS,
   BLOG_CACHE_SWR_SECONDS,
   blogListingCacheTags,
 } from '../modules/blog/cache';
 import { getSitemapRoutePairs } from '../lib/i18n/routes';
-import { buildSitemapXml, sitemapUnavailableResponse } from '../lib/seo/sitemap-xml';
+import {
+  buildSitemapXml,
+  isSitemapHostIndexable,
+  sitemapNotIndexableResponse,
+  sitemapUnavailableResponse,
+} from '../lib/seo/sitemap-xml';
 
 export const prerender = false;
 
@@ -13,6 +19,15 @@ export const GET: APIRoute = async (context) => {
   const site = context.site;
   if (!site) {
     return new Response('Astro site URL must be configured.', { status: 500 });
+  }
+
+  if (
+    !isSitemapHostIndexable({
+      indexable: SEO_INDEXABLE === true,
+      host: context.url.hostname,
+    })
+  ) {
+    return sitemapNotIndexableResponse();
   }
 
   try {

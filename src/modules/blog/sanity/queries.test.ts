@@ -3,7 +3,9 @@ import { describe, it } from 'node:test';
 import {
   blogPostProjection,
   blogPostSummaryProjection,
+  listingPostsPageQuery,
   publishedPostBySlugQuery,
+  publishedPostsCountQuery,
   publishedPostsQuery,
   relatedPostsQuery,
 } from './queries.ts';
@@ -23,5 +25,12 @@ describe('Sanity blog projections', () => {
     assert.match(relatedPostsQuery, /\$categoryId/);
     assert.doesNotMatch(relatedPostsQuery, /bodyHtml/);
     assert.match(publishedPostBySlugQuery, /bodyJson/);
+  });
+
+  it('paginates listing rows in GROQ without body fields', () => {
+    assert.match(publishedPostsCountQuery, /^count\(/);
+    assert.match(listingPostsPageQuery, /\$start\.\.\.\$end/);
+    assert.match(listingPostsPageQuery, /\$excludeSlug/);
+    assert.doesNotMatch(listingPostsPageQuery, /bodyJson|bodyHtml/);
   });
 });

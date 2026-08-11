@@ -132,7 +132,7 @@ const fieldClass =
   import { saveCustomerLead } from '../../lib/customer-leads';
   import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
 
-  (() => {
+  const bindLeadForm = () => {
     const form = document.querySelector<HTMLFormElement>('[data-lead-form]');
     if (!form || form.dataset.bound === 'true') return;
     form.dataset.bound = 'true';
@@ -189,5 +189,7 @@ const fieldClass =
         window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
       })();
     });
-  })();
+  };
+
+  document.addEventListener('astro:page-load', bindLeadForm);
 </script>

@@ -1,5 +1,11 @@
 import { defineMiddleware } from 'astro:middleware';
 import { assertStaffAccess, sanitizeReturnUrl } from './lib/auth/authorization.ts';
+import {
+  buildLegacyRedirectLocation,
+  resolveLegacyRedirect,
+  resolveTrailingSlashRedirect,
+  shouldApplyLegacyRedirect,
+} from './lib/seo/legacy-redirects.ts';
 import { adminAuthBypassEnabled } from './lib/staff-access/admin-auth.ts';
 import { adminApiError } from './lib/staff-access/http.ts';
 import { withPrivateSecurityHeaders, withSecurityHeaders } from './lib/security/headers.ts';
@@ -43,6 +49,22 @@ function forbiddenResponse(isApi: boolean): Response {
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  if (shouldApplyLegacyRedirect(context.request.method)) {
+    const legacyTarget = resolveLegacyRedirect(context.url.pathname);
+    if (legacyTarget) {
+      const location = buildLegacyRedirectLocation(legacyTarget, context.url.search);
+      return withSecurityHeaders(context.redirect(location, 301));
+    }
+
+    // Canonical trailing-slash redirect for current app routes.
+    // Runs after legacy redirect so `/home/` → `/` stays one hop.
+    const slashlessTarget = resolveTrailingSlashRedirect(context.url.pathname);
+    if (slashlessTarget) {
+      const location = buildLegacyRedirectLocation(slashlessTarget, context.url.search);
+      return withSecurityHeaders(context.redirect(location, 301));
+    }
+  }
+
   const pathname = context.url.pathname.replace(/\/$/, '') || '/';
   const adminPage = isAdminPage(pathname);
   const adminApi = isAdminApi(pathname);

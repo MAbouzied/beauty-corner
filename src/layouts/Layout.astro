@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import AnalyticsConsent from '../components/analytics/AnalyticsConsent.astro';
 import Gtm from '../components/analytics/Gtm.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
@@ -188,6 +189,8 @@ const skipLabel = isEnglish ? 'Skip to main content' : 'تجاوز إلى الم
     )}
 
     {structuredData && <JsonLd data={structuredData} />}
+    <!-- Soft client navigations (Next.js-like) — avoids full reload / favicon spinner. -->
+    <ClientRouter fallback="swap" />
   </head>
   <body class="flex min-h-screen flex-col bg-surface text-ink">
     <a
@@ -197,7 +200,7 @@ const skipLabel = isEnglish ? 'Skip to main content' : 'تجاوز إلى الم
       {skipLabel}
     </a>
     {!hideChrome && <SiteHeader locale={locale} />}
-    <main id="main-content" tabindex="-1" class="flex-1">
+    <main id="main-content" tabindex="-1" class="flex-1" transition:animate="none">
       <slot />
     </main>
     {!hideChrome && <SiteFooter locale={locale} />}
@@ -206,10 +209,6 @@ const skipLabel = isEnglish ? 'Skip to main content' : 'تجاوز إلى الم
 </html>
 
 <style is:global>
-  @view-transition {
-    navigation: auto;
-  }
-
   @media (prefers-reduced-motion: reduce) {
     ::view-transition-old(root),
     ::view-transition-new(root) {

@@ -83,3 +83,22 @@ export function sitemapUnavailableResponse(retryAfterSeconds = 120): Response {
     },
   });
 }
+
+/** Non-indexable hosts must not expose a crawlable URL inventory. */
+export function sitemapNotIndexableResponse(): Response {
+  return new Response('Sitemap unavailable on non-indexable hosts.', {
+    status: 404,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Robots-Tag': 'noindex, nofollow',
+      'Cache-Control': 'no-store',
+    },
+  });
+}
+
+export function isSitemapHostIndexable(options: {
+  indexable: boolean;
+  host: string;
+}): boolean {
+  return options.indexable === true && options.host.toLowerCase() === 'beautycorner.sa';
+}

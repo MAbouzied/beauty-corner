@@ -1,5 +1,6 @@
 import type { BlogPost } from '../model/blog-types.ts';
-import type { BlogRepository } from '../repository/blog-repository.ts';
+import { BLOG_PAGE_SIZE } from '../model/blog-types.ts';
+import type { BlogListingPage, BlogRepository } from '../repository/blog-repository.ts';
 
 export type PublicBlogSuccess<T> = { ok: true; data: T };
 export type PublicBlogFailure = { ok: false; kind: 'unavailable' | 'not_found' };
@@ -11,6 +12,7 @@ async function resolveRepository(repository?: BlogRepository): Promise<BlogRepos
   return getBlogRepository();
 }
 
+/** @deprecated Prefer loadPublicBlogListingPage for UI listings. */
 export async function loadPublicBlogList(
   repository?: BlogRepository,
 ): Promise<PublicBlogResult<BlogPost[]>> {
@@ -19,6 +21,21 @@ export async function loadPublicBlogList(
     return { ok: true, data };
   } catch (error) {
     console.error('[blog] Failed to load published posts.', error);
+    return { ok: false, kind: 'unavailable' };
+  }
+}
+
+export async function loadPublicBlogListingPage(
+  page: number,
+  pageSize = BLOG_PAGE_SIZE,
+  repository?: BlogRepository,
+): Promise<PublicBlogResult<BlogListingPage>> {
+  try {
+    const data = await (await resolveRepository(repository)).getListingPage(page, pageSize);
+    if (!data) return { ok: false, kind: 'not_found' };
+    return { ok: true, data };
+  } catch (error) {
+    console.error(`[blog] Failed to load listing page ${page}.`, error);
     return { ok: false, kind: 'unavailable' };
   }
 }

@@ -10,20 +10,20 @@ import {
 } from '../lib/schema';
 import BlogListing from '../modules/blog/components/BlogListing.astro';
 import {
-  BLOG_PAGE_SIZE,
   DEFAULT_BLOG_LISTING_LABELS,
-  paginatePosts,
-  selectListing,
 } from '../modules/blog';
 import {
   BLOG_CACHE_MAX_AGE_SECONDS,
   BLOG_CACHE_SWR_SECONDS,
   blogListingCacheTags,
 } from '../modules/blog/cache';
-import { loadPublicBlogList } from '../modules/blog/lib/load-public-blog';
+import { loadPublicBlogListingPage } from '../modules/blog/lib/load-public-blog';
 
-const result = await loadPublicBlogList();
+const result = await loadPublicBlogListingPage(1);
 if (!result.ok) {
+  if (result.kind === 'not_found') {
+    return new Response(null, { status: 404, statusText: 'Not Found' });
+  }
   Astro.response.status = 503;
   Astro.response.headers.set('Retry-After', '120');
   Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
@@ -37,9 +37,10 @@ if (result.ok && Astro.cache.enabled) {
   });
 }
 
-const listing = result.ok ? selectListing(result.data) : null;
-const recentPage = listing ? paginatePosts(listing.recent, 1, BLOG_PAGE_SIZE) : null;
-const totalPages = recentPage?.totalPages ?? 1;
+const listing = result.ok ? result.data : null;
+const schemaPosts = listing
+  ? [...(listing.featured ? [listing.featured] : []), ...listing.items]
+  : [];
 
 const site = Astro.site!;
 const title = 'مدونة بيوتي كورنر | مقالات عن الأسنان والجلدية في حفر الباطن';
@@ -57,7 +58,7 @@ const labels = DEFAULT_BLOG_LISTING_LABELS;
       path: '/blogs',
       name: title,
       description,
-      posts: listing.allPublished,
+      posts: schemaPosts,
     })}
   >
     <Breadcrumbs
@@ -68,10 +69,10 @@ const labels = DEFAULT_BLOG_LISTING_LABELS;
     />
     <BlogListing
       featured={listing.featured}
-      recent={recentPage?.items ?? []}
-      totalPublished={listing.allPublished.length}
+      recent={listing.items}
+      totalPublished={listing.totalPublished}
       page={1}
-      totalPages={totalPages}
+      totalPages={listing.totalPages}
       labels={labels}
     >
       <BookingSection slot="cta" />

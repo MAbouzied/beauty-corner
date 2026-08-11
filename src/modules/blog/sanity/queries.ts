@@ -142,6 +142,23 @@ const publishedFilter = `
 
 export const publishedPostsQuery = `*[${publishedFilter}] | order(featured desc, publishedAt desc) ${blogPostSummaryProjection}`;
 
+export const publishedPostsCountQuery = `count(*[${publishedFilter}])`;
+
+export const featuredPublishedPostQuery = `*[
+  ${publishedFilter}
+  && featured == true
+] | order(publishedAt desc)[0] ${blogPostSummaryProjection}`;
+
+export const newestPublishedPostQuery = `*[
+  ${publishedFilter}
+] | order(publishedAt desc)[0] ${blogPostSummaryProjection}`;
+
+/** Paginated listing rows excluding the featured slug when provided. */
+export const listingPostsPageQuery = `*[
+  ${publishedFilter}
+  && ($excludeSlug == "" || slug.current != $excludeSlug)
+] | order(publishedAt desc)[$start...$end] ${blogPostSummaryProjection}`;
+
 export const publishedPostBySlugQuery = `*[
   ${publishedFilter}
   && slug.current == $slug

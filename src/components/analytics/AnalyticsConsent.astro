@@ -23,12 +23,10 @@ const copy = en
     };
 ---
 
-<div
+<section
   class="analytics-consent"
   data-analytics-consent
   hidden
-  role="dialog"
-  aria-modal="false"
   aria-labelledby="analytics-consent-title"
   aria-describedby="analytics-consent-body"
 >
@@ -46,7 +44,7 @@ const copy = en
       </button>
     </div>
   </div>
-</div>
+</section>
 
 <style>
   .analytics-consent {
@@ -146,9 +144,5 @@ const copy = en
     });
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAnalyticsConsent, { once: true });
-  } else {
-    initAnalyticsConsent();
-  }
+  document.addEventListener('astro:page-load', initAnalyticsConsent);
 </script>

@@ -6,6 +6,25 @@ export const BLOG_LEXICAL_JSON_MAX_BYTES = 512 * 1024;
 const SAFE_BLOG_HREF =
   /^(https:\/\/|mailto:|tel:|\/(?!\/)|#)/i;
 
+const ALLOWED_EMBED_HOSTS = new Set([
+  'youtube.com',
+  'www.youtube.com',
+  'www.youtube-nocookie.com',
+  'player.vimeo.com',
+]);
+
+export function isAllowedBlogMediaUrl(raw: unknown): boolean {
+  if (typeof raw !== 'string') return false;
+  try {
+    const url = new URL(raw.trim());
+    if (url.protocol !== 'https:') return false;
+    if (url.username || url.password) return false;
+    return ALLOWED_EMBED_HOSTS.has(url.hostname.toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
 export function validateBlogLink(href: unknown): string | undefined {
   if (typeof href !== 'string') return undefined;
   const trimmed = href.trim();
@@ -67,6 +86,7 @@ export const BLOG_HTML_POLICY: IOptions = Object.freeze({
     iframe: ['https'],
   },
   allowedIframeHostnames: [
+    'youtube.com',
     'www.youtube.com',
     'www.youtube-nocookie.com',
     'player.vimeo.com',
@@ -89,6 +109,34 @@ export const BLOG_HTML_POLICY: IOptions = Object.freeze({
                 rel: 'noopener noreferrer',
               }
             : {}),
+        },
+      };
+    },
+    video: (_tagName: string, attribs: Record<string, string>) => {
+      if (!isAllowedBlogMediaUrl(attribs.src)) {
+        return { tagName: 'span', attribs: {} };
+      }
+      return {
+        tagName: 'video',
+        attribs: {
+          src: attribs.src,
+          ...(attribs.poster && isAllowedBlogMediaUrl(attribs.poster)
+            ? { poster: attribs.poster }
+            : {}),
+          ...(attribs.controls !== undefined ? { controls: attribs.controls } : {}),
+          ...(attribs.class ? { class: attribs.class } : {}),
+        },
+      };
+    },
+    source: (_tagName: string, attribs: Record<string, string>) => {
+      if (!isAllowedBlogMediaUrl(attribs.src)) {
+        return { tagName: 'span', attribs: {} };
+      }
+      return {
+        tagName: 'source',
+        attribs: {
+          src: attribs.src,
+          ...(attribs.type ? { type: attribs.type } : {}),
         },
       };
     },

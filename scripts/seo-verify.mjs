@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, extname } from 'node:path';
 
@@ -177,8 +178,24 @@ function main() {
     if (list.length > 1) errors.push(`Duplicate description "${desc.slice(0, 48)}…" on: ${list.join(', ')}`);
   }
 
-  // Sitemap and robots are SSR routes (prerender = false). Content is covered by
-  // unit tests + live staging smoke; static verify only asserts the route wiring.
+  // Sitemap and robots are SSR routes (prerender = false).
+  // Re-run sitemap XML unit tests here so structural generation bugs fail seo:verify.
+  const sitemapTest = spawnSync(
+    process.execPath,
+    [
+      '--experimental-strip-types',
+      '--test',
+      'src/lib/seo/sitemap-xml.test.ts',
+      'src/lib/seo/robots.test.ts',
+    ],
+    { cwd: ROOT, encoding: 'utf8' },
+  );
+  if (sitemapTest.status !== 0) {
+    errors.push('sitemap/robots unit coverage failed during seo:verify');
+    if (sitemapTest.stdout) console.error(sitemapTest.stdout);
+    if (sitemapTest.stderr) console.error(sitemapTest.stderr);
+  }
+
   const sitemapRoutePath = join(ROOT, 'src/pages/sitemap.xml.ts');
   if (!existsSync(sitemapRoutePath)) {
     errors.push('src/pages/sitemap.xml.ts missing (SSR sitemap route)');
@@ -192,6 +209,9 @@ function main() {
     }
     if (!sitemapRoute.includes('sitemapUnavailableResponse')) {
       errors.push('sitemap.xml.ts must return sitemapUnavailableResponse on failure');
+    }
+    if (!sitemapRoute.includes('isSitemapHostIndexable') || !sitemapRoute.includes('SEO_INDEXABLE')) {
+      errors.push('sitemap.xml.ts must gate output with SEO_INDEXABLE / isSitemapHostIndexable');
     }
   }
   if (existsSync(join(DIST, 'sitemap.xml'))) {

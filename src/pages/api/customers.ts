@@ -118,9 +118,9 @@ export const POST = (async ({ request }) => {
 
   const contentType = request.headers.get('Content-Type') ?? '';
   const isJson = contentType.includes('application/json');
-  const isForm =
-    contentType.includes('application/x-www-form-urlencoded') ||
-    contentType.includes('multipart/form-data');
+  // Native no-JS forms use urlencoded. Multipart is rejected — it cannot be
+  // parsed safely with URLSearchParams and is unused by our booking clients.
+  const isForm = contentType.includes('application/x-www-form-urlencoded');
   if (!isJson && !isForm) return json({ ok: false }, 415);
 
   const bodyResult = await readCustomerRequestBody(request);

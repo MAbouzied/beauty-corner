@@ -191,8 +191,9 @@ const labels = en
   import { saveCustomerLead } from '../../lib/customer-leads';
   import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
 
-  const bookingForm = document.querySelector<HTMLFormElement>('#booking-form');
-  if (bookingForm && bookingForm.dataset.bound !== 'true') {
+  const bindBookingSection = () => {
+    const bookingForm = document.querySelector<HTMLFormElement>('#booking-form');
+    if (!bookingForm || bookingForm.dataset.bound === 'true') return;
     bookingForm.dataset.bound = 'true';
 
     const bookingStatus = document.querySelector<HTMLElement>('#booking-status');
@@ -281,5 +282,7 @@ const labels = en
         window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
       })();
     });
-  }
+  };
+
+  document.addEventListener('astro:page-load', bindBookingSection);
 </script>

@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import type { BlogPost } from '../model/blog-types.ts';
-import type { BlogRepository } from '../repository/blog-repository.ts';
+import type { BlogListingPage, BlogRepository } from '../repository/blog-repository.ts';
 import {
   loadPublicBlogList,
+  loadPublicBlogListingPage,
   loadPublicBlogPost,
   loadPublicRelatedPosts,
 } from './load-public-blog.ts';
@@ -26,10 +27,23 @@ function stubPost(slug: string): BlogPost {
   };
 }
 
+function stubListing(page = 1): BlogListingPage {
+  return {
+    featured: stubPost('featured'),
+    items: [stubPost('a')],
+    totalPublished: 2,
+    totalPages: 1,
+    page,
+  };
+}
+
 function stubRepository(overrides: Partial<BlogRepository> = {}): BlogRepository {
   return {
     async getPublishedPosts() {
       return [];
+    },
+    async getListingPage() {
+      return stubListing();
     },
     async getPostBySlug() {
       return null;
@@ -61,6 +75,40 @@ describe('loadPublicBlogList', () => {
       },
     });
     assert.deepEqual(await loadPublicBlogList(repository), { ok: false, kind: 'unavailable' });
+  });
+});
+
+describe('loadPublicBlogListingPage', () => {
+  it('returns a paginated listing page', async () => {
+    const result = await loadPublicBlogListingPage(1, 9, stubRepository());
+    assert.equal(result.ok, true);
+    if (!result.ok) throw new Error('expected success');
+    assert.equal(result.data.featured?.slug, 'featured');
+    assert.equal(result.data.items[0]?.slug, 'a');
+  });
+
+  it('maps missing pages to not_found', async () => {
+    const repository = stubRepository({
+      async getListingPage() {
+        return null;
+      },
+    });
+    assert.deepEqual(await loadPublicBlogListingPage(9, 9, repository), {
+      ok: false,
+      kind: 'not_found',
+    });
+  });
+
+  it('maps repository failures to unavailable', async () => {
+    const repository = stubRepository({
+      async getListingPage() {
+        throw new Error('sanity down');
+      },
+    });
+    assert.deepEqual(await loadPublicBlogListingPage(1, 9, repository), {
+      ok: false,
+      kind: 'unavailable',
+    });
   });
 });
 

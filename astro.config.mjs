@@ -9,7 +9,9 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://beautycorner.sa',
-  trailingSlash: 'never',
+  // Accept both slash styles so legacy WordPress URLs (usually trailing `/`)
+  // reach middleware redirects. Public links/canonicals still omit the slash.
+  trailingSlash: 'ignore',
   redirects: {
     '/devices': {
       status: 301,
@@ -40,7 +42,7 @@ export default defineConfig({
         "font-src 'self' data:",
         "img-src 'self' data: blob: https://cdn.sanity.io https://lh3.googleusercontent.com https://*.googleusercontent.com https://www.googletagmanager.com https://*.google-analytics.com",
         "connect-src 'self' https://*.sanity.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
-        "frame-src https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
+        "frame-src https://www.google.com https://youtube.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
         "media-src 'self' https://cdn.sanity.io",
         "worker-src 'self' blob:",
         'upgrade-insecure-requests',

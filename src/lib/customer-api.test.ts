@@ -97,6 +97,18 @@ describe('enforceCustomerRateLimit', () => {
       'limited',
     );
   });
+
+  it('fails closed when the limiter throws in production mode', async () => {
+    const limiter = {
+      async limit() {
+        throw new Error('binding unavailable');
+      },
+    };
+    assert.equal(
+      await enforceCustomerRateLimit(limiter, 'customers:1', { failClosed: true }),
+      'unavailable',
+    );
+  });
 });
 
 describe('createMemoryRateLimiter', () => {

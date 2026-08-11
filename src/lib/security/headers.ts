@@ -1,5 +1,16 @@
 const FRAME_ANCESTORS_NONE = "frame-ancestors 'none'";
 
+/**
+ * Keep an existing CSP (e.g. Astro hashed policy) and only add
+ * frame-ancestors when the directive is missing.
+ */
+export function mergeContentSecurityPolicy(existing: string | null): string {
+  const current = existing?.trim() ?? '';
+  if (!current) return FRAME_ANCESTORS_NONE;
+  if (/(?:^|;)\s*frame-ancestors\b/i.test(current)) return current;
+  return `${current.replace(/;?\s*$/, '')}; ${FRAME_ANCESTORS_NONE}`;
+}
+
 /** Apply baseline security headers to Worker/SSR responses. */
 export function withSecurityHeaders(response: Response): Response {
   const headers = new Headers(response.headers);
@@ -12,7 +23,10 @@ export function withSecurityHeaders(response: Response): Response {
     'camera=(), microphone=(), geolocation=(), payment=()',
   );
   headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-  headers.set('Content-Security-Policy', FRAME_ANCESTORS_NONE);
+  headers.set(
+    'Content-Security-Policy',
+    mergeContentSecurityPolicy(headers.get('Content-Security-Policy')),
+  );
 
   return new Response(response.body, {
     status: response.status,

@@ -27,6 +27,17 @@ describe('sanitizeBlogHtml', () => {
     assert.doesNotMatch(html, /javascript|href=/);
     assert.match(html, /خطر/);
   });
+
+  it('allows non-www YouTube iframes and blocks arbitrary video hosts', () => {
+    const html = sanitizeBlogHtml(
+      [
+        '<iframe src="https://youtube.com/embed/abc" title="yt"></iframe>',
+        '<video src="https://evil.example/video.mp4" controls></video>',
+      ].join(''),
+    );
+    assert.match(html, /youtube\.com\/embed\/abc/);
+    assert.doesNotMatch(html, /evil\.example|video\.mp4/);
+  });
 });
 
 describe('Lexical blog content', () => {

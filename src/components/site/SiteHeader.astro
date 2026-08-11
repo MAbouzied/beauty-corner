@@ -138,23 +138,30 @@ const brandLabel = isEnglish ? 'Beauty Corner - Home' : 'بيوتي كورنر -
     });
   };
 
-  closeMobileNav();
-  syncLanguageSwitchHrefs();
-  window.addEventListener('hashchange', syncLanguageSwitchHrefs);
+  const bindHeaderInteractions = () => {
+    closeMobileNav();
+    syncLanguageSwitchHrefs();
+  };
 
-  document.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof Element)) return;
+  if (document.documentElement.dataset.siteHeaderBound !== 'true') {
+    document.documentElement.dataset.siteHeaderBound = 'true';
+    window.addEventListener('hashchange', syncLanguageSwitchHrefs);
+    document.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
 
-    if (target.closest('[data-mobile-nav-link]')) {
-      closeMobileNav();
-      return;
-    }
+      if (target.closest('[data-mobile-nav-link]')) {
+        closeMobileNav();
+        return;
+      }
 
-    const openNav = document.querySelector<HTMLDetailsElement>('details[data-mobile-nav][open]');
-    if (!openNav) return;
-    if (!target.closest('details[data-mobile-nav]')) {
-      closeMobileNav();
-    }
-  });
+      const openNav = document.querySelector<HTMLDetailsElement>('details[data-mobile-nav][open]');
+      if (!openNav) return;
+      if (!target.closest('details[data-mobile-nav]')) {
+        closeMobileNav();
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', bindHeaderInteractions);
 </script>

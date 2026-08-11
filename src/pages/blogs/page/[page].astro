@@ -8,36 +8,29 @@ import Layout from '../../../layouts/Layout.astro';
 import { buildBlogCollectionSchemas } from '../../../lib/schema';
 import BlogListing from '../../../modules/blog/components/BlogListing.astro';
 import {
-  BLOG_PAGE_SIZE,
   DEFAULT_BLOG_LISTING_LABELS,
   listingPathForPage,
-  paginatePosts,
-  selectListing,
 } from '../../../modules/blog';
 import {
   BLOG_CACHE_MAX_AGE_SECONDS,
   BLOG_CACHE_SWR_SECONDS,
   blogListingCacheTags,
 } from '../../../modules/blog/cache';
-import { loadPublicBlogList } from '../../../modules/blog/lib/load-public-blog';
+import { loadPublicBlogListingPage } from '../../../modules/blog/lib/load-public-blog';
 
 const pageNumber = Number.parseInt(Astro.params.page ?? '', 10);
 if (!Number.isInteger(pageNumber) || pageNumber < 2) {
   return new Response(null, { status: 404, statusText: 'Not Found' });
 }
 
-const result = await loadPublicBlogList();
+const result = await loadPublicBlogListingPage(pageNumber);
 if (!result.ok) {
+  if (result.kind === 'not_found') {
+    return new Response(null, { status: 404, statusText: 'Not Found' });
+  }
   Astro.response.status = 503;
   Astro.response.headers.set('Retry-After', '120');
   Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
-}
-
-const listing = result.ok ? selectListing(result.data) : null;
-const recentPage = listing ? paginatePosts(listing.recent, pageNumber, BLOG_PAGE_SIZE) : null;
-
-if (result.ok && !recentPage) {
-  return new Response(null, { status: 404, statusText: 'Not Found' });
 }
 
 if (result.ok && Astro.cache.enabled) {
@@ -48,6 +41,8 @@ if (result.ok && Astro.cache.enabled) {
   });
 }
 
+const listing = result.ok ? result.data : null;
+
 const site = Astro.site!;
 const path = listingPathForPage(pageNumber);
 const title = `مدونة بيوتي كورنر — صفحة ${pageNumber} | مقالات الأسنان والجلدية`;
@@ -55,7 +50,7 @@ const description =
   'مقالات عربية إضافية من عيادة بيوتي كورنر في حفر الباطن حول صحة الأسنان والبشرة والعناية الوقائية.';
 ---
 
-{result.ok && listing && recentPage ? (
+{result.ok && listing ? (
   <Layout
     title={title}
     description={description}
@@ -65,7 +60,7 @@ const description =
       path,
       name: title,
       description,
-      posts: recentPage.items,
+      posts: listing.items,
     })}
   >
     <Breadcrumbs
@@ -77,10 +72,10 @@ const description =
     />
     <BlogListing
       featured={null}
-      recent={recentPage.items}
-      totalPublished={listing.allPublished.length}
+      recent={listing.items}
+      totalPublished={listing.totalPublished}
       page={pageNumber}
-      totalPages={recentPage.totalPages}
+      totalPages={listing.totalPages}
       labels={DEFAULT_BLOG_LISTING_LABELS}
     >
       <BookingSection slot="cta" />

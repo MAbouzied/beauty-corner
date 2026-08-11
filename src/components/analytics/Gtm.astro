@@ -68,5 +68,17 @@ import { isGtmConfigured } from '../../lib/gtm';
     };
 
     bindContactTracking();
+
+    // astro:after-swap fires only on SPA navigations (View Transitions), not on
+    // the initial page load. GTM's own gtm.js handles the first page_view when
+    // the container script is loaded, avoiding a double send for returning
+    // consented users who would otherwise see two page_view hits on first load.
+    document.addEventListener('astro:after-swap', () => {
+      if (!isGtmEnabled()) return;
+      pushGtmEvent('page_view', {
+        page_title: document.title,
+        page_location: window.location.href,
+      });
+    });
   </script>
 )}

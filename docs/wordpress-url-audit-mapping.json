@@ -1,0 +1,192 @@
+{
+  "site": "https://beautycorner.sa",
+  "auditDate": "2026-08-11",
+  "status": "implemented-via-middleware",
+  "implementation": {
+    "module": "src/lib/seo/legacy-redirects.ts",
+    "middleware": "src/middleware.ts",
+    "tests": "src/lib/seo/legacy-redirects.test.ts"
+  },
+  "sources": {
+    "googleSiteSearch": {
+      "query": "site:beautycorner.sa",
+      "resultCount": 1,
+      "urls": ["https://beautycorner.sa/"]
+    },
+    "googleExactDomain": {
+      "query": "\"beautycorner.sa\"",
+      "beautycornerSaUrlsFound": ["https://beautycorner.sa/"]
+    },
+    "waybackMachine": "no captures found",
+    "commonCrawl": "no captures found across recent indexes",
+    "repoArchiveFile": {
+      "path": "archive-urls.json",
+      "note": "Contains roomspa-sa.com URLs (spa/WooCommerce), NOT beautycorner.sa. Do not use as Beauty Corner redirect source without confirmation."
+    }
+  },
+  "newSiteRoutes": {
+    "staticAr": ["/", "/services", "/doctors", "/contact", "/book", "/privacy", "/blogs"],
+    "staticEn": ["/en", "/en/services", "/en/doctors", "/en/contact", "/en/book", "/en/privacy"],
+    "serviceDetails": [
+      "/services/dental-implants",
+      "/services/dental-prosthetics",
+      "/services/teeth-whitening",
+      "/services/cleaning-polishing",
+      "/services/tooth-extraction",
+      "/services/root-canal",
+      "/services/cosmetic-fillings",
+      "/services/gum-contouring",
+      "/services/gum-depigmentation",
+      "/services/dental-xray-3d",
+      "/services/acne-treatment",
+      "/services/pigmentation",
+      "/services/non-surgical-aesthetics"
+    ],
+    "doctorDetails": [
+      "/doctors/dentistry-fatima",
+      "/doctors/dentistry-wissam"
+    ],
+    "alreadyRedirected": {
+      "/devices": "/#devices",
+      "/en/devices": "/en#devices"
+    },
+    "newOnlyNoLegacyEquivalentNeeded": [
+      "/en/*",
+      "/privacy",
+      "/en/privacy",
+      "/book",
+      "/en/book",
+      "/blogs",
+      "/blogs/*",
+      "/admin/*",
+      "/login"
+    ]
+  },
+  "patternMapping": [
+    {
+      "oldPattern": "/home",
+      "oldPatternAlt": "/home/",
+      "newUrl": "/",
+      "confidence": "high",
+      "equivalentType": "page",
+      "notes": "Legacy WP home alias → new Arabic home."
+    },
+    {
+      "oldPattern": "/حول",
+      "oldPatternAlt": "/حول/",
+      "newUrl": "/",
+      "confidence": "medium",
+      "equivalentType": "section-or-home",
+      "notes": "No dedicated About page in new app. Closest is home (clinic intro). Alternative: /contact if About was NAP-focused."
+    },
+    {
+      "oldPattern": "/خدمات",
+      "oldPatternAlt": "/خدمات/",
+      "newUrl": "/services",
+      "confidence": "high",
+      "equivalentType": "page",
+      "notes": "Arabic services listing → /services."
+    },
+    {
+      "oldPattern": "/اتصل",
+      "oldPatternAlt": "/اتصل/",
+      "newUrl": "/contact",
+      "confidence": "high",
+      "equivalentType": "page",
+      "notes": "Common WP contact slug; confirm if it existed on old site via GSC."
+    },
+    {
+      "oldPattern": "/مدونة",
+      "oldPatternAlt": "/مدونة/",
+      "newUrl": "/blogs",
+      "confidence": "medium",
+      "equivalentType": "page",
+      "notes": "Only if old WP blog existed under this slug. New blog is Arabic-only."
+    },
+    {
+      "oldPattern": "/product/*",
+      "newUrl": null,
+      "suggestedFallback": "/services",
+      "confidence": "low",
+      "equivalentType": "none-confirmed",
+      "notes": "No beautycorner.sa /product URLs found in Google/Wayback/Common Crawl. Cannot map individual service products without GSC export or old sitemap. Do NOT invent slug→service mappings."
+    },
+    {
+      "oldPattern": "/product-category/*",
+      "newUrl": null,
+      "suggestedFallback": "/services",
+      "confidence": "low",
+      "equivalentType": "none-confirmed",
+      "notes": "No indexed category URLs for beautycorner.sa. Possible future bucket redirect to /services only after GSC confirms traffic."
+    },
+    {
+      "oldPattern": "/tag/*",
+      "newUrl": null,
+      "suggestedFallback": null,
+      "confidence": "n/a",
+      "equivalentType": "none",
+      "notes": "No tag taxonomy in new app. No indexed beautycorner.sa tag URLs found. Candidate for 410/gone or soft-404 cleanup — not a content redirect."
+    },
+    {
+      "oldPattern": "/author/*",
+      "newUrl": null,
+      "suggestedFallback": null,
+      "confidence": "n/a",
+      "equivalentType": "none",
+      "notes": "No author archive in new app. No indexed beautycorner.sa author URLs found. Candidate for 410/gone."
+    },
+    {
+      "oldPattern": "/category/*",
+      "newUrl": null,
+      "suggestedFallback": "/blogs",
+      "confidence": "low",
+      "equivalentType": "none-confirmed",
+      "notes": "Only if old WP used post categories. New blog has no category routes."
+    },
+    {
+      "oldPattern": "/shop",
+      "oldPatternAlt": "/cart|/checkout|/wishlist|/my-account|/السلة",
+      "newUrl": null,
+      "suggestedFallback": null,
+      "confidence": "n/a",
+      "equivalentType": "none",
+      "notes": "Ecommerce surfaces have no equivalent on the clinic site. Not redirect targets unless GSC proves they existed on beautycorner.sa."
+    }
+  ],
+  "confirmedOldToNewMappings": [
+    {
+      "oldUrl": "https://beautycorner.sa/",
+      "newUrl": "https://beautycorner.sa/",
+      "action": "keep",
+      "reason": "Only URL currently indexed for the domain in Google site search."
+    }
+  ],
+  "noEquivalent": [
+    {
+      "pattern": "/tag/*",
+      "reason": "No taxonomy pages in new site; none indexed for this domain."
+    },
+    {
+      "pattern": "/author/*",
+      "reason": "No author pages in new site; none indexed for this domain."
+    },
+    {
+      "pattern": "/product/* (specific slugs)",
+      "reason": "No slug inventory available for beautycorner.sa. Cannot map to /services/{id} without source list."
+    },
+    {
+      "pattern": "/product-category/* (specific slugs)",
+      "reason": "No category inventory for beautycorner.sa."
+    }
+  ],
+  "productionFindings": {
+    "soft404Risk": "Live site currently returns HTTP 200 + homepage title/canonical for unknown paths (including /home, /product/x, /services). This masks true 404s and hurts crawl cleanup. Fix before/with redirects.",
+    "liveSitemap": "https://beautycorner.sa/sitemap.xml currently emits only the homepage — incomplete vs route matrix."
+  },
+  "nextStepsBeforeRedirectImplementation": [
+    "Export Coverage → Excluded/Not found (or Legacy) URLs from Google Search Console for beautycorner.sa",
+    "Or provide old WordPress sitemap / WooCommerce CSV",
+    "Confirm whether the Arabic brief (/product, /tag, /author) was meant for beautycorner.sa or roomspa-sa.com",
+    "Then approve per-URL 301 map; leave no-equivalent URLs for separate 410/404 strategy"
+  ]
+}
