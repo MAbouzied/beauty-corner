@@ -2,9 +2,13 @@
 const EXACT_LEGACY_REDIRECTS: Readonly<Record<string, string | undefined>> = {
   '/home': '/',
   '/حول': '/',
+  '/about': '/',
+  '/about-us': '/',
   '/خدمات': '/services',
   '/اتصل': '/contact',
+  '/contact-us': '/contact',
   '/مدونة': '/blogs',
+  '/blog': '/blogs',
   '/السلة': '/',
   '/shop': '/',
   '/cart': '/',
@@ -13,12 +17,20 @@ const EXACT_LEGACY_REDIRECTS: Readonly<Record<string, string | undefined>> = {
   '/my-account': '/',
   '/products-compare': '/',
   '/hello-world': '/',
+  '/sample-page': '/',
   '/wp-login.php': '/',
-  '/wp-admin': '/',
   '/feed': '/',
   '/comments/feed': '/',
   '/footer-about-widget': '/',
   '/footer-subscription': '/',
+  // Archived WP posts/pages with no Astro equivalent → home.
+  '/الخدمات-البدنية': '/',
+  '/آخر-الأخبار-المهمة-في-التكنولوجيا': '/',
+  '/أنواع-البطاقات-الذكية-والرقمية': '/',
+  '/الترجمة-والكتابة-بالحديث': '/',
+  '/تصاميم-حديثة-وإبداعية': '/',
+  '/كيف-نزيد-عدد-الزيارات؟': '/',
+  '/وظائف-المستقبل-مع-الذكاء-الاصطناعي': '/',
 };
 
 /**
@@ -32,6 +44,9 @@ const HOME_PREFIXES: readonly string[] = [
   '/author',
   '/category',
   '/wp-admin',
+  '/wp-content',
+  '/wp-includes',
+  '/wp-json',
 ];
 
 /** Paths that belong to the new app / platform and must never be rewritten. */
@@ -124,6 +139,51 @@ export function buildLegacyRedirectLocation(targetPath: string, search: string):
 export function shouldApplyLegacyRedirect(method: string): boolean {
   const upper = method.toUpperCase();
   return upper === 'GET' || upper === 'HEAD';
+}
+
+function encodeRedirectPath(pathname: string): string {
+  if (pathname === '/') return '/';
+  return pathname
+    .split('/')
+    .map((segment) => (segment ? encodeURIComponent(segment) : segment))
+    .join('/');
+}
+
+function pushExactRedirectRule(lines: string[], from: string, to: string): void {
+  lines.push(`${from} ${to} 301`);
+  if (!from.endsWith('/')) lines.push(`${from}/ ${to} 301`);
+}
+
+/**
+ * Cloudflare Workers `_redirects` rules mirroring middleware mappings.
+ * Kept as a static-asset safety net when a request is served before the Worker.
+ * Non-ASCII paths also emit percent-encoded aliases for crawler request forms.
+ */
+export function buildCloudflareRedirectsFile(): string {
+  const lines = [
+    '# Generated from src/lib/seo/legacy-redirects.ts — do not hand-edit.',
+    '# Exact legacy paths',
+  ];
+
+  for (const [from, to] of Object.entries(EXACT_LEGACY_REDIRECTS)) {
+    if (!to || to === from) continue;
+    pushExactRedirectRule(lines, from, to);
+    const encoded = encodeRedirectPath(from);
+    if (encoded !== from) pushExactRedirectRule(lines, encoded, to);
+  }
+
+  lines.push('# Prefix buckets with no Astro equivalent → home');
+  // Non-splat rules first (Cloudflare performance recommendation).
+  for (const prefix of HOME_PREFIXES) {
+    lines.push(`${prefix} / 301`);
+    lines.push(`${prefix}/ / 301`);
+  }
+  for (const prefix of HOME_PREFIXES) {
+    lines.push(`${prefix}/* / 301`);
+  }
+
+  lines.push('');
+  return lines.join('\n');
 }
 
 /**

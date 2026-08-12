@@ -5,6 +5,15 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": false,
   "preview_urls": false,
+  // Never SPA-fallback unknown paths to index.html.
+  // Keep assets-first so `public/_redirects` can 301 legacy WordPress URLs.
+  // Misses then reach the Astro Worker (middleware + 404.astro).
+  // html_handling drops trailing slashes for real *.html files.
+  "assets": {
+    "not_found_handling": "none",
+    "html_handling": "drop-trailing-slash",
+    "run_worker_first": false
+  },
   "ratelimits": [
     {
       "name": "CUSTOMER_RATE_LIMITER",

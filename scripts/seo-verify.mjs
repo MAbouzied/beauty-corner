@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, extname } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const ROOT = process.cwd();
 const DIST_ROOT = join(ROOT, 'dist');
@@ -20,6 +21,15 @@ function walkHtmlFiles(dir, files = []) {
 
 function stripTags(html) {
   return html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ');
+}
+
+/**
+ * Detects Astro's trailing-slash redirect stubs (e.g. /book/ → /book).
+ * These files have <meta http-equiv="refresh"> but no real content.
+ * Exported for unit testing.
+ */
+export function isRedirectStub(html) {
+  return /<meta[^>]+http-equiv=["']refresh["']/i.test(html);
 }
 
 function extract(html, regex) {
@@ -75,8 +85,11 @@ function main() {
   for (const file of htmlFiles) {
     const route = fileToRoute(file);
     if (route === null) continue;
-    routes.push(route);
     const html = readFileSync(file, 'utf8');
+    // Skip trailing-slash redirect stubs that Astro emits (e.g. /book/ → /book).
+    // These have <meta http-equiv="refresh"> but no real SEO content.
+    if (isRedirectStub(html)) continue;
+    routes.push(route);
     const body = stripTags(html);
 
     const title = extract(html, /<title>([^<]*)<\/title>/i)[0];
@@ -258,16 +271,85 @@ function main() {
     errors.push('LandingSections still contains placeholder/dead article UI');
   }
 
-  // 404 page checks
+  // 404 page checks — must be real HTML so the Worker can serve Astro 404s.
   const notFoundPath = join(DIST, '404.html');
-  if (existsSync(notFoundPath)) {
+  if (!existsSync(notFoundPath)) {
+    errors.push('404.html missing from build output');
+  } else {
     const html = readFileSync(notFoundPath, 'utf8');
+    if (isRedirectStub(html)) {
+      errors.push('404.html is a trailing-slash redirect stub; emit a real 404 page');
+    }
     if (!/noindex/i.test(html)) errors.push('404.html missing noindex');
+    if (!/data-404-page/i.test(html)) errors.push('404.html missing data-404-page marker');
     if (/nofollow/i.test(html) && !/noindex,\s*follow/i.test(html)) {
       warnings.push('404.html uses nofollow; prefer noindex, follow');
     }
     if (html.includes('hreflang') && html.includes('/en/404')) {
       errors.push('404.html references /en/404 in hreflang');
+    }
+  }
+
+  // Critical public pages must exist as real HTML (not refresh stubs).
+  // With trailingSlash:never + build.format:file these are *.html files.
+  const requiredHtmlFiles = [
+    'services.html',
+    'doctors.html',
+    'contact.html',
+    'book.html',
+    'privacy.html',
+    'en.html',
+    'en/services.html',
+    'en/doctors.html',
+    'en/contact.html',
+    'en/book.html',
+    'en/privacy.html',
+  ];
+  for (const rel of requiredHtmlFiles) {
+    const full = join(DIST, rel);
+    if (!existsSync(full)) {
+      errors.push(`missing built page: ${rel}`);
+      continue;
+    }
+    const html = readFileSync(full, 'utf8');
+    if (isRedirectStub(html)) {
+      errors.push(`${rel} is a redirect stub instead of real page HTML`);
+    }
+  }
+
+  const wranglerPath = join(ROOT, 'wrangler.jsonc');
+  if (!existsSync(wranglerPath)) {
+    errors.push('wrangler.jsonc missing');
+  } else {
+    try {
+      const wranglerRaw = readFileSync(wranglerPath, 'utf8')
+        .replace(/^\s*\/\/.*$/gm, '')
+        .replace(/,\s*([}\]])/g, '$1');
+      const wrangler = JSON.parse(wranglerRaw);
+      const assets = wrangler?.assets ?? {};
+      if (assets.not_found_handling !== 'none') {
+        errors.push('wrangler.jsonc must set assets.not_found_handling to none so Worker handles misses');
+      }
+      if (assets.run_worker_first !== false) {
+        errors.push('wrangler.jsonc must set assets.run_worker_first to false so _redirects apply before Worker');
+      }
+      if (assets.html_handling !== 'drop-trailing-slash') {
+        errors.push('wrangler.jsonc must set assets.html_handling to drop-trailing-slash');
+      }
+    } catch {
+      errors.push('wrangler.jsonc could not be parsed for assets checks');
+    }
+  }
+
+  const redirectsPath = join(DIST, '_redirects');
+  if (!existsSync(redirectsPath)) {
+    errors.push('dist _redirects missing; public/_redirects must ship with assets');
+  } else {
+    const redirects = readFileSync(redirectsPath, 'utf8');
+    for (const rule of ['/home / 301', '/blog /blogs 301', '/product/* / 301']) {
+      if (!redirects.includes(rule)) {
+        errors.push(`_redirects missing required rule: ${rule}`);
+      }
     }
   }
 
@@ -282,4 +364,7 @@ function main() {
   console.log(`SEO verify passed with ${warnings.length} warning(s).`);
 }
 
-main();
+// Only run the CLI when this file is executed directly (not when unit tests import helpers).
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
+}

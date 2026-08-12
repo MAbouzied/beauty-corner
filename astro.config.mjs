@@ -9,9 +9,12 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://beautycorner.sa',
-  // Accept both slash styles so legacy WordPress URLs (usually trailing `/`)
-  // reach middleware redirects. Public links/canonicals still omit the slash.
-  trailingSlash: 'ignore',
+  // Emit real HTML files (not trailing-slash refresh stubs). Legacy WordPress
+  // trailing-slash URLs are handled by public/_redirects + middleware.
+  trailingSlash: 'never',
+  build: {
+    format: 'file',
+  },
   redirects: {
     '/devices': {
       status: 301,

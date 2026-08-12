@@ -7,7 +7,8 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "redirects:generate": "node --experimental-strip-types scripts/generate-redirects.mjs",
+    "build": "npm run redirects:generate && astro build",
     "check": "astro check",
     "seo:verify": "node scripts/seo-verify.mjs",
     "seo:verify:static": "node scripts/seo-verify.mjs",

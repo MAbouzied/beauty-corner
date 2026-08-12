@@ -1,12 +1,18 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import {
+  buildCloudflareRedirectsFile,
   buildLegacyRedirectLocation,
   normalizeLegacyPathname,
   resolveLegacyRedirect,
   resolveTrailingSlashRedirect,
   shouldApplyLegacyRedirect,
 } from './legacy-redirects.ts';
+
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 
 describe('normalizeLegacyPathname', () => {
   it('strips trailing slash except root', () => {
@@ -35,6 +41,10 @@ describe('resolveLegacyRedirect', () => {
     assert.equal(resolveLegacyRedirect('/اتصل'), '/contact');
     assert.equal(resolveLegacyRedirect('/مدونة'), '/blogs');
     assert.equal(resolveLegacyRedirect('/حول'), '/');
+    assert.equal(resolveLegacyRedirect('/blog'), '/blogs');
+    assert.equal(resolveLegacyRedirect('/contact-us'), '/contact');
+    assert.equal(resolveLegacyRedirect('/about'), '/');
+    assert.equal(resolveLegacyRedirect('/about-us'), '/');
   });
 
   it('maps encoded Arabic legacy pages', () => {
@@ -67,10 +77,19 @@ describe('resolveLegacyRedirect', () => {
     assert.equal(resolveLegacyRedirect('/hello-world'), '/');
     assert.equal(resolveLegacyRedirect('/wp-login.php'), '/');
     assert.equal(resolveLegacyRedirect('/wp-admin'), '/');
+    assert.equal(resolveLegacyRedirect('/wp-admin/options'), '/');
+    assert.equal(resolveLegacyRedirect('/wp-content/uploads/x.jpg'), '/');
+    assert.equal(resolveLegacyRedirect('/wp-json/wp/v2/posts'), '/');
     assert.equal(resolveLegacyRedirect('/feed'), '/');
     assert.equal(resolveLegacyRedirect('/comments/feed'), '/');
     assert.equal(resolveLegacyRedirect('/footer-about-widget'), '/');
     assert.equal(resolveLegacyRedirect('/footer-subscription'), '/');
+  });
+
+  it('sends leftover WordPress content slugs without equivalents to home', () => {
+    assert.equal(resolveLegacyRedirect('/الخدمات-البدنية'), '/');
+    assert.equal(resolveLegacyRedirect('/كيف-نزيد-عدد-الزيارات؟'), '/');
+    assert.equal(resolveLegacyRedirect('/sample-page'), '/');
   });
 
   it('does not match prefix false positives like /production', () => {
@@ -121,6 +140,24 @@ describe('buildLegacyRedirectLocation', () => {
     assert.equal(buildLegacyRedirectLocation('/', '?utm=1'), '/?utm=1');
     assert.equal(buildLegacyRedirectLocation('/services', '?ref=wp'), '/services?ref=wp');
     assert.equal(buildLegacyRedirectLocation('/contact', ''), '/contact');
+  });
+});
+
+describe('buildCloudflareRedirectsFile', () => {
+  it('emits 301 rules for exact and prefix legacy paths', () => {
+    const body = buildCloudflareRedirectsFile();
+    assert.match(body, /^\/home \/ 301$/m);
+    assert.match(body, /^\/home\/ \/ 301$/m);
+    assert.match(body, /^\/blog \/blogs 301$/m);
+    assert.match(body, /^\/product\/\* \/ 301$/m);
+    assert.match(body, /^\/خدمات \/services 301$/m);
+    assert.match(body, /^\/%D8%AE%D8%AF%D9%85%D8%A7%D8%AA \/services 301$/m);
+    assert.match(body, /^\/wp-content\/\* \/ 301$/m);
+  });
+
+  it('keeps public/_redirects synchronized with the builder', () => {
+    const disk = readFileSync(join(repoRoot, 'public/_redirects'), 'utf8');
+    assert.equal(disk, buildCloudflareRedirectsFile());
   });
 });
 

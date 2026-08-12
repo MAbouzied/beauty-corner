@@ -1,11 +1,14 @@
 {
   "site": "https://beautycorner.sa",
-  "auditDate": "2026-08-11",
-  "status": "implemented-via-middleware",
+  "auditDate": "2026-08-12",
+  "status": "implemented-via-middleware-and-cloudflare-assets",
   "implementation": {
     "module": "src/lib/seo/legacy-redirects.ts",
     "middleware": "src/middleware.ts",
-    "tests": "src/lib/seo/legacy-redirects.test.ts"
+    "tests": "src/lib/seo/legacy-redirects.test.ts",
+    "cloudflareAssets": "wrangler.jsonc → assets.not_found_handling=none, run_worker_first=false, html_handling=drop-trailing-slash",
+    "staticRedirects": "public/_redirects (generated from legacy-redirects.ts)",
+    "buildFormat": "astro.config.mjs → trailingSlash:never + build.format:file"
   },
   "sources": {
     "googleSiteSearch": {
@@ -21,172 +24,52 @@
     "commonCrawl": "no captures found across recent indexes",
     "repoArchiveFile": {
       "path": "archive-urls.json",
-      "note": "Contains roomspa-sa.com URLs (spa/WooCommerce), NOT beautycorner.sa. Do not use as Beauty Corner redirect source without confirmation."
+      "note": "Contains roomspa-sa.com URLs (spa/WooCommerce). Used only as candidate no-equivalent → home fallbacks for known Arabic slugs; not treated as confirmed beautycorner.sa indexed inventory."
     }
   },
-  "newSiteRoutes": {
-    "staticAr": ["/", "/services", "/doctors", "/contact", "/book", "/privacy", "/blogs"],
-    "staticEn": ["/en", "/en/services", "/en/doctors", "/en/contact", "/en/book", "/en/privacy"],
-    "serviceDetails": [
-      "/services/dental-implants",
-      "/services/dental-prosthetics",
-      "/services/teeth-whitening",
-      "/services/cleaning-polishing",
-      "/services/tooth-extraction",
-      "/services/root-canal",
-      "/services/cosmetic-fillings",
-      "/services/gum-contouring",
-      "/services/gum-depigmentation",
-      "/services/dental-xray-3d",
-      "/services/acne-treatment",
-      "/services/pigmentation",
-      "/services/non-surgical-aesthetics"
-    ],
-    "doctorDetails": [
-      "/doctors/dentistry-fatima",
-      "/doctors/dentistry-wissam"
-    ],
-    "alreadyRedirected": {
-      "/devices": "/#devices",
-      "/en/devices": "/en#devices"
-    },
-    "newOnlyNoLegacyEquivalentNeeded": [
-      "/en/*",
-      "/privacy",
-      "/en/privacy",
-      "/book",
-      "/en/book",
-      "/blogs",
-      "/blogs/*",
-      "/admin/*",
-      "/login"
-    ]
+  "routingRules": {
+    "hasEquivalent": "301 to matching Astro route",
+    "noEquivalentKnownLegacy": "301 to /",
+    "unknownNonLegacy": "HTTP 404 via Astro Worker + src/pages/404.astro (assets.not_found_handling=none)"
   },
-  "patternMapping": [
-    {
-      "oldPattern": "/home",
-      "oldPatternAlt": "/home/",
-      "newUrl": "/",
-      "confidence": "high",
-      "equivalentType": "page",
-      "notes": "Legacy WP home alias → new Arabic home."
-    },
-    {
-      "oldPattern": "/حول",
-      "oldPatternAlt": "/حول/",
-      "newUrl": "/",
-      "confidence": "medium",
-      "equivalentType": "section-or-home",
-      "notes": "No dedicated About page in new app. Closest is home (clinic intro). Alternative: /contact if About was NAP-focused."
-    },
-    {
-      "oldPattern": "/خدمات",
-      "oldPatternAlt": "/خدمات/",
-      "newUrl": "/services",
-      "confidence": "high",
-      "equivalentType": "page",
-      "notes": "Arabic services listing → /services."
-    },
-    {
-      "oldPattern": "/اتصل",
-      "oldPatternAlt": "/اتصل/",
-      "newUrl": "/contact",
-      "confidence": "high",
-      "equivalentType": "page",
-      "notes": "Common WP contact slug; confirm if it existed on old site via GSC."
-    },
-    {
-      "oldPattern": "/مدونة",
-      "oldPatternAlt": "/مدونة/",
-      "newUrl": "/blogs",
-      "confidence": "medium",
-      "equivalentType": "page",
-      "notes": "Only if old WP blog existed under this slug. New blog is Arabic-only."
-    },
-    {
-      "oldPattern": "/product/*",
-      "newUrl": null,
-      "suggestedFallback": "/services",
-      "confidence": "low",
-      "equivalentType": "none-confirmed",
-      "notes": "No beautycorner.sa /product URLs found in Google/Wayback/Common Crawl. Cannot map individual service products without GSC export or old sitemap. Do NOT invent slug→service mappings."
-    },
-    {
-      "oldPattern": "/product-category/*",
-      "newUrl": null,
-      "suggestedFallback": "/services",
-      "confidence": "low",
-      "equivalentType": "none-confirmed",
-      "notes": "No indexed category URLs for beautycorner.sa. Possible future bucket redirect to /services only after GSC confirms traffic."
-    },
-    {
-      "oldPattern": "/tag/*",
-      "newUrl": null,
-      "suggestedFallback": null,
-      "confidence": "n/a",
-      "equivalentType": "none",
-      "notes": "No tag taxonomy in new app. No indexed beautycorner.sa tag URLs found. Candidate for 410/gone or soft-404 cleanup — not a content redirect."
-    },
-    {
-      "oldPattern": "/author/*",
-      "newUrl": null,
-      "suggestedFallback": null,
-      "confidence": "n/a",
-      "equivalentType": "none",
-      "notes": "No author archive in new app. No indexed beautycorner.sa author URLs found. Candidate for 410/gone."
-    },
-    {
-      "oldPattern": "/category/*",
-      "newUrl": null,
-      "suggestedFallback": "/blogs",
-      "confidence": "low",
-      "equivalentType": "none-confirmed",
-      "notes": "Only if old WP used post categories. New blog has no category routes."
-    },
-    {
-      "oldPattern": "/shop",
-      "oldPatternAlt": "/cart|/checkout|/wishlist|/my-account|/السلة",
-      "newUrl": null,
-      "suggestedFallback": null,
-      "confidence": "n/a",
-      "equivalentType": "none",
-      "notes": "Ecommerce surfaces have no equivalent on the clinic site. Not redirect targets unless GSC proves they existed on beautycorner.sa."
-    }
-  ],
   "confirmedOldToNewMappings": [
     {
       "oldUrl": "https://beautycorner.sa/",
       "newUrl": "https://beautycorner.sa/",
       "action": "keep",
       "reason": "Only URL currently indexed for the domain in Google site search."
-    }
-  ],
-  "noEquivalent": [
-    {
-      "pattern": "/tag/*",
-      "reason": "No taxonomy pages in new site; none indexed for this domain."
     },
     {
-      "pattern": "/author/*",
-      "reason": "No author pages in new site; none indexed for this domain."
+      "oldPattern": "/خدمات|/services (legacy Arabic)",
+      "newUrl": "/services",
+      "action": "301"
     },
     {
-      "pattern": "/product/* (specific slugs)",
-      "reason": "No slug inventory available for beautycorner.sa. Cannot map to /services/{id} without source list."
+      "oldPattern": "/اتصل|/contact-us",
+      "newUrl": "/contact",
+      "action": "301"
     },
     {
-      "pattern": "/product-category/* (specific slugs)",
-      "reason": "No category inventory for beautycorner.sa."
+      "oldPattern": "/مدونة|/blog",
+      "newUrl": "/blogs",
+      "action": "301"
+    },
+    {
+      "oldPattern": "/home|/حول|/about|/about-us|/product/*|/tag/*|/author/*|/category/*|/wp-*",
+      "newUrl": "/",
+      "action": "301",
+      "reason": "No equivalent page in Astro app."
     }
   ],
   "productionFindings": {
-    "soft404Risk": "Live site currently returns HTTP 200 + homepage title/canonical for unknown paths (including /home, /product/x, /services). This masks true 404s and hurts crawl cleanup. Fix before/with redirects.",
-    "liveSitemap": "https://beautycorner.sa/sitemap.xml currently emits only the homepage — incomplete vs route matrix."
+    "soft404RootCause": "Live domain was serving SPA-style 200+index.html for unknown paths, and Astro trailingSlash:ignore emitted redirect stubs for almost all pages so asset fallback looked like the homepage.",
+    "fix": "Deploy Worker with real HTML files, public/_redirects, assets.not_found_handling=none, and middleware legacy redirects.",
+    "liveSitemap": "Must emit full indexable matrix once SEO_INDEXABLE=true on production Worker."
   },
-  "nextStepsBeforeRedirectImplementation": [
-    "Export Coverage → Excluded/Not found (or Legacy) URLs from Google Search Console for beautycorner.sa",
-    "Or provide old WordPress sitemap / WooCommerce CSV",
-    "Confirm whether the Arabic brief (/product, /tag, /author) was meant for beautycorner.sa or roomspa-sa.com",
-    "Then approve per-URL 301 map; leave no-equivalent URLs for separate 410/404 strategy"
+  "nextStepsAfterDeploy": [
+    "Redeploy with npm run deploy so beautycorner.sa serves this Worker (not the old SPA shell)",
+    "Verify /home → 301 /, /unknown → 404, /services → real services HTML",
+    "Confirm /sitemap.xml lists all indexable routes",
+    "Export remaining GSC 404 URLs and add any missing exact redirects"
   ]
 }
