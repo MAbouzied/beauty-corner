@@ -61,6 +61,7 @@ const SKIP_PREFIXES: readonly string[] = [
   '/doctors',
   '/contact',
   '/book',
+  '/form',
   '/privacy',
   '/blogs',
 ];

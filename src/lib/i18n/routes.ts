@@ -95,6 +95,13 @@ const staticRoutePairs: readonly RoutePair[] = [
     priority: 0.8,
   },
   {
+    id: 'form',
+    ar: '/form',
+    en: '/en/form',
+    indexable: false,
+    inSitemap: false,
+  },
+  {
     id: 'privacy',
     ar: '/privacy',
     en: '/en/privacy',
