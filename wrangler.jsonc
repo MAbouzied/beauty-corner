@@ -3,8 +3,10 @@
   "name": "beauty-corner",
   "compatibility_date": "2026-07-25",
   "compatibility_flags": ["nodejs_compat"],
-  "workers_dev": false,
-  "preview_urls": false,
+  // Temporarily enabled so the Worker is reachable while beautycorner.sa
+  // stays on a different Cloudflare account/zone that this login cannot bind.
+  "workers_dev": true,
+  "preview_urls": true,
   // Never SPA-fallback unknown paths to index.html.
   // Keep assets-first so `public/_redirects` can 301 legacy WordPress URLs.
   // Misses then reach the Astro Worker (middleware + 404.astro).
