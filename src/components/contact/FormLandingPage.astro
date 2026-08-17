@@ -100,10 +100,7 @@ const callHref = buildPhoneUrl();
         <div class="mt-6 sm:mt-8">
           <SocialLinks locale={locale} heading={copy.followUs} id="form-social" />
         </div>
-      </article>
-
-      <article class="order-first min-w-0 rounded-3xl border border-border bg-surface-soft p-4 sm:p-6 lg:order-none" aria-label={copy.pageTitle}>
-        <nav class="mb-4 flex flex-col gap-3" aria-label={copy.actionsAria} data-form-actions>
+        <nav class="mt-6 flex flex-col gap-3 sm:mt-8" aria-label={copy.actionsAria} data-form-actions>
           <a
             href={whatsappHref}
             target="_blank"
@@ -130,6 +127,9 @@ const callHref = buildPhoneUrl();
             {copy.offersAction}
           </a>
         </nav>
+      </article>
+
+      <article class="order-first min-w-0 rounded-3xl border border-border bg-surface-soft p-4 sm:p-6 lg:order-none" aria-label={copy.pageTitle}>
         <form
           id="contact-form"
           class="flex w-full min-w-0 flex-col gap-4"

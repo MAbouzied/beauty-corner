@@ -47,5 +47,7 @@ describe('form landing copy', () => {
     assert.match(source, /buildPhoneUrl/);
     assert.match(source, /clinicMapUrl/);
     assert.match(source, /offersHref/);
+    assert.ok(source.indexOf('SocialLinks') < source.indexOf('data-form-actions'));
+    assert.ok(source.indexOf('data-form-actions') < source.indexOf('id="contact-form"'));
   });
 });

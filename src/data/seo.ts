@@ -14,8 +14,7 @@ export const clinicGeo = {
   longitude: 45.97076,
 } as const;
 
-export const clinicMapUrl =
-  'https://www.google.com/maps/search/?api=1&query=حي+المحمدية+طريق+الملك+فيصل+حفر+الباطن';
+export const clinicMapUrl = 'https://maps.app.goo.gl/FzR9jF2ucx55xMAg9';
 
 export function imageMimeType(path: string): string {
   const lower = path.toLowerCase();
