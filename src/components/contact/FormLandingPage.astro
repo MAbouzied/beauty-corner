@@ -1,7 +1,7 @@
 ---
 import AssetIcon from '../ui/AssetIcon.astro';
 import SocialLinks from './SocialLinks.astro';
-import { clinicLines } from '../../data/contact';
+import { buildPhoneUrl, buildWhatsAppUrl, clinicLines } from '../../data/contact';
 import { getFormLandingCopy } from '../../data/form-landing';
 import { clinicMapUrl } from '../../data/seo';
 import { localizeContact, languageSwitchHref, type Locale } from '../../lib/i18n/localize';
@@ -21,6 +21,12 @@ const languageHref = languageSwitchHref(
 );
 const fieldClass =
   'min-h-12 w-full min-w-0 max-w-full rounded-2xl border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-placeholder focus:border-primary';
+const actionClass =
+  'inline-flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-full px-7 text-sm font-bold transition-transform hover:-translate-y-0.5';
+const whatsappHref = buildWhatsAppUrl(
+  locale === 'en' ? 'Hello, I would like to contact Beauty Corner' : 'أهلاً، أريد التواصل مع بيوتي كورنر',
+);
+const callHref = buildPhoneUrl();
 ---
 
 <section class="min-h-dvh overflow-x-clip bg-surface" dir={locale === 'en' ? 'ltr' : 'rtl'}>
@@ -84,7 +90,7 @@ const fieldClass =
                   <dt class="sr-only">{copy.phoneLabel}</dt>
                   <dd class="flex items-start gap-2">
                     <AssetIcon src="/assets/phone.svg" size="sm" class="mt-0.5 text-primary" />
-                    <span dir="ltr">{line.phoneDisplay}</span>
+                    <a class="hover:text-primary" href={buildPhoneUrl(line.id)} dir="ltr">{line.phoneDisplay}</a>
                   </dd>
                 </div>
               ))
@@ -97,12 +103,42 @@ const fieldClass =
       </article>
 
       <article class="order-first min-w-0 rounded-3xl border border-border bg-surface-soft p-4 sm:p-6 lg:order-none" aria-label={copy.pageTitle}>
+        <nav class="mb-4 flex flex-col gap-3" aria-label={copy.actionsAria} data-form-actions>
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            class:list={[actionClass, 'bg-gold-gradient text-ink-button shadow-[var(--shadow-gold)]']}
+          >
+            <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+            {copy.whatsappAction}
+          </a>
+          <a href={callHref} class:list={[actionClass, 'border border-border text-ink hover:bg-surface-accent']}>
+            <AssetIcon src="/assets/phone.svg" size="sm" />
+            {copy.callAction}
+          </a>
+          <a
+            href={clinicMapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class:list={[actionClass, 'border border-border text-ink hover:bg-surface-accent']}
+          >
+            <AssetIcon src="/assets/location.svg" size="sm" />
+            {copy.locationAction}
+          </a>
+          <a href={copy.offersHref} class:list={[actionClass, 'bg-gold-gradient text-ink-button shadow-[var(--shadow-gold)]']}>
+            {copy.offersAction}
+          </a>
+        </nav>
         <form
           id="contact-form"
           class="flex w-full min-w-0 flex-col gap-4"
+          method="post"
+          action="/api/customers"
           data-locale={locale}
           data-saving={copy.saving}
           data-redirecting={copy.redirecting}
+          data-save-failed={copy.saveFailed}
           data-invalid={copy.invalid}
           data-gtm-form="form_landing"
         >
@@ -155,6 +191,8 @@ const fieldClass =
             Website
             <input name="website" type="text" tabindex="-1" autocomplete="off" />
           </label>
+          <input type="hidden" name="consent" value="true" />
+          <input type="hidden" name="locale" value={locale} />
 
           <button
             type="submit"
@@ -191,6 +229,16 @@ const fieldClass =
     if (!(form instanceof HTMLFormElement) || form.dataset.bound === 'true') return;
     form.dataset.bound = 'true';
 
+    const params = new URLSearchParams(window.location.search);
+    for (const fieldName of ['phone', 'name', 'department', 'message'] as const) {
+      const value = params.get(fieldName)?.trim();
+      if (!value) continue;
+      const field = form.elements.namedItem(fieldName);
+      if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) {
+        field.value = value;
+      }
+    }
+
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       const status = form.querySelector<HTMLElement>('[data-form-status]');
@@ -226,8 +274,9 @@ const fieldClass =
       if (status) status.textContent = form.dataset.saving ?? '';
 
       void (async () => {
+        let saved = false;
         try {
-          await saveCustomerLead({
+          const result = await saveCustomerLead({
             name,
             phone,
             department,
@@ -236,10 +285,15 @@ const fieldClass =
             consent: true,
             website,
           });
+          saved = result.ok;
         } catch {
-          /* Still open WhatsApp so the clinic receives the request. */
+          saved = false;
         }
-        if (status) status.textContent = form.dataset.redirecting ?? '';
+        if (status) {
+          status.textContent = saved
+            ? (form.dataset.redirecting ?? '')
+            : (form.dataset.saveFailed ?? form.dataset.redirecting ?? '');
+        }
         if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
         else window.location.href = whatsappUrl;
         if (submit) submit.disabled = false;
@@ -247,5 +301,6 @@ const fieldClass =
     });
   };
 
+  bindFormLanding();
   document.addEventListener('astro:page-load', bindFormLanding);
 </script>

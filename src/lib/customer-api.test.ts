@@ -6,6 +6,7 @@ import {
   createMemoryRateLimiter,
   enforceCustomerRateLimit,
   parseCustomerLeadBody,
+  parseCustomerLeadFromUrlEncoded,
 } from './customer-api.ts';
 
 describe('parseCustomerLeadBody', () => {
@@ -37,6 +38,36 @@ describe('parseCustomerLeadBody', () => {
     }, { departments: bookingDepartments });
 
     assert.deepEqual(result, { ok: false, status: 422 });
+  });
+
+  it('accepts a native form POST with consent=true', () => {
+    const params = new URLSearchParams({
+      name: 'test222',
+      phone: '0500000000',
+      department: 'قسم الفيلر',
+      locale: 'ar',
+      consent: 'true',
+    });
+
+    const result = parseCustomerLeadFromUrlEncoded(params, { departments: bookingDepartments });
+    assert.equal(result.ok, true);
+    if (!result.ok || result.kind !== 'lead') throw new Error('expected lead');
+    assert.equal(result.lead.name, 'test222');
+    assert.equal(result.lead.phone, '0500000000');
+    assert.equal(result.lead.department, 'قسم الفيلر');
+  });
+
+  it('rejects a native form POST without consent', () => {
+    const params = new URLSearchParams({
+      name: 'test222',
+      phone: '0500000000',
+      department: 'قسم الفيلر',
+    });
+
+    assert.deepEqual(
+      parseCustomerLeadFromUrlEncoded(params, { departments: bookingDepartments }),
+      { ok: false, status: 422 },
+    );
   });
 
   it('treats honeypot submissions as successful no-ops', () => {

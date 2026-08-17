@@ -33,11 +33,18 @@ export type FormLandingCopy = {
   submit: string;
   saving: string;
   redirecting: string;
+  saveFailed: string;
   invalid: string;
   goFullSite: string;
   languageLabel: string;
   languageAria: string;
   brandHomeAria: string;
+  actionsAria: string;
+  whatsappAction: string;
+  callAction: string;
+  locationAction: string;
+  offersAction: string;
+  offersHref: string;
   departments: ReadonlyArray<{ value: string; label: string }>;
 };
 
@@ -68,11 +75,18 @@ const copy = {
     submit: 'إرسال عبر واتساب',
     saving: 'جاري حفظ بياناتك...',
     redirecting: 'جاري فتح واتساب...',
+    saveFailed: 'تعذر حفظ السجل الإلكتروني. سيتم فتح واتساب لإرسال الطلب للعيادة.',
     invalid: 'يرجى التأكد من الاسم ورقم الجوال السعودي واختيار القسم.',
     goFullSite: 'الموقع الكامل',
     languageLabel: 'EN',
     languageAria: 'Switch to English',
     brandHomeAria: 'بيوتي كورنر - الرئيسية',
+    actionsAria: 'خيارات التواصل',
+    whatsappAction: 'تواصل واتساب',
+    callAction: 'اتصال',
+    locationAction: 'الموقع',
+    offersAction: 'العروض',
+    offersHref: '/#services',
   },
   en: {
     pageTitle: 'Contact us - Beauty Corner',
@@ -100,11 +114,18 @@ const copy = {
     submit: 'Send via WhatsApp',
     saving: 'Saving your details...',
     redirecting: 'Opening WhatsApp...',
+    saveFailed: 'We could not save the online record. WhatsApp will still open so the clinic receives the request.',
     invalid: 'Please check your name, Saudi mobile number, and department.',
     goFullSite: 'Full website',
     languageLabel: 'AR',
     languageAria: 'التبديل إلى العربية',
     brandHomeAria: 'Beauty Corner - Home',
+    actionsAria: 'Contact options',
+    whatsappAction: 'WhatsApp',
+    callAction: 'Call',
+    locationAction: 'Location',
+    offersAction: 'Offers',
+    offersHref: '/en#services',
   },
 } as const;
 
