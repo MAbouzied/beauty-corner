@@ -95,26 +95,26 @@
   --color-surface: #ffffff;
   --color-surface-soft: #fff8f9;
   --color-surface-accent: #ffeff2;
-  --color-ink: #161314;
-  --color-ink-button: #202020;
+  --color-ink: #1b1418;
+  --color-ink-button: #ffffff;
   --color-muted: #686161;
   --color-placeholder: #717680;
   --color-primary: #b53874;
   --color-border: #eae3e2;
   --color-border-control: #d5d7da;
-  --color-success-soft: #e6fae9;
-  --color-success: #0b6f20;
+  --color-success-soft: #eaf6ea;
+  --color-success: #1f6b1c;
   --color-danger: #b42318;
-  --color-gold-light: #f8e58c;
-  --color-gold: #e6c45a;
-  --color-gold-text: #9a6a18;
-  --color-gold-deep: #b98b35;
+  --color-gold-light: #247022;
+  --color-gold: #1f6b1c;
+  --color-gold-text: #1f6b1c;
+  --color-gold-deep: #1b5e1a;
   --color-focus: #b53874;
   --radius-card: 2.125rem;
   --radius-section: 1.625rem;
   --shadow-card: 0 1px 2px rgb(30 18 18 / 4%), 0 8px 24px -12px rgb(30 18 18 / 8%);
   --shadow-control: 0 1px 2px rgb(10 13 18 / 5%);
-  --shadow-gold: 0 8px 24px -10px rgb(212 152 36 / 45%);
+  --shadow-gold: 0 8px 24px -10px rgb(31 107 28 / 40%);
 }
 
 @utility bg-gold-gradient {
@@ -167,6 +167,14 @@
 
   :focus-visible {
     outline: 2px solid var(--color-focus);
+  }
+
+  .bg-gold-gradient {
+    color: var(--color-ink-button);
+  }
+
+  .bg-gold-gradient img {
+    filter: brightness(0) invert(1);
   }
 }
 

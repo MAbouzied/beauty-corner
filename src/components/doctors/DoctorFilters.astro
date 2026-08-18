@@ -1,17 +1,23 @@
 ---
-import type { Doctor } from '../../data/doctors';
+import { specialties } from '../../data/doctors';
 import type { Locale } from '../../lib/i18n/localize';
 import { isEnglish, localizeSpecialty } from '../../lib/i18n/localize';
 import AssetIcon from '../ui/AssetIcon.astro';
 
 export interface Props {
-  doctors: readonly Doctor[];
   locale?: Locale;
 }
 
-const { doctors, locale = 'ar' } = Astro.props;
+const { locale = 'ar' } = Astro.props;
 const en = isEnglish(locale);
-const specialties = ['كل الأطباء', ...new Set(doctors.map((doctor) => doctor.specialty))];
+const filterSpecialties = specialties.filter((specialty) => specialty !== 'خدمات الليزر');
+
+function filterLabel(specialty: (typeof specialties)[number]): string {
+  if (specialty === 'الأمراض الجلدية والتجميل') {
+    return en ? 'Dermatology doctors' : 'أطباء الجلدية';
+  }
+  return localizeSpecialty(specialty, locale);
+}
 ---
 
 <aside class="lg:w-96 lg:shrink-0" aria-label={en ? 'Filter doctors' : 'تصفية الأطباء'}>
@@ -35,7 +41,7 @@ const specialties = ['كل الأطباء', ...new Set(doctors.map((doctor) => d
       <fieldset class="border-y border-border py-4">
         <legend class="sr-only">{en ? 'Specialty' : 'التخصص'}</legend>
         <div class="space-y-1">
-          {specialties.map((specialty, index) => (
+          {filterSpecialties.map((specialty, index) => (
             <label class="block cursor-pointer">
               <input
                 type="radio"
@@ -45,7 +51,7 @@ const specialties = ['كل الأطباء', ...new Set(doctors.map((doctor) => d
                 checked={index === 0}
               />
               <span class="flex min-h-12 items-center rounded-lg px-3 text-sm peer-checked:bg-surface-accent peer-checked:font-bold peer-checked:text-primary peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus">
-                {localizeSpecialty(specialty, locale)}
+                {filterLabel(specialty)}
               </span>
             </label>
           ))}

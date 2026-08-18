@@ -273,11 +273,15 @@ export function buildPhysicianSchema(
       '@type': 'MedicalProcedure',
       name: localizeDoctorService(serviceName, locale),
     })),
-    additionalProperty: {
-      '@type': 'PropertyValue',
-      name: 'yearsOfExperience',
-      value: doctor.experienceYears,
-    },
+    ...(doctor.experienceYears != null
+      ? {
+          additionalProperty: {
+            '@type': 'PropertyValue',
+            name: 'yearsOfExperience',
+            value: doctor.experienceYears,
+          },
+        }
+      : {}),
   };
 }
 

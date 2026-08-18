@@ -74,8 +74,10 @@ export const uiEn = {
     heroTitle: 'Complete care for your smile and skin',
     heroText:
       'Dentistry and dermatology services in Al Muhammadiyah, King Faisal Road — modern clinic care with easy WhatsApp booking.',
-    servicesTitle: 'Dental services',
+    servicesTitle: 'Dental and dermatology services',
     servicesText: 'Choose the care you need and book through WhatsApp in minutes.',
+    dentalServicesTitle: 'Dental services',
+    dermatologyServicesTitle: 'Dermatology services',
     devicesTitle: 'Our equipment',
     devicesText: 'Clinic devices used for whitening, treatment, and precise dental care.',
     devicesEyebrow: 'Our devices',
@@ -89,8 +91,8 @@ export const uiEn = {
     servicesTitle: 'Dental & Dermatology Services in Hafr Al-Batin | Beauty Corner',
     servicesDescription: 'Browse dentistry and dermatology services at Beauty Corner in Hafr Al-Batin and book your appointment.',
     servicesHeading: 'Dentistry and dermatology services',
-    doctorsTitle: 'Dentists in Hafr Al-Batin | Beauty Corner',
-    doctorsDescription: 'Meet the Beauty Corner dental team in Hafr Al-Batin and choose the right doctor for your care plan.',
+    doctorsTitle: 'Dentists & Dermatologists in Hafr Al-Batin | Beauty Corner',
+    doctorsDescription: 'Meet the Beauty Corner dental and dermatology team in Hafr Al-Batin and choose the right doctor for your care plan.',
     doctorsHeading: 'Specialist doctors you can trust',
     contactTitle: 'Contact Beauty Corner Clinic in Hafr Al-Batin',
     contactDescription: 'Contact Beauty Corner in Hafr Al-Batin, Al Muhammadiyah, King Faisal Road. Book an appointment or reach us by WhatsApp and phone.',
@@ -193,6 +195,27 @@ export const servicesEn: Record<
           'Replacing a missing or severely damaged tooth.',
           'Protecting a tooth after root canal treatment.',
           'Improving smile appearance and chewing function.',
+        ],
+      },
+    ],
+  },
+  'dental-veneers': {
+    title: 'Dental veneers',
+    description: 'Thin veneers that improve tooth shape and color with a natural look.',
+    heroImageAlt: 'Dental treatment room at Beauty Corner',
+    sections: [
+      {
+        title: 'A balanced smile with custom veneers',
+        paragraphs: [
+          'Veneers cover the front surface to improve shade, shape, and visible alignment after assessing teeth, gums, and suitability.',
+        ],
+      },
+      {
+        title: 'Treatment steps',
+        listItems: [
+          'Exam to check if teeth are ready for veneers.',
+          'Choose a shape and shade that fit your smile.',
+          'Place the veneers and review the final result.',
         ],
       },
     ],
@@ -357,45 +380,86 @@ export const servicesEn: Record<
       },
     ],
   },
-  'acne-treatment': {
-    title: 'Acne treatment & scars',
-    description: 'Diagnosis and treatment of acne and scars with personalized medical plans.',
-    heroImageAlt: 'Skin care at Beauty Corner clinic',
+  laser: {
+    title: 'Laser',
+    description: 'Medical laser sessions after skin assessment for hair removal or suitable skin concerns.',
+    heroImageAlt: 'Equipped treatment room at Beauty Corner clinic',
     sections: [
       {
-        title: 'Care tailored to your skin',
+        title: 'Medical laser after assessment',
         paragraphs: [
-          'We start by assessing skin type and acne causes before building a gradual treatment plan for your case.',
+          'We examine the skin first to choose the right laser, then explain the expected number of sessions and aftercare.',
         ],
       },
       {
         title: 'What’s included',
-        listItems: ['Precise skin assessment', 'Staged treatment plan', 'Follow-up and plan adjustments'],
-      },
-    ],
-  },
-  pigmentation: {
-    title: 'Pigmentation & skin tone evening',
-    description: 'Medical treatments to lighten pigmentation and even skin tone.',
-    heroImageAlt: 'Pigmentation care session at the clinic',
-    sections: [
-      {
-        title: 'Safer, more even skin tone',
-        paragraphs: [
-          'We identify the cause of pigmentation first, then choose the most suitable procedure for a natural and safe result.',
+        listItems: [
+          'Skin-type assessment and laser suitability.',
+          'A clear session plan based on the treatment goal.',
+          'Before-and-after care guidance to protect results.',
         ],
       },
     ],
   },
-  'non-surgical-aesthetics': {
-    title: 'Non-surgical aesthetic procedures',
-    description: 'Medical aesthetic procedures to improve skin appearance without surgery.',
-    heroImageAlt: 'Non-surgical aesthetic care at the clinic',
+  'filler-botox': {
+    title: 'Filler & Botox',
+    description: 'Medical filler and Botox injections to refine facial features with a natural look.',
+    heroImageAlt: 'Equipped treatment room at Beauty Corner clinic',
     sections: [
       {
-        title: 'Natural-looking medical aesthetics',
+        title: 'Balanced medical aesthetics',
         paragraphs: [
-          'We offer non-surgical procedures after skin assessment, with clear expectations and aftercare steps.',
+          'We assess your facial features and goals first, then decide whether filler, Botox, or both is the right option.',
+        ],
+      },
+      {
+        title: 'Before the session',
+        listItems: [
+          'Consultation to clarify the goal and expected result.',
+          'Choose suitable areas after medical assessment.',
+          'Aftercare steps and follow-up when needed.',
+        ],
+      },
+    ],
+  },
+  'body-contouring': {
+    title: 'Body contouring',
+    description: 'Non-surgical contouring and fat-dissolving sessions after a medical assessment.',
+    heroImageAlt: 'Equipped treatment room at Beauty Corner clinic',
+    sections: [
+      {
+        title: 'A clear body-contouring plan',
+        paragraphs: [
+          'We identify focus areas after assessment, then set a session plan with realistic expectations.',
+        ],
+      },
+      {
+        title: 'What to expect',
+        listItems: [
+          'Medical assessment of contouring or fat-dissolving areas.',
+          'Explanation of the technique and approximate session count.',
+          'Aftercare and follow-up guidance.',
+        ],
+      },
+    ],
+  },
+  hydrafacial: {
+    title: 'HydraFacial skin cleaning',
+    description: 'Deep HydraFacial cleansing to clear pores and refresh the skin.',
+    heroImageAlt: 'Equipped treatment room at Beauty Corner clinic',
+    sections: [
+      {
+        title: 'Gentle deep cleansing',
+        paragraphs: [
+          'HydraFacial cleans pores and hydrates the skin after a type assessment, for a fresher look without harsh peeling.',
+        ],
+      },
+      {
+        title: 'What the session includes',
+        listItems: [
+          'Skin-type assessment before cleansing.',
+          'Deep cleaning and hydration during the session.',
+          'Simple same-day aftercare tips.',
         ],
       },
     ],
@@ -463,6 +527,36 @@ export const doctorsEn: Record<
       },
     ],
   },
+  'dermatology-hala': {
+    name: 'Dr. Hala Al-Badawy',
+    title: 'Dermatology & aesthetics doctor',
+    seoRole: 'Dermatology & aesthetics doctor at Beauty Corner in Hafr Al-Batin',
+    specialty: 'Dermatology & aesthetics',
+    summary:
+      'A dermatology and aesthetics doctor who assesses the skin and plans laser, filler, Botox, contouring, and skin-care treatments.',
+    sections: [
+      {
+        title: 'About the doctor',
+        paragraphs: [
+          'Dr. Hala Al-Badawy starts with a skin assessment, then explains suitable dermatology and aesthetic options before any procedure.',
+        ],
+      },
+      {
+        title: 'Focus areas',
+        listItems: [
+          'Laser for pigmentation and hair',
+          'Filler and Botox',
+          'Body contouring and skin care such as HydraFacial',
+        ],
+      },
+      {
+        title: 'Care approach',
+        paragraphs: [
+          'She focuses on a natural result and a clear plan after assessment, with follow-up after the session when needed.',
+        ],
+      },
+    ],
+  },
 };
 
 export const devicesEn: Record<string, { name: string; description: string; imageAlt: string }> = {
@@ -502,6 +596,54 @@ export const devicesEn: Record<string, { name: string; description: string; imag
       'A modern examination unit with a comfortable chair, medical lighting, and multi-tool arm for everyday exams and care.',
     imageAlt: 'Teal dental examination and treatment unit inside the clinic',
   },
+  'curas-qswitched': {
+    name: 'CuRAS Q-Switched Nd:YAG laser',
+    description:
+      'Wontech CuRAS laser with 1064 and 532 nm wavelengths for pigmentation, melasma, tattoo removal, and laser toning.',
+    imageAlt: 'CuRAS Q-Switched laser in the dermatology room at Beauty Corner',
+  },
+  'nuera-tight': {
+    name: 'Lumenis NuEra Tight',
+    description:
+      'A non-surgical radiofrequency system for skin tightening, body contouring, and cellulite appearance by heating tissue and supporting collagen.',
+    imageAlt: 'Lumenis NuEra Tight skin-tightening device inside the clinic',
+  },
+  'candela-gentlemax-pro': {
+    name: 'Candela GentleMax Pro',
+    description:
+      'A dual-wavelength laser for permanent hair removal, pigmented and vascular lesions, and skin rejuvenation across skin types.',
+    imageAlt: 'Candela GentleMax Pro laser hair-removal device inside the clinic',
+  },
+  'lumenis-splendor-x': {
+    name: 'Lumenis Splendor X',
+    description:
+      'Splendor X with BLEND X combines Alexandrite 755 nm and Nd:YAG 1064 nm for hair removal, pigmentation, and vascular treatments.',
+    imageAlt: 'Lumenis Splendor X laser hair-removal device inside the clinic',
+  },
+  'preime-dermafacial': {
+    name: 'Préime DermaFacial',
+    description:
+      'A five-technology skin platform: hydro-cleansing, exfoliation, microcurrent, radiofrequency, and ultrasound for tailored hydration and glow.',
+    imageAlt: 'Préime DermaFacial skin-care device in the dermatology room',
+  },
+  'aqua-peel-tera': {
+    name: 'Aqua Peel Tera',
+    description:
+      'A hydradermabrasion system for deep cleansing, gentle exfoliation, impurity extraction, and serum infusion to improve skin texture.',
+    imageAlt: 'Aqua Peel Tera skin-cleansing device at Beauty Corner',
+  },
+  'multi-tera': {
+    name: 'Multi Tera',
+    description:
+      'A multi-function aesthetic platform that combines technologies such as ultrasound and radiofrequency to firm skin and improve tone.',
+    imageAlt: 'Multi Tera device beside Aqua Peel Tera in the dermatology room',
+  },
+  'fractional-co2-laser': {
+    name: 'Fractional CO2 Laser',
+    description:
+      'A fractional carbon-dioxide laser for skin resurfacing, acne scars, fine lines, and overall texture and tone improvement.',
+    imageAlt: 'Fractional CO2 Laser for skin resurfacing in the dermatology room',
+  },
 };
 
 export const faqEn = [
@@ -518,7 +660,7 @@ export const faqEn = [
   {
     question: 'Which services are available at the clinic?',
     answer:
-      'The clinic offers dental services such as implants, prosthetics, whitening, cleaning, root canal treatment, and extraction, plus selected dermatology services depending on doctor availability.',
+      'The clinic offers dental services such as implants, prosthetics, veneers, whitening, cleaning, root canal treatment, and extraction, plus dermatology services: laser, filler and Botox, body contouring, and HydraFacial skin cleaning.',
   },
   {
     question: 'Where is the Hafr Al-Batin branch?',

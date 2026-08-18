@@ -20,10 +20,12 @@ import AssetIcon from '../ui/AssetIcon.astro';
 import ButtonLink from '../ui/ButtonLink.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import SitePicture from '../ui/SitePicture.astro';
+import ClinicGallerySlider from './ClinicGallerySlider.astro';
 import DevicesSection from './DevicesSection.astro';
 
 const landingDoctors = doctors.slice(0, 3);
-const landingServices = clinicServices.filter((service) => service.department === 'أسنان');
+const landingDentalServices = clinicServices.filter((service) => service.department === 'أسنان');
+const landingDermatologyServices = clinicServices.filter((service) => service.department === 'جلدية');
 const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كورنر.';
 ---
 
@@ -42,9 +44,22 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
 
 <section id="specialties" class="bg-surface-soft py-12 sm:py-24" aria-labelledby="specialties-heading">
   <div class="page-container">
-    <div id="specialties-heading"><SectionHeading eyebrow="خدماتنا" title="خدمات طب الأسنان في مكان واحد" /></div>
-    <div class="mt-8 grid gap-4 sm:mt-10 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {landingServices.map((service) => <ServiceCard service={service} />)}
+    <div id="specialties-heading">
+      <SectionHeading eyebrow="خدماتنا" title="خدمات الأسنان والجلدية في مكان واحد" />
+    </div>
+    <div class="mt-8 space-y-10 sm:mt-10">
+      <div>
+        <h3 class="text-lg font-bold text-ink sm:text-xl">خدمات الأسنان</h3>
+        <div class="mt-4 grid gap-4 sm:mt-5 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {landingDentalServices.map((service) => <ServiceCard service={service} />)}
+        </div>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-ink sm:text-xl">خدمات الجلدية</h3>
+        <div class="mt-4 grid gap-4 sm:mt-5 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {landingDermatologyServices.map((service) => <ServiceCard service={service} />)}
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -114,14 +129,14 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
 
 <section class="bg-surface-soft py-12 sm:py-24" aria-labelledby="gallery-heading">
   <div class="page-container">
-    <div id="gallery-heading"><SectionHeading eyebrow="نماذج من العيادة" title="لمحة من داخل العيادة" /></div>
-    <SitePicture
-      src="/assets/landing-clinic-gallery.jpg"
-      alt="غرفة علاج أسنان مضيئة داخل عيادة بيوتي كورنر"
-      widths={[640, 960, 1280, 1600]}
-      sizes="(max-width: 1024px) calc(100vw - 2rem), 76rem"
-      class="mt-6 aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)] sm:mt-8 sm:aspect-[16/9]"
-    />
+    <div id="gallery-heading">
+      <SectionHeading
+        eyebrow="نماذج من العيادة"
+        title="لمحة من داخل العيادة"
+        description="صور من داخل العيادة تنتقل بسلاسة، لتأخذ فكرة عن أجواء العلاج."
+      />
+    </div>
+    <ClinicGallerySlider />
   </div>
 </section>
 

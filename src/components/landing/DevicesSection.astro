@@ -29,13 +29,15 @@ const copy = ui(locale);
       {devices.map((device) => (
         <li>
           <article class="h-full overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]">
-            <SitePicture
-              src={device.image}
-              alt={device.imageAlt}
-              widths={[320, 480, 640, 800]}
-              sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 50vw, 33vw"
-              class="aspect-[4/3] w-full object-cover"
-            />
+            <div class="device-photo relative aspect-[4/3] bg-surface-soft">
+              <SitePicture
+                src={device.image}
+                alt={device.imageAlt}
+                widths={[320, 480, 640, 800]}
+                sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 50vw, 33vw"
+                class="object-contain p-4"
+              />
+            </div>
             <div class="p-5 sm:p-6">
               <h3 class="text-lg font-bold tracking-tight text-balance text-ink">{device.name}</h3>
               <p class="mt-2 text-sm leading-6 text-pretty text-muted">{device.description}</p>
@@ -46,3 +48,14 @@ const copy = ui(locale);
     </ul>
   </div>
 </section>
+
+<style>
+  .device-photo :global(picture),
+  .device-photo :global(img) {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+  }
+</style>

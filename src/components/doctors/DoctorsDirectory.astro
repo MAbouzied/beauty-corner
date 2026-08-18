@@ -17,7 +17,7 @@ const en = isEnglish(locale);
 
 <section id="doctors-directory" class="py-12 sm:py-20">
   <div class="page-container flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-16">
-    <DoctorFilters doctors={doctors} locale={locale} />
+    <DoctorFilters locale={locale} />
     <div class="min-w-0 flex-1">
       <p id="results-status" class="sr-only" aria-live="polite"></p>
       <div id="doctors-grid" class="grid gap-6 md:grid-cols-2">

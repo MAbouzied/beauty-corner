@@ -3,20 +3,25 @@ import { describe, it } from 'node:test';
 import { contrastRatio, meetsWcagAa } from './contrast.ts';
 
 describe('WCAG contrast tokens', () => {
-  it('gold text meets AA on white', () => {
-    assert.ok(meetsWcagAa('#9a6a18', '#ffffff'));
-    assert.ok(contrastRatio('#9a6a18', '#ffffff') >= 4.5);
+  it('brand green text meets AA on white', () => {
+    assert.ok(meetsWcagAa('#1f6b1c', '#ffffff'));
+    assert.ok(contrastRatio('#1f6b1c', '#ffffff') >= 4.5);
+  });
+
+  it('white text meets AA on brand green buttons', () => {
+    assert.ok(meetsWcagAa('#ffffff', '#247022'));
+    assert.ok(meetsWcagAa('#ffffff', '#1f6b1c'));
   });
 
   it('success text meets AA on white', () => {
-    assert.ok(meetsWcagAa('#0b6f20', '#ffffff'));
+    assert.ok(meetsWcagAa('#1f6b1c', '#ffffff'));
   });
 
   it('placeholder meets AA on white', () => {
     assert.ok(meetsWcagAa('#717680', '#ffffff'));
   });
 
-  it('decorative gold fails body-text AA on white', () => {
-    assert.equal(meetsWcagAa('#e6c45a', '#ffffff'), false);
+  it('logo leaf green is decorative on white', () => {
+    assert.equal(meetsWcagAa('#3fa63b', '#ffffff'), false);
   });
 });

@@ -55,4 +55,68 @@ export const clinicDevices: readonly ClinicDevice[] = [
     image: '/assets/devices/dental-examination-unit.jpg',
     imageAlt: 'وحدة فحص وعلاج أسنان بلون تركوازي داخل العيادة',
   },
+  {
+    id: 'curas-qswitched',
+    name: 'جهاز CuRAS ليزر Q-Switched Nd:YAG',
+    description:
+      'ليزر Wontech CuRAS بطولي موجة 1064 و532 نانومتر لعلاج التصبغات والكلف وإزالة الوشم وتجديد البشرة بالليزر تونينغ.',
+    image: '/assets/devices/curas-qswitched.jpg',
+    imageAlt: 'جهاز CuRAS ليزر Q-Switched داخل عيادة الجلدية في بيوتي كورنر',
+  },
+  {
+    id: 'nuera-tight',
+    name: 'جهاز Lumenis NuEra Tight',
+    description:
+      'جهاز ترددات راديوية غير جراحي لشد الجلد ونحت الجسم وتقليل مظهر السيلوليت عبر تسخين طبقات الجلد وتحفيز الكولاجين.',
+    image: '/assets/devices/nuera-tight.jpg',
+    imageAlt: 'جهاز Lumenis NuEra Tight لشد الجلد ونحت الجسم داخل العيادة',
+  },
+  {
+    id: 'candela-gentlemax-pro',
+    name: 'جهاز Candela GentleMax Pro',
+    description:
+      'ليزر ثنائي الطول الموجي لإزالة الشعر الدائمة وعلاج التصبغات والآفات الوعائية وتجديد البشرة لمختلف أنواع الجلد.',
+    image: '/assets/devices/candela-gentlemax-pro.jpg',
+    imageAlt: 'جهاز Candela GentleMax Pro لإزالة الشعر بالليزر داخل العيادة',
+  },
+  {
+    id: 'lumenis-splendor-x',
+    name: 'جهاز Lumenis Splendor X',
+    description:
+      'ليزر Splendor X بتقنية BLEND X يجمع ألكسندرايت 755 نانومتر وNd:YAG 1064 نانومتر لإزالة الشعر وعلاج التصبغات والأوعية الدموية.',
+    image: '/assets/devices/lumenis-splendor-x.jpg',
+    imageAlt: 'جهاز Lumenis Splendor X لإزالة الشعر بالليزر داخل العيادة',
+  },
+  {
+    id: 'preime-dermafacial',
+    name: 'جهاز Préime DermaFacial',
+    description:
+      'منصة عناية بالبشرة تجمع خمس تقنيات: تنظيف مائي، تقشير، تحفيز عضلي، ترددات راديوية، وألتراساوند لترطيب ونضارة مخصصة.',
+    image: '/assets/devices/preime-dermafacial.jpg',
+    imageAlt: 'جهاز Préime DermaFacial لتنظيف ونضارة البشرة داخل عيادة الجلدية',
+  },
+  {
+    id: 'aqua-peel-tera',
+    name: 'جهاز Aqua Peel Tera',
+    description:
+      'جهاز هيدروديرمابريشن لتنظيف عميق وتقشير لطيف واستخلاص الشوائب مع حقن سيروم مرطّب لتحسين ملمس البشرة.',
+    image: '/assets/devices/aqua-peel-tera.jpg',
+    imageAlt: 'جهاز Aqua Peel Tera لتنظيف البشرة داخل عيادة بيوتي كورنر',
+  },
+  {
+    id: 'multi-tera',
+    name: 'جهاز Multi Tera',
+    description:
+      'منصة تجميل متعددة المهام تجمع تقنيات مثل الموجات فوق الصوتية والترددات الراديوية لشد البشرة وتحسين التوهج والمرونة.',
+    image: '/assets/devices/aqua-peel-tera.jpg',
+    imageAlt: 'جهاز Multi Tera بجانب Aqua Peel Tera داخل غرفة علاج الجلدية',
+  },
+  {
+    id: 'fractional-co2-laser',
+    name: 'جهاز Fractional CO2 Laser',
+    description:
+      'ليزر ثاني أكسيد الكربون الجزئي لتجديد سطح البشرة وعلاج ندبات حب الشباب والخطوط الدقيقة وتحسين ملمس الجلد ولونه.',
+    image: '/assets/devices/fractional-co2-laser.jpg',
+    imageAlt: 'جهاز Fractional CO2 Laser لتجديد البشرة داخل عيادة الجلدية',
+  },
 ] as const;

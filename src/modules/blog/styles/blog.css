@@ -13,9 +13,9 @@
   --blog-radius-section: var(--radius-section, 1.625rem);
   --blog-shadow-card: var(--shadow-card, 0 1px 2px rgb(30 18 18 / 4%), 0 8px 24px -12px rgb(30 18 18 / 8%));
   --blog-reading-width: 70ch;
-  --blog-gold-light: var(--color-gold-light, #f8e58c);
-  --blog-gold: var(--color-gold, #e6c45a);
-  --blog-gold-deep: var(--color-gold-deep, #b98b35);
+  --blog-gold-light: var(--color-gold-light, #247022);
+  --blog-gold: var(--color-gold, #1f6b1c);
+  --blog-gold-deep: var(--color-gold-deep, #1b5e1a);
   --blog-focus: var(--color-focus, var(--blog-accent));
   color: var(--blog-text);
 }
@@ -199,7 +199,7 @@
     var(--blog-gold) 45%,
     var(--blog-gold-deep) 100%
   );
-  color: var(--blog-text);
+  color: var(--color-ink-button, #ffffff);
   font-weight: 800;
   text-decoration: none;
 }

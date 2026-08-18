@@ -31,6 +31,8 @@ export interface ClinicService {
 const dentalHero = '/assets/landing-hero.jpg';
 const dentalHeroAlt = 'غرفة علاج أسنان حديثة داخل عيادة بيوتي كورنر';
 const dentistrySpecialty = 'طب وتجميل الأسنان' as const;
+const dermHero = '/assets/devices/dental-examination-unit.jpg';
+const dermHeroAlt = 'غرفة علاج مجهزة داخل عيادة بيوتي كورنر';
 
 export const clinicServices: readonly ClinicService[] = [
   {
@@ -84,6 +86,33 @@ export const clinicServices: readonly ClinicService[] = [
           'تعويض سن مفقود أو متضرر بشدة.',
           'حماية الأسنان بعد علاج العصب.',
           'تحسين شكل الابتسامة ووظيفة المضغ.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dental-veneers',
+    title: 'عدسات الأسنان',
+    description: 'عدسات رقيقة لتحسين شكل ولون الأسنان بمظهر طبيعي.',
+    category: 'تركيبات وتشخيص',
+    department: 'أسنان',
+    icon: '/assets/service-prosthetics.svg',
+    heroImage: '/assets/landing-clinic-gallery.jpg',
+    heroImageAlt: dentalHeroAlt,
+    doctorSpecialty: dentistrySpecialty,
+    sections: [
+      {
+        title: 'ابتسامة متناسقة بعدسات مخصصة',
+        paragraphs: [
+          'عدسات الأسنان تغطي السطح الأمامي لتحسين اللون والشكل والمحاذاة الظاهرة، بعد تقييم صحة الأسنان واللثة ومدى ملاءمة الحالة.',
+        ],
+      },
+      {
+        title: 'خطوات العلاج',
+        listItems: [
+          'فحص لتحديد جاهزية الأسنان للعدسات.',
+          'اختيار الشكل واللون المناسب لابتسامتك.',
+          'تركيب العدسات ومتابعة النتيجة النهائية.',
         ],
       },
     ],
@@ -305,66 +334,109 @@ export const clinicServices: readonly ClinicService[] = [
     ],
   },
   {
-    id: 'acne-treatment',
-    title: 'علاج حب الشباب وآثاره',
-    description: 'تشخيص وعلاج حب الشباب والندبات بخطط طبية مخصصة.',
+    id: 'laser',
+    title: 'الليزر',
+    description: 'جلسات ليزر طبية لتقييم البشرة وإزالة الشعر أو علاج المشكلات الجلدية المناسبة.',
     category: 'تجميل',
     department: 'جلدية',
-    icon: '/assets/service-dermatology.svg',
-    heroImage: '/assets/devices/dental-examination-unit.jpg',
-    heroImageAlt: 'غرفة علاج مجهزة داخل عيادة بيوتي كورنر',
-    doctorSpecialty: 'الأمراض الجلدية والتجميل',
+    icon: '/assets/service-laser.svg',
+    heroImage: dermHero,
+    heroImageAlt: dermHeroAlt,
+    doctorSpecialty: 'خدمات الليزر',
     sections: [
       {
-        title: 'علاج مخصص لنوع بشرتك',
+        title: 'ليزر طبي بعد تقييم الحالة',
         paragraphs: [
-          'نبدأ بتقييم نوع البشرة وسبب حب الشباب قبل بناء خطة علاجية تدريجية تناسب حالتك.',
+          'نبدأ بفحص البشرة لتحديد نوع الليزر المناسب، ثم نشرح عدد الجلسات المتوقع وتعليمات العناية بعدها.',
         ],
       },
       {
-        title: 'ما يشمله العلاج',
+        title: 'ما تشمله الخدمة',
         listItems: [
-          'تقييم طبي دقيق للبشرة.',
-          'خطة علاجية مرحلية.',
-          'متابعة النتائج وتعديل الخطة عند الحاجة.',
+          'تقييم نوع البشرة ومدى ملاءمة الليزر.',
+          'خطة جلسات واضحة حسب الهدف العلاجي.',
+          'إرشادات قبل الجلسة وبعدها للحفاظ على النتيجة.',
         ],
       },
     ],
   },
   {
-    id: 'pigmentation',
-    title: 'التصبغات وتوحيد لون البشرة',
-    description: 'علاجات طبية لتفتيح التصبغات وتوحيد لون البشرة.',
+    id: 'filler-botox',
+    title: 'الفيلر والبوتوكس',
+    description: 'حقن فيلر وبوتوكس طبية لتحسين ملامح الوجه بمظهر طبيعي.',
     category: 'تجميل',
     department: 'جلدية',
     icon: '/assets/service-dermatology.svg',
-    heroImage: '/assets/devices/dental-examination-unit.jpg',
-    heroImageAlt: 'جلسة عناية تجميلية داخل العيادة',
+    heroImage: dermHero,
+    heroImageAlt: dermHeroAlt,
     doctorSpecialty: 'الأمراض الجلدية والتجميل',
     sections: [
       {
-        title: 'توحيد لون البشرة بأمان',
+        title: 'تجميل طبي بمظهر متوازن',
         paragraphs: [
-          'نحدد سبب التصبغ أولاً ثم نختار الإجراء الأنسب للحصول على نتيجة طبيعية وآمنة.',
+          'نقيّم ملامح الوجه واحتياجك أولاً، ثم نحدد إن كان الفيلر أو البوتوكس أو الجمع بينهما هو الأنسب.',
+        ],
+      },
+      {
+        title: 'قبل الجلسة',
+        listItems: [
+          'استشارة لتوضيح الهدف والنتيجة المتوقعة.',
+          'اختيار المناطق المناسبة حسب التقييم الطبي.',
+          'شرح العناية بعد الحقن وموعد المتابعة إن لزم.',
         ],
       },
     ],
   },
   {
-    id: 'non-surgical-aesthetics',
-    title: 'الإجراءات التجميلية غير الجراحية',
-    description: 'إجراءات تجميلية طبية لتحسين مظهر البشرة دون جراحة.',
+    id: 'body-contouring',
+    title: 'النحت',
+    description: 'جلسات نحت وإذابة الدهون غير الجراحية لتحسين شكل الجسم بعد التقييم الطبي.',
     category: 'تجميل',
     department: 'جلدية',
     icon: '/assets/service-dermatology.svg',
-    heroImage: '/assets/devices/dental-examination-unit.jpg',
-    heroImageAlt: 'إجراءات تجميلية غير جراحية داخل العيادة',
+    heroImage: dermHero,
+    heroImageAlt: dermHeroAlt,
     doctorSpecialty: 'الأمراض الجلدية والتجميل',
     sections: [
       {
-        title: 'تجميل طبي بمظهر طبيعي',
+        title: 'نحت الجسم بخطة واضحة',
         paragraphs: [
-          'نقدم إجراءات غير جراحية بعد تقييم البشرة، مع شرح التوقعات وخطوات العناية بعدها.',
+          'نحدد مناطق التركيز بعد التقييم، ثم نضع خطة جلسات تناسب هدفك مع توقعات واقعية للنتيجة.',
+        ],
+      },
+      {
+        title: 'ما تتوقعه',
+        listItems: [
+          'تقييم طبي لمناطق النحت أو الإذابة.',
+          'شرح التقنية وعدد الجلسات التقريبي.',
+          'نصائح للعناية والمتابعة بعد الجلسات.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hydrafacial',
+    title: 'تنظيف البشرة الهيدرافيشل',
+    description: 'تنظيف عميق للبشرة بتقنية الهيدرافيشل لتنقية المسام ونضارة فورية.',
+    category: 'تجميل',
+    department: 'جلدية',
+    icon: '/assets/service-dermatology.svg',
+    heroImage: dermHero,
+    heroImageAlt: dermHeroAlt,
+    doctorSpecialty: 'الأمراض الجلدية والتجميل',
+    sections: [
+      {
+        title: 'تنظيف عميق بلطف',
+        paragraphs: [
+          'جلسة الهيدرافيشل تنظّف المسام وترطّب البشرة بعد تقييم نوعها، لتظهر أكثر نضارة دون تقشير عنيف.',
+        ],
+      },
+      {
+        title: 'ماذا تشمل الجلسة؟',
+        listItems: [
+          'تقييم نوع البشرة قبل التنظيف.',
+          'تنظيف عميق وترطيب أثناء الجلسة.',
+          'إرشادات بسيطة للعناية في اليوم نفسه.',
         ],
       },
     ],

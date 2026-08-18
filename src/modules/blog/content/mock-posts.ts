@@ -204,7 +204,7 @@ export const mockBlogPosts: BlogPost[] = [
           type: 'link-paragraph',
           parts: [
             { text: 'تعرّف على ' },
-            { text: 'علاج حب الشباب', href: '/services/acne-treatment' },
+            { text: 'تنظيف البشرة الهيدرافيشل', href: '/services/hydrafacial' },
             { text: ' أو ' },
             { text: 'احجز استشارة', href: '/book' },
             { text: '.' },
@@ -396,7 +396,7 @@ export const mockBlogPosts: BlogPost[] = [
           type: 'link-paragraph',
           parts: [
             { text: 'تعرّف على ' },
-            { text: 'خدمة التصبغات', href: '/services/pigmentation' },
+            { text: 'خدمة الليزر', href: '/services/laser' },
             { text: ' أو ' },
             { text: 'احجز استشارة', href: '/book' },
             { text: '.' },

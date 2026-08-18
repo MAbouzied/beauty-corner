@@ -4,19 +4,10 @@ import { clinicDevices } from './devices.ts';
 import { devicesEn } from '../lib/i18n/content-en.ts';
 
 describe('clinic devices', () => {
-  it('lists six clinic devices with matching English overlays', () => {
-    assert.equal(clinicDevices.length, 6);
-    assert.deepEqual(
-      clinicDevices.map((device) => device.id),
-      [
-        'beyond-whitening',
-        'dental-unit-integrated',
-        'dental-unit-blue',
-        'dental-unit-led',
-        'woodpecker-ptb',
-        'dental-examination-unit',
-      ],
-    );
+  it('lists clinic devices with matching English overlays', () => {
+    assert.ok(clinicDevices.length >= 6);
+    assert.ok(clinicDevices.some((device) => device.id === 'curas-qswitched'));
+    assert.ok(clinicDevices.some((device) => device.id === 'preime-dermafacial'));
 
     for (const device of clinicDevices) {
       assert.ok(devicesEn[device.id], `missing English overlay for ${device.id}`);

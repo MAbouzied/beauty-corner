@@ -68,7 +68,7 @@ describe('clinic contact lines', () => {
     assert.equal(clinicLineFromDepartment('قسم الفيلر'), 'dermatology');
     assert.equal(clinicLineFromDepartment('قسم الليزر'), 'dermatology');
     assert.equal(clinicLineFromDepartment('زراعة الأسنان'), 'dental');
-    assert.equal(clinicLineFromDepartment('علاج حب الشباب وآثاره'), 'dermatology');
+    assert.equal(clinicLineFromDepartment('الليزر'), 'dermatology');
     assert.equal(clinicLineFromDepartment(''), 'dermatology');
   });
 });

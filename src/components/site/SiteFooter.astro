@@ -4,7 +4,7 @@ import SocialLinks from '../contact/SocialLinks.astro';
 import { clinicLicenses } from '../../data/licenses';
 import { clinicServices } from '../../data/services';
 import type { Locale } from '../../lib/i18n/localize';
-import { isEnglish, localizeContact, localizeService, ui } from '../../lib/i18n/localize';
+import { isEnglish, localizeContact, localizeDepartment, localizeService, ui } from '../../lib/i18n/localize';
 
 export interface Props {
   locale?: Locale;
@@ -37,10 +37,13 @@ const links = en
       { label: 'سياسة الخصوصية', href: '/privacy' },
     ];
 
-const footerServices = clinicServices
-  .filter((service) => service.department === 'أسنان')
-  .slice(0, 6)
-  .map((service) => localizeService(service, locale));
+const footerServiceGroups = (['أسنان', 'جلدية'] as const).map((department) => ({
+  department,
+  label: localizeDepartment(department, locale),
+  services: clinicServices
+    .filter((service) => service.department === department)
+    .map((service) => localizeService(service, locale)),
+}));
 
 const licenseCopy = en
   ? {
@@ -92,15 +95,22 @@ const licenseCopy = en
       </section>
       <section>
         <h2 class="mb-4 text-sm font-bold">{en ? copy!.nav.services : 'الخدمات'}</h2>
-        <ul class="space-y-2 text-sm text-muted">
-          {footerServices.map((service) => (
-            <li>
-              <a href={en ? `/en/services/${service.id}` : `/services/${service.id}`} class="hover:text-primary">
-                {service.title}
-              </a>
-            </li>
+        <div class="space-y-5">
+          {footerServiceGroups.map((group) => (
+            <div>
+              <h3 class="mb-2 text-xs font-bold text-primary">{group.label}</h3>
+              <ul class="space-y-2 text-sm text-muted">
+                {group.services.map((service) => (
+                  <li>
+                    <a href={en ? `/en/services/${service.id}` : `/services/${service.id}`} class="hover:text-primary">
+                      {service.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       </section>
       <section>
         <h2 class="mb-4 text-sm font-bold">{en ? copy!.nav.contact : 'تواصل معنا'}</h2>

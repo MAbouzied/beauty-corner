@@ -69,7 +69,7 @@
 | **Structured data** | `CollectionPage`, `ItemList` (services), `MedicalClinic` | Same |
 | **Social image** | /assets/landing-hero.jpg | /assets/landing-hero.jpg |
 | **Sitemap** | Yes · monthly · priority 0.8 | Yes · monthly · priority 0.8 |
-| **Notes** | Links to all 13 service detail pages. | Same |
+| **Notes** | Links to all 15 service detail pages. | Same |
 
 ### 3. Doctors Directory
 
@@ -137,7 +137,7 @@
 
 ---
 
-## Service Detail Routes (13 pairs · 26 URLs)
+## Service Detail Routes (15 pairs · 30 URLs)
 
 Pattern: **Title** `{service} في حفر الباطن | بيوتي كورنر` (AR) · `{service} in Hafr Al-Batin | Beauty Corner` (EN)
 
@@ -145,6 +145,7 @@ Pattern: **Title** `{service} في حفر الباطن | بيوتي كورنر` 
 |----|--------|--------|--------------------|--------------------|---------|---------|-----------------|--------------|---------|
 | dental-implants | /services/dental-implants | /en/services/dental-implants | زراعة الأسنان في حفر الباطن \| بيوتي كورنر | Dental Implants in Hafr Al-Batin \| Beauty Corner | زراعة الأسنان | Dental implants | `MedicalWebPage`, `MedicalProcedure`, `Service` | /assets/service-detail-dentistry.jpg | Yes · 0.7 |
 | dental-prosthetics | /services/dental-prosthetics | /en/services/dental-prosthetics | تركيبات الأسنان في حفر الباطن \| بيوتي كورنر | Dental Prosthetics in Hafr Al-Batin \| Beauty Corner | تركيبات الأسنان | Dental prosthetics | Same | /assets/landing-clinic-gallery.jpg | Yes · 0.7 |
+| dental-veneers | /services/dental-veneers | /en/services/dental-veneers | عدسات الأسنان في حفر الباطن \| بيوتي كورنر | Dental Veneers in Hafr Al-Batin \| Beauty Corner | عدسات الأسنان | Dental veneers | Same | /assets/landing-clinic-gallery.jpg | Yes · 0.7 |
 | teeth-whitening | /services/teeth-whitening | /en/services/teeth-whitening | تبييض الأسنان في حفر الباطن \| بيوتي كورنر | Teeth Whitening in Hafr Al-Batin \| Beauty Corner | تبييض الأسنان | Teeth whitening | Same | /assets/devices/beyond-whitening.jpg | Yes · 0.7 |
 | cleaning-polishing | /services/cleaning-polishing | /en/services/cleaning-polishing | تنظيف وتلميع الأسنان في حفر الباطن \| بيوتي كورنر | Cleaning & Polishing in Hafr Al-Batin \| Beauty Corner | تنظيف وتلميع الأسنان | Cleaning & polishing | Same | /assets/landing-waiting-area.jpg | Yes · 0.7 |
 | tooth-extraction | /services/tooth-extraction | /en/services/tooth-extraction | الخلع (جراحي وعادي) في حفر الباطن \| بيوتي كورنر | Tooth Extraction in Hafr Al-Batin \| Beauty Corner | الخلع (جراحي وعادي) | Extraction (surgical & simple) | Same | /assets/service-detail-dentistry.jpg | Yes · 0.7 |
@@ -153,9 +154,10 @@ Pattern: **Title** `{service} في حفر الباطن | بيوتي كورنر` 
 | gum-contouring | /services/gum-contouring | /en/services/gum-contouring | قص اللثة (جراحي وليزر) في حفر الباطن \| بيوتي كورنر | Gum Contouring in Hafr Al-Batin \| Beauty Corner | قص اللثة (جراحي وليزر) | Gum contouring (surgical & laser) | Same | /assets/devices/woodpecker-ptb.png | Yes · 0.7 |
 | gum-depigmentation | /services/gum-depigmentation | /en/services/gum-depigmentation | توريد اللثة بالليزر في حفر الباطن \| بيوتي كورنر | Laser Gum Depigmentation in Hafr Al-Batin \| Beauty Corner | توريد اللثة بالليزر | Laser gum depigmentation | Same | /assets/devices/woodpecker-ptb.png | Yes · 0.7 |
 | dental-xray-3d | /services/dental-xray-3d | /en/services/dental-xray-3d | أشعة الأسنان 3D في حفر الباطن \| بيوتي كورنر | 3D Dental X-ray in Hafr Al-Batin \| Beauty Corner | أشعة الأسنان 3D | 3D dental X-ray | Same | /assets/landing-clinic-gallery.jpg | Yes · 0.7 |
-| acne-treatment | /services/acne-treatment | /en/services/acne-treatment | علاج حب الشباب وآثاره في حفر الباطن \| بيوتي كورنر | Acne Treatment & Scars in Hafr Al-Batin \| Beauty Corner | علاج حب الشباب وآثاره | Acne treatment & scars | Same | /assets/landing-blog-skin.jpg | Yes · 0.7 |
-| pigmentation | /services/pigmentation | /en/services/pigmentation | التصبغات وتوحيد لون البشرة في حفر الباطن \| بيوتي كورنر | Pigmentation & Skin Tone in Hafr Al-Batin \| Beauty Corner | التصبغات وتوحيد لون البشرة | Pigmentation & skin tone evening | Same | /assets/landing-blog-skin.jpg | Yes · 0.7 |
-| non-surgical-aesthetics | /services/non-surgical-aesthetics | /en/services/non-surgical-aesthetics | الإجراءات التجميلية غير الجراحية في حفر الباطن \| بيوتي كورنر | Non-surgical Aesthetics in Hafr Al-Batin \| Beauty Corner | الإجراءات التجميلية غير الجراحية | Non-surgical aesthetic procedures | Same | /assets/landing-blog-skin.jpg | Yes · 0.7 |
+| laser | /services/laser | /en/services/laser | الليزر في حفر الباطن \| بيوتي كورنر | Laser in Hafr Al-Batin \| Beauty Corner | الليزر | Laser | Same | /assets/devices/dental-examination-unit.jpg | Yes · 0.7 |
+| filler-botox | /services/filler-botox | /en/services/filler-botox | الفيلر والبوتوكس في حفر الباطن \| بيوتي كورنر | Filler & Botox in Hafr Al-Batin \| Beauty Corner | الفيلر والبوتوكس | Filler & Botox | Same | /assets/devices/dental-examination-unit.jpg | Yes · 0.7 |
+| body-contouring | /services/body-contouring | /en/services/body-contouring | النحت في حفر الباطن \| بيوتي كورنر | Body Contouring in Hafr Al-Batin \| Beauty Corner | النحت | Body contouring | Same | /assets/devices/dental-examination-unit.jpg | Yes · 0.7 |
+| hydrafacial | /services/hydrafacial | /en/services/hydrafacial | تنظيف البشرة الهيدرافيشل في حفر الباطن \| بيوتي كورنر | HydraFacial Skin Cleaning in Hafr Al-Batin \| Beauty Corner | تنظيف البشرة الهيدرافيشل | HydraFacial skin cleaning | Same | /assets/devices/dental-examination-unit.jpg | Yes · 0.7 |
 
 **Shared fields for all service detail URLs:**
 
@@ -167,7 +169,7 @@ Pattern: **Title** `{service} في حفر الباطن | بيوتي كورنر` 
 
 ---
 
-## Doctor Profile Routes (2 pairs · 4 URLs)
+## Doctor Profile Routes (3 pairs · 6 URLs)
 
 Pattern: **Title** `{doctor name} — طبيب أسنان في حفر الباطن | بيوتي كورنر` (AR) · `{doctor name} — Dentist in Hafr Al-Batin | Beauty Corner` (EN)
 
@@ -175,6 +177,7 @@ Pattern: **Title** `{doctor name} — طبيب أسنان في حفر الباط
 |----|--------|--------|--------------------|--------------------|---------|---------|-----------------|--------------|---------|
 | dentistry-fatima | /doctors/dentistry-fatima | /en/doctors/dentistry-fatima | د. فاطمة نضال — طبيبة أسنان في حفر الباطن \| بيوتي كورنر | Dr. Fatima Nidal — Dentist in Hafr Al-Batin \| Beauty Corner | د. فاطمة نضال | Dr. Fatima Nidal | `Physician`, `MedicalWebPage`, `Person` | /assets/doctor-dentistry.png | Yes · 0.7 |
 | dentistry-wissam | /doctors/dentistry-wissam | /en/doctors/dentistry-wissam | د. وسام مندور — أخصائي جراحة وجه وفكين في حفر الباطن \| بيوتي كورنر | Dr. Wissam Mandour — Oral & Maxillofacial Specialist in Hafr Al-Batin \| Beauty Corner | د. وسام مندور | Dr. Wissam Mandour | Same | /assets/doctor-wissam.png | Yes · 0.7 |
+| dermatology-hala | /doctors/dermatology-hala | /en/doctors/dermatology-hala | د. هالة البدوي — طبيبة الجلدية والتجميل في حفر الباطن \| بيوتي كورنر | Dr. Hala Al-Badawy — Dermatology Doctor in Hafr Al-Batin \| Beauty Corner | د. هالة البدوي | Dr. Hala Al-Badawy | Same | /assets/doctor-hala.jpg | Yes · 0.7 |
 
 **Shared fields for all doctor profile URLs:**
 
@@ -202,9 +205,9 @@ Pattern: **Title** `{doctor name} — طبيب أسنان في حفر الباط
 | Category | Pairs | URLs (×2 locales) |
 |----------|-------|-------------------|
 | Static (excl. 404) | 6 | 12 |
-| Service detail | 13 | 26 |
+| Service detail | 15 | 30 |
 | Doctor profile | 3 | 6 |
-| **Total indexable** | **22** | **44** |
+| **Total indexable** | **24** | **48** |
 
 ---
 
