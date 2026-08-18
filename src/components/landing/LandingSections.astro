@@ -2,7 +2,6 @@
 import { clinicContact } from '../../data/contact';
 import { doctors } from '../../data/doctors';
 import { faqItems } from '../../data/faq';
-import { clinicServices } from '../../data/services';
 import {
   clinicBenefits,
   experiencePoints,
@@ -15,7 +14,7 @@ import ClinicLineButtons from '../contact/ClinicLineButtons.astro';
 import SocialLinks from '../contact/SocialLinks.astro';
 import DoctorCard from '../doctors/DoctorCard.astro';
 import FaqSection from '../sections/FaqSection.astro';
-import ServiceCard from '../services/ServiceCard.astro';
+import ServiceDepartmentTabs from '../services/ServiceDepartmentTabs.astro';
 import AssetIcon from '../ui/AssetIcon.astro';
 import ButtonLink from '../ui/ButtonLink.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
@@ -24,8 +23,6 @@ import ClinicGallerySlider from './ClinicGallerySlider.astro';
 import DevicesSection from './DevicesSection.astro';
 
 const landingDoctors = doctors.slice(0, 3);
-const landingDentalServices = clinicServices.filter((service) => service.department === 'أسنان');
-const landingDermatologyServices = clinicServices.filter((service) => service.department === 'جلدية');
 const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كورنر.';
 ---
 
@@ -47,19 +44,8 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
     <div id="specialties-heading">
       <SectionHeading eyebrow="خدماتنا" title="خدمات الأسنان والجلدية في مكان واحد" />
     </div>
-    <div class="mt-8 space-y-10 sm:mt-10">
-      <div>
-        <h3 class="text-lg font-bold text-ink sm:text-xl">خدمات الأسنان</h3>
-        <div class="mt-4 grid gap-4 sm:mt-5 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {landingDentalServices.map((service) => <ServiceCard service={service} />)}
-        </div>
-      </div>
-      <div>
-        <h3 class="text-lg font-bold text-ink sm:text-xl">خدمات الجلدية</h3>
-        <div class="mt-4 grid gap-4 sm:mt-5 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {landingDermatologyServices.map((service) => <ServiceCard service={service} />)}
-        </div>
-      </div>
+    <div class="mt-8 sm:mt-10">
+      <ServiceDepartmentTabs />
     </div>
   </div>
 </section>

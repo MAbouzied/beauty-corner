@@ -4,6 +4,8 @@ export const serviceDepartments = ['كل الخدمات', 'أسنان', 'جلد�
 
 export type ServiceDepartment = (typeof serviceDepartments)[number];
 
+export const homeServiceDepartments = ['أسنان', 'جلدية'] as const;
+
 export const serviceCategories = ['كل الخدمات', 'تجميل', 'علاج وجراحة', 'تركيبات وتشخيص'] as const;
 
 export type ServiceCategory = (typeof serviceCategories)[number];
