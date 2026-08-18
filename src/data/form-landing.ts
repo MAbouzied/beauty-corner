@@ -1,11 +1,37 @@
-import { departmentsEn } from '../lib/i18n/content-en.ts';
+import { departmentsEn, servicesEn } from '../lib/i18n/content-en.ts';
 import { bookingDepartments } from './booking-departments.ts';
+import { clinicServices } from './services.ts';
 
 type Locale = 'ar' | 'en';
 
-function departmentLabel(department: string, locale: Locale): string {
-  if (locale !== 'en') return department;
-  return departmentsEn[department as keyof typeof departmentsEn] ?? department;
+const formDepartmentOrder = ['جلدية', 'أسنان'] as const;
+
+export type FormServiceOption = {
+  value: string;
+  label: string;
+};
+
+export type FormServiceGroup = {
+  department: (typeof formDepartmentOrder)[number];
+  label: string;
+  services: ReadonlyArray<FormServiceOption>;
+};
+
+export const formServiceValues = clinicServices.map((service) => service.title);
+
+export const acceptedLeadDepartments = [...bookingDepartments, ...formServiceValues];
+
+export function getFormServiceGroups(locale: Locale): ReadonlyArray<FormServiceGroup> {
+  return formDepartmentOrder.map((department) => ({
+    department,
+    label: locale === 'en' ? departmentsEn[department] : department,
+    services: clinicServices
+      .filter((service) => service.department === department)
+      .map((service) => ({
+        value: service.title,
+        label: locale === 'en' ? (servicesEn[service.id]?.title ?? service.title) : service.title,
+      })),
+  }));
 }
 
 export type FormLandingCopy = {
@@ -13,9 +39,6 @@ export type FormLandingCopy = {
   pageDescription: string;
   homeHref: string;
   formHref: string;
-  breadcrumbHome: string;
-  breadcrumbContact: string;
-  breadcrumbsAria: string;
   branchesEyebrow: string;
   branchesHeading: string;
   addressLabel: string;
@@ -25,39 +48,32 @@ export type FormLandingCopy = {
   phone: string;
   name: string;
   service: string;
-  message: string;
   phonePlaceholder: string;
   namePlaceholder: string;
   servicePlaceholder: string;
-  messagePlaceholder: string;
   submit: string;
   saving: string;
   redirecting: string;
   saveFailed: string;
   invalid: string;
-  goFullSite: string;
   languageLabel: string;
   languageAria: string;
-  brandHomeAria: string;
+  brandAria: string;
   actionsAria: string;
   whatsappAction: string;
   callAction: string;
   locationAction: string;
-  offersAction: string;
-  offersHref: string;
-  departments: ReadonlyArray<{ value: string; label: string }>;
+  departments: ReadonlyArray<FormServiceOption>;
+  serviceGroups: ReadonlyArray<FormServiceGroup>;
 };
 
 const copy = {
   ar: {
     pageTitle: 'تواصل معنا - بيوتي كورنر',
     pageDescription:
-      'أرسل اسمك ورقم جوالك واختر القسم، ثم أكمل التواصل عبر واتساب. بيوتي كورنر في حفر الباطن.',
+      'أرسل اسمك ورقم جوالك واختر الخدمة، ثم أكمل الطلب. بيوتي كورنر في حفر الباطن.',
     homeHref: '/',
     formHref: '/form',
-    breadcrumbHome: 'الرئيسية',
-    breadcrumbContact: 'تواصل معنا',
-    breadcrumbsAria: 'مسار التنقل',
     branchesEyebrow: 'موقعنا',
     branchesHeading: 'زُرنا في أقرب فرع',
     addressLabel: 'العنوان',
@@ -66,37 +82,29 @@ const copy = {
     followUs: 'تابعنا:',
     phone: 'رقم الجوال',
     name: 'الاسم الكامل',
-    service: 'القسم المطلوب',
-    message: 'رسالتك (اختياري)',
+    service: 'الخدمة المطلوبة',
     phonePlaceholder: '05XXXXXXXX',
     namePlaceholder: 'اكتب اسمك',
-    servicePlaceholder: 'اختر القسم',
-    messagePlaceholder: 'اكتب تفاصيل طلبك هنا...',
-    submit: 'إرسال عبر واتساب',
+    servicePlaceholder: 'اختر الخدمة',
+    submit: 'أرسل الآن',
     saving: 'جاري حفظ بياناتك...',
-    redirecting: 'جاري فتح واتساب...',
-    saveFailed: 'تعذر حفظ السجل الإلكتروني. سيتم فتح واتساب لإرسال الطلب للعيادة.',
-    invalid: 'يرجى التأكد من الاسم ورقم الجوال السعودي واختيار القسم.',
-    goFullSite: 'الموقع الكامل',
+    redirecting: 'جاري إرسال طلبك...',
+    saveFailed: 'تعذر حفظ السجل الإلكتروني. سيتم إرسال الطلب للعيادة الآن.',
+    invalid: 'يرجى التأكد من الاسم ورقم الجوال السعودي واختيار الخدمة.',
     languageLabel: 'EN',
     languageAria: 'Switch to English',
-    brandHomeAria: 'بيوتي كورنر - الرئيسية',
+    brandAria: 'بيوتي كورنر',
     actionsAria: 'خيارات التواصل',
     whatsappAction: 'تواصل واتساب',
     callAction: 'اتصال',
     locationAction: 'الموقع',
-    offersAction: 'العروض',
-    offersHref: '/#services',
   },
   en: {
     pageTitle: 'Contact us - Beauty Corner',
     pageDescription:
-      'Send your name, mobile number, and department, then continue on WhatsApp. Beauty Corner in Hafr Al-Batin.',
+      'Send your name, mobile number, and requested service. Beauty Corner in Hafr Al-Batin.',
     homeHref: '/en',
     formHref: '/en/form',
-    breadcrumbHome: 'Home',
-    breadcrumbContact: 'Contact',
-    breadcrumbsAria: 'Breadcrumb',
     branchesEyebrow: 'Visit us',
     branchesHeading: 'Visit our nearest branch',
     addressLabel: 'Address',
@@ -105,36 +113,30 @@ const copy = {
     followUs: 'Follow us:',
     phone: 'Mobile number',
     name: 'Full name',
-    service: 'Requested department',
-    message: 'Your message (optional)',
+    service: 'Requested service',
     phonePlaceholder: '05XXXXXXXX',
     namePlaceholder: 'Enter your name',
-    servicePlaceholder: 'Choose a department',
-    messagePlaceholder: 'Write your request details here...',
-    submit: 'Send via WhatsApp',
+    servicePlaceholder: 'Choose a service',
+    submit: 'Send now',
     saving: 'Saving your details...',
-    redirecting: 'Opening WhatsApp...',
-    saveFailed: 'We could not save the online record. WhatsApp will still open so the clinic receives the request.',
-    invalid: 'Please check your name, Saudi mobile number, and department.',
-    goFullSite: 'Full website',
+    redirecting: 'Sending your request...',
+    saveFailed: 'We could not save the online record. Your request will still be sent to the clinic.',
+    invalid: 'Please check your name, Saudi mobile number, and service.',
     languageLabel: 'AR',
     languageAria: 'التبديل إلى العربية',
-    brandHomeAria: 'Beauty Corner - Home',
+    brandAria: 'Beauty Corner',
     actionsAria: 'Contact options',
     whatsappAction: 'WhatsApp',
     callAction: 'Call',
     locationAction: 'Location',
-    offersAction: 'Offers',
-    offersHref: '/en#services',
   },
 } as const;
 
 export function getFormLandingCopy(locale: Locale): FormLandingCopy {
+  const serviceGroups = getFormServiceGroups(locale);
   return {
     ...copy[locale],
-    departments: bookingDepartments.map((department) => ({
-      value: department,
-      label: departmentLabel(department, locale),
-    })),
+    serviceGroups,
+    departments: serviceGroups.flatMap((group) => [...group.services]),
   };
 }

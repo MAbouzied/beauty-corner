@@ -1,4 +1,5 @@
 import { clinicFacts, formatClinicHours, formatClinicLocation } from './clinic-facts.ts';
+import { clinicServices } from './services.ts';
 
 export type ClinicLineId = 'dental' | 'dermatology';
 
@@ -67,10 +68,13 @@ export function getClinicLine(id: ClinicLineId): ClinicLine {
   return line;
 }
 
-/** Map a booking department label to the matching clinic phone/WhatsApp line. */
+/** Map a booking department or service title to the matching clinic phone/WhatsApp line. */
 export function clinicLineFromDepartment(department: string): ClinicLineId {
-  const value = department.trim().toLowerCase();
-  if (value === 'أسنان' || value === 'dentistry' || value === 'dental') return 'dental';
+  const value = department.trim();
+  const lower = value.toLowerCase();
+  if (value === 'أسنان' || lower === 'dentistry' || lower === 'dental') return 'dental';
+  const service = clinicServices.find((item) => item.title === value);
+  if (service?.department === 'أسنان') return 'dental';
   // Aesthetic booking departments and dermatology share the dermatology line.
   return 'dermatology';
 }

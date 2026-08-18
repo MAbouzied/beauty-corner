@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { bookingDepartments } from '../../data/booking-departments';
+import { acceptedLeadDepartments } from '../../data/form-landing';
 import {
   buildBookingWhatsAppMessage,
   buildWhatsAppUrl,
@@ -135,11 +135,11 @@ export const POST = (async ({ request }) => {
     } catch {
       return json({ ok: false }, 400);
     }
-    parsed = parseCustomerLeadBody(body, { page, departments: bookingDepartments });
+    parsed = parseCustomerLeadBody(body, { page, departments: acceptedLeadDepartments });
   } else {
     parsed = parseCustomerLeadFromUrlEncoded(new URLSearchParams(bodyResult.raw), {
       page,
-      departments: bookingDepartments,
+      departments: acceptedLeadDepartments,
     });
   }
 
