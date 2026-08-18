@@ -28,15 +28,17 @@ const copy = ui(locale);
     <ul class="mt-8 grid list-none gap-4 p-0 sm:mt-10 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {devices.map((device) => (
         <li>
-          <article class="h-full overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]">
-            <div class="device-photo relative aspect-[4/3] bg-surface-soft">
-              <SitePicture
-                src={device.image}
-                alt={device.imageAlt}
-                widths={[320, 480, 640, 800]}
-                sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 50vw, 33vw"
-                class="object-contain p-4"
-              />
+          <article class="flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]">
+            <div class="device-photo bg-surface-soft">
+              <div class="device-photo-fit p-4">
+                <SitePicture
+                  src={device.image}
+                  alt={device.imageAlt}
+                  widths={[320, 480, 640, 800]}
+                  sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 50vw, 33vw"
+                  class="size-full object-contain"
+                />
+              </div>
             </div>
             <div class="p-5 sm:p-6">
               <h3 class="text-lg font-bold tracking-tight text-balance text-ink">{device.name}</h3>
@@ -50,12 +52,32 @@ const copy = ui(locale);
 </section>
 
 <style>
-  .device-photo :global(picture),
-  .device-photo :global(img) {
+  .device-photo {
+    position: relative;
+    width: 100%;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .device-photo::before {
+    content: "";
+    display: block;
+    padding-top: 75%;
+  }
+
+  .device-photo-fit {
     position: absolute;
     inset: 0;
-    height: 100%;
+  }
+
+  .device-photo-fit :global(picture),
+  .device-photo-fit :global(img) {
+    display: block;
     width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
+    object-position: center;
   }
 </style>
