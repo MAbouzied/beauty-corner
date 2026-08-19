@@ -26,16 +26,16 @@ describe('form landing copy', () => {
     assert.equal(ar.locationAction, 'الموقع');
   });
 
-  it('groups services from the services page into dermatology then dentistry', () => {
+  it('groups services from the services page into dentistry then dermatology', () => {
     const arGroups = getFormServiceGroups('ar');
     const enGroups = getFormServiceGroups('en');
     const ar = getFormLandingCopy('ar');
     const en = getFormLandingCopy('en');
 
-    assert.deepEqual(arGroups.map((group) => group.department), ['جلدية', 'أسنان']);
-    assert.equal(arGroups[0]?.label, 'جلدية');
-    assert.equal(enGroups[0]?.label, 'Dermatology');
-    assert.equal(enGroups[1]?.label, 'Dentistry');
+    assert.deepEqual(arGroups.map((group) => group.department), ['أسنان', 'جلدية']);
+    assert.equal(arGroups[0]?.label, 'أسنان');
+    assert.equal(enGroups[0]?.label, 'Dentistry');
+    assert.equal(enGroups[1]?.label, 'Dermatology');
 
     const arValues = arGroups.flatMap((group) => group.services.map((service) => service.value));
     const serviceTitles = clinicServices.map((service) => service.title);

@@ -4,7 +4,7 @@ import { clinicServices } from './services.ts';
 
 type Locale = 'ar' | 'en';
 
-const formDepartmentOrder = ['جلدية', 'أسنان'] as const;
+const formDepartmentOrder = ['أسنان', 'جلدية'] as const;
 
 export type FormServiceOption = {
   value: string;
