@@ -21,5 +21,8 @@ describe('clinic map facts', () => {
     assert.match(source, /clinicMapUrl/);
     assert.match(source, /ButtonLink/);
     assert.match(source, /location\.svg/);
+    assert.match(source, /w-fit/);
+    assert.match(source, /justify-center/);
+    assert.match(source, /sm:grid-cols-2/);
   });
 });
