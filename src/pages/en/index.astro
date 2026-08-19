@@ -9,6 +9,7 @@ import AssetIcon from '../../components/ui/AssetIcon.astro';
 import ButtonLink from '../../components/ui/ButtonLink.astro';
 import SitePicture from '../../components/ui/SitePicture.astro';
 import { doctors } from '../../data/doctors';
+import { clinicMapUrl } from '../../data/seo';
 import { localizeContact, localizeFaq, ui } from '../../lib/i18n/localize';
 import {
   buildBreadcrumbSchema,
@@ -123,7 +124,11 @@ const faqItems = localizeFaq('en');
             <ClinicPhoneList locale="en" class="mt-1 space-y-1" />
           </li>
         </ul>
-        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <ButtonLink href={clinicMapUrl} target="_blank">
+            <AssetIcon src="/assets/location.svg" size="sm" />
+            Open in Google Maps
+          </ButtonLink>
           <ButtonLink href="/en/contact">{copy.common.bookAppointment}</ButtonLink>
           <ButtonLink href="/en/book" variant="outline">{copy.nav.quickBook}</ButtonLink>
         </div>

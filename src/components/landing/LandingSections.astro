@@ -209,7 +209,7 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
 <section id="contact" class="bg-surface-soft py-12 sm:py-24" aria-labelledby="contact-heading">
   <div class="page-container">
     <div id="contact-heading"><SectionHeading eyebrow="الموقع والتواصل" title="نحن قريبون منك" /></div>
-    <div class="mt-8 grid gap-5 sm:mt-10 sm:gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+    <div class="mt-8 sm:mt-10">
       <address class="not-italic rounded-[var(--radius-card)] border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-7">
         <dl class="space-y-5">
           <div><dt class="text-xs font-bold">العنوان</dt><dd class="mt-1 text-sm text-muted">{clinicContact.location}</dd></div>
@@ -227,25 +227,13 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
           </div>
           <div><dt class="text-xs font-bold">مواقف السيارات</dt><dd class="mt-1 text-sm text-muted">متوفرة أمام الفرع</dd></div>
         </dl>
-      </address>
-      <div class="overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]">
-        <iframe
-          title="موقع عيادة بيوتي كورنر على خرائط جوجل"
-          src="https://www.google.com/maps?q=%D8%AD%D9%8A+%D8%A7%D9%84%D9%85%D8%AD%D9%85%D8%AF%D9%8A%D8%A9+%D8%B7%D8%B1%D9%8A%D9%82+%D8%A7%D9%84%D9%85%D9%84%D9%83+%D9%81%D9%8A%D8%B5%D9%84+%D8%AD%D9%81%D8%B1+%D8%A7%D9%84%D8%A8%D8%A7%D8%B7%D9%86&output=embed"
-          class="min-h-80 w-full border-0"
-          width="600"
-          height="450"
-          loading="lazy"
-          referrerpolicy="strict-origin-when-cross-origin"
-          sandbox="allow-scripts allow-same-origin allow-popups"
-          allowfullscreen
-        ></iframe>
-        <div class="border-t border-border px-4 py-3 text-center">
-          <a href={clinicMapUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-primary hover:underline">
+        <div class="mt-6" data-gtm-location="contact">
+          <ButtonLink href={clinicMapUrl} target="_blank" class="w-full whitespace-normal sm:w-auto">
+            <AssetIcon src="/assets/location.svg" size="sm" />
             فتح الموقع في خرائط جوجل
-          </a>
+          </ButtonLink>
         </div>
-      </div>
+      </address>
     </div>
   </div>
 </section>

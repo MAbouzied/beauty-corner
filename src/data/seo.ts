@@ -8,13 +8,13 @@ export const socialCard = {
   altEn: 'Beauty Corner — dental and dermatology clinic in Hafr Al-Batin',
 } as const;
 
-/** Approximate clinic coordinates for Al Muhammadiyah, King Faisal Road, Hafr Al-Batin. */
+/** Clinic pin from the official Beauty Corner Google Maps listing. */
 export const clinicGeo = {
-  latitude: 28.43421,
-  longitude: 45.97076,
+  latitude: 28.3967825,
+  longitude: 45.9833191,
 } as const;
 
-export const clinicMapUrl = 'https://maps.app.goo.gl/FzR9jF2ucx55xMAg9';
+export const clinicMapUrl = 'https://maps.app.goo.gl/ALNUFTzXzqctrbpM6';
 
 export function imageMimeType(path: string): string {
   const lower = path.toLowerCase();
