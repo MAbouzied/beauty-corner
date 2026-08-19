@@ -1,9 +1,9 @@
 ---
-import { bookingDepartments } from '../../data/booking-departments';
 import { clinicContact } from '../../data/contact';
 import AssetIcon from '../ui/AssetIcon.astro';
 import PillLabel from '../ui/PillLabel.astro';
 import ClinicLineButtons from './ClinicLineButtons.astro';
+import ServiceDepartmentOptions from './ServiceDepartmentOptions.astro';
 
 const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كورنر.';
 ---
@@ -58,10 +58,7 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
         <label class="grid gap-2 text-xs font-bold">
           القسم
           <select name="department" required data-department-select class="min-h-12 rounded-2xl border border-border bg-surface px-4 text-sm font-normal shadow-[var(--shadow-control)]">
-            <option value="">اختر القسم</option>
-            {bookingDepartments.map((department) => (
-              <option value={department}>{department}</option>
-            ))}
+            <ServiceDepartmentOptions placeholder="اختر القسم" />
           </select>
         </label>
       </div>

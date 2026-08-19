@@ -56,7 +56,7 @@ describe('form landing copy', () => {
     assert.match(source, /action="\/api\/customers"/);
     assert.match(source, /name="consent"/);
     assert.match(source, /name="locale"/);
-    assert.match(source, /<optgroup/);
+    assert.match(source, /ServiceDepartmentOptions/);
     assert.match(source, /data-form-actions/);
     assert.match(source, /buildWhatsAppUrl/);
     assert.match(source, /buildPhoneUrl/);
@@ -68,5 +68,28 @@ describe('form landing copy', () => {
     assert.doesNotMatch(source, /href=\{copy\.homeHref\}/);
     assert.ok(source.indexOf('SocialLinks') < source.indexOf('data-form-actions'));
     assert.ok(source.indexOf('data-form-actions') < source.indexOf('id="contact-form"'));
+  });
+
+  it('uses the same dentistry-then-dermatology options on every public booking form', async () => {
+    const optionSource = await readFile(
+      new URL('../components/contact/ServiceDepartmentOptions.astro', import.meta.url),
+      'utf8',
+    );
+    assert.match(optionSource, /getFormServiceGroups/);
+    assert.match(optionSource, /<optgroup/);
+
+    const formFiles = [
+      '../components/contact/FormLandingPage.astro',
+      '../components/contact/BookingForm.astro',
+      '../components/services/BookingSection.astro',
+      '../pages/book.astro',
+      '../pages/en/book.astro',
+    ];
+
+    for (const file of formFiles) {
+      const source = await readFile(new URL(file, import.meta.url), 'utf8');
+      assert.match(source, /ServiceDepartmentOptions/, file);
+      assert.doesNotMatch(source, /bookingDepartments/, file);
+    }
   });
 });

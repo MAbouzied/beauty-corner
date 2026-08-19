@@ -2,7 +2,7 @@
 import ClinicLineButtons from '../components/contact/ClinicLineButtons.astro';
 import ClinicPhoneList from '../components/contact/ClinicPhoneList.astro';
 import AssetIcon from '../components/ui/AssetIcon.astro';
-import { bookingDepartments } from '../data/booking-departments';
+import ServiceDepartmentOptions from '../components/contact/ServiceDepartmentOptions.astro';
 import { organization } from '../data/organization';
 import { buildWebPageSchema } from '../lib/schema';
 import Layout from '../layouts/Layout.astro';
@@ -61,10 +61,7 @@ const fieldClass =
           <label class="grid gap-2 text-xs font-bold">
             القسم
             <select id="lead-department" name="department" required class={fieldClass} aria-describedby="lead-department-error" aria-invalid="false">
-              <option value="">اختر القسم</option>
-              {bookingDepartments.map((department) => (
-                <option value={department}>{department}</option>
-              ))}
+              <ServiceDepartmentOptions placeholder="اختر القسم" />
             </select>
             <p id="lead-department-error" class="hidden text-xs text-danger" role="status" data-error-for="lead-department"></p>
           </label>

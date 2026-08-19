@@ -2,9 +2,9 @@
 import ClinicLineButtons from '../../components/contact/ClinicLineButtons.astro';
 import ClinicPhoneList from '../../components/contact/ClinicPhoneList.astro';
 import AssetIcon from '../../components/ui/AssetIcon.astro';
-import { bookingDepartments } from '../../data/booking-departments';
+import ServiceDepartmentOptions from '../../components/contact/ServiceDepartmentOptions.astro';
 import { organization } from '../../data/organization';
-import { localizeContact, localizeDepartment, ui } from '../../lib/i18n/localize';
+import { localizeContact, ui } from '../../lib/i18n/localize';
 import {
   buildBreadcrumbSchema,
   buildWebPageSchema,
@@ -75,10 +75,7 @@ const fieldClass =
           <label class="grid gap-2 text-xs font-bold">
             {copy.common.department}
             <select name="department" required class={fieldClass}>
-              <option value="">{copy.common.chooseDepartment}</option>
-              {bookingDepartments.map((department) => (
-                <option value={department}>{localizeDepartment(department, 'en')}</option>
-              ))}
+              <ServiceDepartmentOptions locale="en" placeholder={copy.common.chooseDepartment} />
             </select>
           </label>
         </div>

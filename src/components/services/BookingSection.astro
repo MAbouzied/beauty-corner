@@ -1,13 +1,12 @@
 ---
-import { bookingDepartments } from '../../data/booking-departments';
 import type { Locale } from '../../lib/i18n/localize';
 import {
   isEnglish,
   localizeContact,
-  localizeDepartment,
   ui,
 } from '../../lib/i18n/localize';
 import ClinicLineButtons from '../contact/ClinicLineButtons.astro';
+import ServiceDepartmentOptions from '../contact/ServiceDepartmentOptions.astro';
 import AssetIcon from '../ui/AssetIcon.astro';
 import PillLabel from '../ui/PillLabel.astro';
 
@@ -136,12 +135,11 @@ const labels = en
           <div class="space-y-1.5">
             <label for="booking-department" class="block text-xs font-bold">{labels.department}</label>
             <select id="booking-department" name="department" class={fieldClass} required aria-describedby="booking-department-error" aria-invalid="false">
-              <option value="">{labels.chooseDepartment}</option>
-              {bookingDepartments.map((department) => (
-                <option value={department} selected={department === defaultDepartment}>
-                  {localizeDepartment(department, locale)}
-                </option>
-              ))}
+              <ServiceDepartmentOptions
+                locale={locale}
+                placeholder={labels.chooseDepartment}
+                selectedValue={defaultDepartment}
+              />
             </select>
             <p id="booking-department-error" class="hidden text-xs text-danger" data-error-for="booking-department" role="status"></p>
           </div>

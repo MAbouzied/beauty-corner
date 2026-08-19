@@ -1,5 +1,6 @@
 ---
 import AssetIcon from '../ui/AssetIcon.astro';
+import ServiceDepartmentOptions from './ServiceDepartmentOptions.astro';
 import SocialLinks from './SocialLinks.astro';
 import { buildPhoneUrl, buildWhatsAppUrl, clinicLines } from '../../data/contact';
 import { getFormLandingCopy } from '../../data/form-landing';
@@ -162,16 +163,7 @@ const callHref = buildPhoneUrl();
           <label class="grid gap-2 text-sm text-muted">
             {copy.service}
             <select class={fieldClass} name="department" required>
-              <option value="">{copy.servicePlaceholder}</option>
-              {
-                copy.serviceGroups.map((group) => (
-                  <optgroup label={group.label}>
-                    {group.services.map((service) => (
-                      <option value={service.value}>{service.label}</option>
-                    ))}
-                  </optgroup>
-                ))
-              }
+              <ServiceDepartmentOptions locale={locale} placeholder={copy.servicePlaceholder} />
             </select>
           </label>
 
