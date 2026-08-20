@@ -3,7 +3,7 @@ import { clinicContact } from '../../data/contact';
 import AssetIcon from '../ui/AssetIcon.astro';
 import PillLabel from '../ui/PillLabel.astro';
 import ClinicLineButtons from './ClinicLineButtons.astro';
-import ServiceDepartmentOptions from './ServiceDepartmentOptions.astro';
+import BookingServiceFields from './BookingServiceFields.astro';
 
 const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كورنر.';
 ---
@@ -14,7 +14,7 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
       <PillLabel text="احجز موعدك" />
       <h2 id="booking-heading" class="text-display mt-3 font-black sm:mt-4">نموذج حجز سريع</h2>
       <p class="mt-4 max-w-lg text-sm leading-7 text-pretty text-muted">
-        املأ الاسم ورقم الجوال واختر القسم، ثم أرسل الطلب عبر واتساب.
+        املأ الاسم ورقم الجوال، اختر التخصص ثم الخدمة، ثم أرسل الطلب عبر واتساب.
       </p>
       <div class="mt-6" data-gtm-location="booking_contact_sidebar">
         <ClinicLineButtons
@@ -55,12 +55,14 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
           رقم الجوال
           <input name="phone" type="tel" dir="ltr" inputmode="numeric" autocomplete="tel" required minlength="10" maxlength="20" pattern="05[0-9]{8}" placeholder="05XXXXXXXX" class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
         </label>
-        <label class="grid gap-2 text-xs font-bold">
-          القسم
-          <select name="department" required data-department-select class="min-h-12 rounded-2xl border border-border bg-surface px-4 text-sm font-normal shadow-[var(--shadow-control)]">
-            <ServiceDepartmentOptions placeholder="اختر القسم" />
-          </select>
-        </label>
+        <BookingServiceFields
+          fieldClass="min-h-12 rounded-2xl border border-border bg-surface px-4 text-sm font-normal shadow-[var(--shadow-control)]"
+          labelClass="grid gap-2 text-xs font-bold"
+          specialtyLabel="التخصص"
+          serviceLabel="الخدمة"
+          specialtyPlaceholder="اختر التخصص"
+          servicePlaceholder="اختر الخدمة"
+        />
       </div>
       <label class="mt-5 flex items-start gap-3 text-xs leading-6 text-muted">
         <input name="consent" type="checkbox" required class="mt-1 size-4 shrink-0 accent-primary" />
@@ -113,13 +115,15 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
 
         const data = new FormData(form);
         const department = String(data.get('department') ?? '').trim();
+        const service = String(data.get('service') ?? '').trim();
         const message = buildBookingWhatsAppMessage({
           name: String(data.get('name') ?? '').trim(),
           phone: String(data.get('phone') ?? '').trim(),
           department,
+          service,
           branch: clinicContact.branch,
         });
-        const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(department));
+        const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(service || department));
 
         pushGtmEvent(GtmEvents.formSubmit, {
           form_id: formId,
@@ -131,7 +135,7 @@ const contactMessage = 'مرحباً، أود الحجز عبر بيوتي كو�
             name: String(data.get('name') ?? '').trim(),
             phone: String(data.get('phone') ?? '').trim(),
             department,
-            service: department,
+            service,
             locale: 'ar',
             consent: data.has('consent'),
             website: String(data.get('website') ?? ''),

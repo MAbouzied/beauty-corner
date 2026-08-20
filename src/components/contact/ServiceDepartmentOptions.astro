@@ -17,9 +17,13 @@ const groups = getFormServiceGroups(locale);
   groups.map((group) => (
     <optgroup label={group.label}>
       {group.services.map((service) => (
-        <option value={service.value} selected={service.value === selectedValue}>
-          {service.label}
-        </option>
+            <option
+              value={service.value}
+              data-specialty={group.department}
+              selected={service.value === selectedValue}
+            >
+              {service.label}
+            </option>
       ))}
     </optgroup>
   ))

@@ -2,7 +2,7 @@
 import ClinicLineButtons from '../components/contact/ClinicLineButtons.astro';
 import ClinicPhoneList from '../components/contact/ClinicPhoneList.astro';
 import AssetIcon from '../components/ui/AssetIcon.astro';
-import ServiceDepartmentOptions from '../components/contact/ServiceDepartmentOptions.astro';
+import BookingServiceFields from '../components/contact/BookingServiceFields.astro';
 import { organization } from '../data/organization';
 import { buildWebPageSchema } from '../lib/schema';
 import Layout from '../layouts/Layout.astro';
@@ -11,7 +11,7 @@ const contactMessage = 'مرحباً، أود الاستفسار عن خدمات
 const site = Astro.site!;
 const title = 'احجز موعدك في عيادة بيوتي كورنر بحفر الباطن';
 const description =
-  'احجز موعدك في بيوتي كورنر بحفر الباطن خلال دقائق — أدخل اسمك ورقم جوالك واختر القسم.';
+  'احجز موعدك في بيوتي كورنر بحفر الباطن خلال دقائق — أدخل اسمك ورقم جوالك واختر التخصص والخدمة.';
 const fieldClass =
   'min-h-12 w-full rounded-2xl border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-placeholder focus:border-primary aria-[invalid=true]:border-danger';
 ---
@@ -58,13 +58,21 @@ const fieldClass =
             <input id="lead-phone" name="phone" type="tel" dir="ltr" required minlength="10" maxlength="20" pattern="05[0-9]{8}" inputmode="numeric" autocomplete="tel" placeholder="05XXXXXXXX" class={fieldClass} aria-describedby="lead-phone-error" aria-invalid="false" />
             <p id="lead-phone-error" class="hidden text-xs text-danger" role="status" data-error-for="lead-phone"></p>
           </label>
-          <label class="grid gap-2 text-xs font-bold">
-            القسم
-            <select id="lead-department" name="department" required class={fieldClass} aria-describedby="lead-department-error" aria-invalid="false">
-              <ServiceDepartmentOptions placeholder="اختر القسم" />
-            </select>
-            <p id="lead-department-error" class="hidden text-xs text-danger" role="status" data-error-for="lead-department"></p>
-          </label>
+          <BookingServiceFields
+            fieldClass={fieldClass}
+            labelClass="grid gap-2 text-xs font-bold"
+            specialtyLabel="التخصص"
+            serviceLabel="الخدمة"
+            specialtyPlaceholder="اختر التخصص"
+            servicePlaceholder="اختر الخدمة"
+            specialtyId="lead-department"
+            serviceId="lead-service"
+            specialtyDescribedBy="lead-department-error"
+            serviceDescribedBy="lead-service-error"
+          >
+            <p slot="specialty-error" id="lead-department-error" class="hidden text-xs text-danger" role="status" data-error-for="lead-department"></p>
+            <p slot="service-error" id="lead-service-error" class="hidden text-xs text-danger" role="status" data-error-for="lead-service"></p>
+          </BookingServiceFields>
         </div>
 
         <label class="mt-5 flex items-start gap-3 text-xs leading-6 text-muted">
@@ -128,7 +136,8 @@ const fieldClass =
     const messages: Readonly<Record<string, string>> = {
       'lead-name': 'يرجى إدخال الاسم الكامل (3 أحرف على الأقل).',
       'lead-phone': 'يرجى إدخال رقم جوال سعودي بصيغة 05XXXXXXXX.',
-      'lead-department': 'يرجى اختيار القسم.',
+      'lead-department': 'يرجى اختيار التخصص.',
+      'lead-service': 'يرجى اختيار الخدمة.',
       'lead-consent': 'الموافقة مطلوبة للمتابعة.',
     };
     const showFieldState = (field: HTMLInputElement | HTMLSelectElement) => {
@@ -157,7 +166,7 @@ const fieldClass =
       if (!isValid) {
         pushGtmEvent(GtmEvents.formError, { form_id: formId, method: 'whatsapp' });
         if (status) {
-          status.textContent = 'يرجى تعبئة الاسم ورقم الجوال والقسم.';
+          status.textContent = 'يرجى تعبئة الاسم ورقم الجوال والتخصص والخدمة.';
           status.className = 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
         }
         requiredFields.find((field) => !field.checkValidity())?.focus();
@@ -166,13 +175,15 @@ const fieldClass =
 
       const data = new FormData(form);
       const department = String(data.get('department') ?? '').trim();
+      const service = String(data.get('service') ?? '').trim();
       const message = buildBookingWhatsAppMessage({
         name: String(data.get('name') ?? '').trim(),
         phone: String(data.get('phone') ?? '').trim(),
         department,
+        service,
         branch: clinicContact.branch,
       });
-      const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(department));
+      const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(service || department));
 
       pushGtmEvent(GtmEvents.formSubmit, {
         form_id: formId,
@@ -184,7 +195,7 @@ const fieldClass =
           name: String(data.get('name') ?? '').trim(),
           phone: String(data.get('phone') ?? '').trim(),
           department,
-          service: department,
+          service,
           locale: 'ar',
           consent: data.has('consent'),
           website: String(data.get('website') ?? ''),

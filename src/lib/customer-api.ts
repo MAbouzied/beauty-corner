@@ -30,12 +30,20 @@ export type CustomerRateLimiter = {
 const clean = (value: unknown, maxLength: number) =>
   typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
 
+export type LeadServiceOption = {
+  department: string;
+  title: string;
+};
+
+export type CustomerLeadParseOptions = {
+  page?: string;
+  departments: readonly string[];
+  services?: readonly LeadServiceOption[];
+};
+
 export function parseCustomerLeadBody(
   body: Partial<CustomerLead>,
-  options: {
-    page?: string;
-    departments: readonly string[];
-  },
+  options: CustomerLeadParseOptions,
 ): CustomerLeadParseResult {
   const page = options.page ?? '';
 
@@ -46,11 +54,20 @@ export function parseCustomerLeadBody(
   const name = clean(body.name, 100);
   const phone = clean(body.phone, 20);
   const submittedDepartment = clean(body.department, 120);
+  const submittedService = clean(body.service, 120);
   const department = options.departments.find((item) => item === submittedDepartment) ?? '';
   const locale = body.locale === 'en' ? 'en' : 'ar';
 
   if (name.length < 3 || !/^05\d{8}$/.test(phone) || !department || body.consent !== true) {
     return { ok: false, status: 422 };
+  }
+
+  const specialtyServices = (options.services ?? []).filter((item) => item.department === department);
+  let service = department;
+  if (specialtyServices.length > 0) {
+    const matched = specialtyServices.find((item) => item.title === submittedService);
+    if (!matched) return { ok: false, status: 422 };
+    service = matched.title;
   }
 
   return {
@@ -60,8 +77,7 @@ export function parseCustomerLeadBody(
       name,
       phone,
       department,
-      // Booking forms are department-only; keep the column for sheet compatibility.
-      service: department,
+      service,
       locale,
       page,
     },
@@ -139,7 +155,7 @@ export function createMemoryRateLimiter(
 
 export function parseCustomerLeadFromUrlEncoded(
   params: URLSearchParams,
-  options: { page?: string; departments: readonly string[] },
+  options: CustomerLeadParseOptions,
 ): CustomerLeadParseResult {
   return parseCustomerLeadBody(
     {

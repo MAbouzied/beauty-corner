@@ -22,6 +22,8 @@ describe('form landing copy', () => {
     assert.doesNotMatch(en.submit, /واتساب|WhatsApp/i);
     assert.doesNotMatch(ar.pageTitle, /نجم/);
     assert.match(ar.pageTitle, /بيوتي كورنر/);
+    assert.equal(ar.specialty, 'التخصص');
+    assert.equal(en.specialty, 'Specialty');
     assert.equal(ar.callAction, 'اتصال');
     assert.equal(ar.locationAction, 'الموقع');
   });
@@ -42,6 +44,7 @@ describe('form landing copy', () => {
     assert.deepEqual(arValues.sort(), [...serviceTitles].sort());
     assert.equal(ar.departments.length, clinicServices.length);
     assert.notEqual(en.departments[0]?.label, en.departments[0]?.value);
+    assert.ok(acceptedLeadDepartments.includes('أسنان'));
     assert.ok(acceptedLeadDepartments.includes(bookingDepartments[0]));
     assert.ok(acceptedLeadDepartments.includes(clinicServices[0]!.title));
   });
@@ -56,7 +59,7 @@ describe('form landing copy', () => {
     assert.match(source, /action="\/api\/customers"/);
     assert.match(source, /name="consent"/);
     assert.match(source, /name="locale"/);
-    assert.match(source, /ServiceDepartmentOptions/);
+    assert.match(source, /BookingServiceFields/);
     assert.match(source, /data-form-actions/);
     assert.match(source, /buildWhatsAppUrl/);
     assert.match(source, /buildPhoneUrl/);
@@ -66,7 +69,7 @@ describe('form landing copy', () => {
     assert.doesNotMatch(source, /goFullSite/);
     assert.doesNotMatch(source, /name="message"/);
     assert.doesNotMatch(source, /href=\{copy\.homeHref\}/);
-    assert.ok(source.indexOf('SocialLinks') < source.indexOf('data-form-actions'));
+    assert.ok(source.indexOf('data-form-actions') < source.indexOf('<SocialLinks'));
     assert.ok(source.indexOf('data-form-actions') < source.indexOf('id="contact-form"'));
   });
 
@@ -77,6 +80,7 @@ describe('form landing copy', () => {
     );
     assert.match(optionSource, /getFormServiceGroups/);
     assert.match(optionSource, /<optgroup/);
+    assert.match(optionSource, /data-specialty/);
 
     const formFiles = [
       '../components/contact/FormLandingPage.astro',
@@ -88,7 +92,7 @@ describe('form landing copy', () => {
 
     for (const file of formFiles) {
       const source = await readFile(new URL(file, import.meta.url), 'utf8');
-      assert.match(source, /ServiceDepartmentOptions/, file);
+      assert.match(source, /BookingServiceFields/, file);
       assert.doesNotMatch(source, /bookingDepartments/, file);
     }
   });

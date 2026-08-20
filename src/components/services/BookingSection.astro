@@ -6,7 +6,7 @@ import {
   ui,
 } from '../../lib/i18n/localize';
 import ClinicLineButtons from '../contact/ClinicLineButtons.astro';
-import ServiceDepartmentOptions from '../contact/ServiceDepartmentOptions.astro';
+import BookingServiceFields from '../contact/BookingServiceFields.astro';
 import AssetIcon from '../ui/AssetIcon.astro';
 import PillLabel from '../ui/PillLabel.astro';
 
@@ -35,8 +35,10 @@ const labels = en
       call: copy!.common.call,
       name: copy!.common.fullName,
       phone: copy!.common.phone,
-      department: copy!.common.department,
-      chooseDepartment: copy!.common.chooseDepartment,
+      department: copy!.common.specialty,
+      service: copy!.common.service,
+      chooseDepartment: copy!.common.chooseSpecialty,
+      chooseService: copy!.common.chooseService,
       send: copy!.common.sendWhatsapp,
       namePh: copy!.common.namePlaceholder,
       phonePh: copy!.common.phonePlaceholder,
@@ -47,20 +49,23 @@ const labels = en
   : {
       eyebrow: 'احجز موعدك',
       title: 'احجز سريعا الآن',
-      subtitle: 'املأ الاسم ورقم الجوال واختر القسم، ثم أرسل الطلب عبر واتساب.',
+      subtitle: 'املأ الاسم ورقم الجوال، اختر التخصص ثم الخدمة، ثم أرسل الطلب عبر واتساب.',
       whatsapp: 'واتساب',
       call: 'اتصال',
       name: 'الاسم الكامل',
       phone: 'رقم الجوال',
-      department: 'القسم',
-      chooseDepartment: 'اختر القسم',
+      department: 'التخصص',
+      service: 'الخدمة',
+      chooseDepartment: 'اختر التخصص',
+      chooseService: 'اختر الخدمة',
       send: 'إرسال عبر واتساب',
       namePh: 'مثال: عبدالله محمد',
       phonePh: '05XXXXXXXX',
       errors: {
         name: 'يرجى إدخال الاسم الكامل (3 أحرف على الأقل).',
         phone: 'يرجى إدخال رقم جوال سعودي بصيغة 05XXXXXXXX.',
-        department: 'يرجى اختيار القسم.',
+        department: 'يرجى اختيار التخصص.',
+        service: 'يرجى اختيار الخدمة.',
         consent: 'الموافقة مطلوبة للمتابعة.',
       },
       statusInvalid: 'يرجى تصحيح الحقول الموضحة قبل المتابعة.',
@@ -115,6 +120,7 @@ const labels = en
         data-msg-name={labels.errors.name}
         data-msg-phone={labels.errors.phone}
         data-msg-department={labels.errors.department}
+        data-msg-service={labels.errors.service}
         data-msg-consent={labels.errors.consent}
       >
         <label class="sr-only" aria-hidden="true">
@@ -132,17 +138,23 @@ const labels = en
             <input id="booking-phone" name="phone" type="tel" dir="ltr" class={fieldClass} placeholder={labels.phonePh} autocomplete="tel" inputmode="numeric" minlength="10" maxlength="20" pattern="05[0-9]{8}" required aria-describedby="booking-phone-error" aria-invalid="false" />
             <p id="booking-phone-error" class="hidden text-xs text-danger" data-error-for="booking-phone" role="status"></p>
           </div>
-          <div class="space-y-1.5">
-            <label for="booking-department" class="block text-xs font-bold">{labels.department}</label>
-            <select id="booking-department" name="department" class={fieldClass} required aria-describedby="booking-department-error" aria-invalid="false">
-              <ServiceDepartmentOptions
-                locale={locale}
-                placeholder={labels.chooseDepartment}
-                selectedValue={defaultDepartment}
-              />
-            </select>
-            <p id="booking-department-error" class="hidden text-xs text-danger" data-error-for="booking-department" role="status"></p>
-          </div>
+          <BookingServiceFields
+            locale={locale}
+            fieldClass={fieldClass}
+            labelClass="block text-xs font-bold"
+            specialtyLabel={labels.department}
+            serviceLabel={labels.service}
+            specialtyPlaceholder={labels.chooseDepartment}
+            servicePlaceholder={labels.chooseService}
+            defaultService={defaultDepartment}
+            specialtyId="booking-department"
+            serviceId="booking-service"
+            specialtyDescribedBy="booking-department-error"
+            serviceDescribedBy="booking-service-error"
+          >
+            <p slot="specialty-error" id="booking-department-error" class="hidden text-xs text-danger" data-error-for="booking-department" role="status"></p>
+            <p slot="service-error" id="booking-service-error" class="hidden text-xs text-danger" data-error-for="booking-service" role="status"></p>
+          </BookingServiceFields>
         </div>
 
         <label class="mt-5 flex cursor-pointer items-start gap-3 text-xs leading-5 text-muted">
@@ -204,6 +216,7 @@ const labels = en
       'booking-name': bookingForm.dataset.msgName ?? '',
       'booking-phone': bookingForm.dataset.msgPhone ?? '',
       'booking-department': bookingForm.dataset.msgDepartment ?? '',
+      'booking-service': bookingForm.dataset.msgService ?? '',
       'booking-consent': bookingForm.dataset.msgConsent ?? '',
     };
 
@@ -244,13 +257,15 @@ const labels = en
 
       const data = new FormData(bookingForm);
       const department = String(data.get('department') ?? '').trim();
+      const service = String(data.get('service') ?? '').trim();
       const message = buildBookingWhatsAppMessage({
         name: String(data.get('name') ?? '').trim(),
         phone: String(data.get('phone') ?? '').trim(),
         department,
+        service,
         branch: clinicContact.branch,
       });
-      const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(department));
+      const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(service || department));
 
       pushGtmEvent(GtmEvents.formSubmit, {
         form_id: formId,
@@ -262,7 +277,7 @@ const labels = en
           name: String(data.get('name') ?? '').trim(),
           phone: String(data.get('phone') ?? '').trim(),
           department,
-          service: department,
+          service,
           locale: bookingForm.dataset.locale === 'en' ? 'en' : 'ar',
           consent: data.has('consent'),
           website: String(data.get('website') ?? ''),

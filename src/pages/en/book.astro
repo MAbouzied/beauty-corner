@@ -2,7 +2,7 @@
 import ClinicLineButtons from '../../components/contact/ClinicLineButtons.astro';
 import ClinicPhoneList from '../../components/contact/ClinicPhoneList.astro';
 import AssetIcon from '../../components/ui/AssetIcon.astro';
-import ServiceDepartmentOptions from '../../components/contact/ServiceDepartmentOptions.astro';
+import BookingServiceFields from '../../components/contact/BookingServiceFields.astro';
 import { organization } from '../../data/organization';
 import { localizeContact, ui } from '../../lib/i18n/localize';
 import {
@@ -72,12 +72,15 @@ const fieldClass =
             {copy.common.phone}
             <input name="phone" type="tel" dir="ltr" required minlength="10" maxlength="20" pattern="05[0-9]{8}" inputmode="numeric" autocomplete="tel" placeholder={copy.common.phonePlaceholder} class={fieldClass} />
           </label>
-          <label class="grid gap-2 text-xs font-bold">
-            {copy.common.department}
-            <select name="department" required class={fieldClass}>
-              <ServiceDepartmentOptions locale="en" placeholder={copy.common.chooseDepartment} />
-            </select>
-          </label>
+          <BookingServiceFields
+            locale="en"
+            fieldClass={fieldClass}
+            labelClass="grid gap-2 text-xs font-bold"
+            specialtyLabel={copy.common.specialty}
+            serviceLabel={copy.common.service}
+            specialtyPlaceholder={copy.common.chooseSpecialty}
+            servicePlaceholder={copy.common.chooseService}
+          />
         </div>
 
         <label class="mt-5 flex items-start gap-3 text-xs leading-6 text-muted">
@@ -150,13 +153,15 @@ const fieldClass =
 
       const data = new FormData(form);
       const department = String(data.get('department') ?? '').trim();
+      const service = String(data.get('service') ?? '').trim();
       const message = buildBookingWhatsAppMessage({
         name: String(data.get('name') ?? '').trim(),
         phone: String(data.get('phone') ?? '').trim(),
         department,
+        service,
         branch: clinicContact.branch,
       });
-      const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(department));
+      const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(service || department));
 
       pushGtmEvent(GtmEvents.formSubmit, {
         form_id: formId,
@@ -168,7 +173,7 @@ const fieldClass =
           name: String(data.get('name') ?? '').trim(),
           phone: String(data.get('phone') ?? '').trim(),
           department,
-          service: department,
+          service,
           locale: 'en',
           consent: data.has('consent'),
           website: String(data.get('website') ?? ''),

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { acceptedLeadDepartments } from '../../data/form-landing';
+import { acceptedLeadDepartments, formServiceCatalog } from '../../data/form-landing';
 import {
   buildBookingWhatsAppMessage,
   buildWhatsAppUrl,
@@ -135,11 +135,16 @@ export const POST = (async ({ request }) => {
     } catch {
       return json({ ok: false }, 400);
     }
-    parsed = parseCustomerLeadBody(body, { page, departments: acceptedLeadDepartments });
+    parsed = parseCustomerLeadBody(body, {
+      page,
+      departments: acceptedLeadDepartments,
+      services: formServiceCatalog,
+    });
   } else {
     parsed = parseCustomerLeadFromUrlEncoded(new URLSearchParams(bodyResult.raw), {
       page,
       departments: acceptedLeadDepartments,
+      services: formServiceCatalog,
     });
   }
 
@@ -157,9 +162,10 @@ export const POST = (async ({ request }) => {
     name: lead.name,
     phone: lead.phone,
     department: lead.department,
+    service: lead.service,
     branch: clinicContact.branch,
   });
-  const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(lead.department));
+  const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(lead.service || lead.department));
   const persist = await persistLead(lead);
   const saved = persist === 'saved';
 

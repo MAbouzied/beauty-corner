@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { bookingDepartments } from '../data/booking-departments.ts';
+import { formServiceCatalog } from '../data/form-landing.ts';
 import {
   assertCustomerRequestAllowed,
   createMemoryRateLimiter,
@@ -26,6 +27,35 @@ describe('parseCustomerLeadBody', () => {
     assert.equal(result.lead.service, 'قسم الفيلر');
     assert.equal(result.lead.locale, 'en');
     assert.equal(result.lead.page, '/en/book');
+  });
+
+  it('accepts a specialty with a matching service', () => {
+    const result = parseCustomerLeadBody({
+      name: 'عبدالله محمد',
+      phone: '0551234567',
+      department: 'أسنان',
+      service: 'زراعة الأسنان',
+      locale: 'ar',
+      consent: true,
+    }, { page: '/form', departments: ['أسنان', 'جلدية'], services: formServiceCatalog });
+
+    assert.equal(result.ok, true);
+    if (!result.ok || result.kind !== 'lead') throw new Error('expected lead');
+    assert.equal(result.lead.department, 'أسنان');
+    assert.equal(result.lead.service, 'زراعة الأسنان');
+  });
+
+  it('rejects a service that does not belong to the specialty', () => {
+    const result = parseCustomerLeadBody({
+      name: 'عبدالله محمد',
+      phone: '0551234567',
+      department: 'أسنان',
+      service: 'الليزر',
+      locale: 'ar',
+      consent: true,
+    }, { departments: ['أسنان', 'جلدية'], services: formServiceCatalog });
+
+    assert.deepEqual(result, { ok: false, status: 422 });
   });
 
   it('rejects unknown departments', () => {
