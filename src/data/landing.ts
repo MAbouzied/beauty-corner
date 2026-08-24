@@ -1,3 +1,4 @@
+import { bookingDepartments } from './booking-departments.ts';
 import { clinicOpeningHoursRows } from './clinic-facts.ts';
 
 export const trustPoints = ['أطباء متخصصون', 'أجهزة وتقنيات حديثة', 'خصوصية وراحة', 'خطط علاجية مخصصة'] as const;
@@ -17,7 +18,7 @@ export const serviceGroups = [
   },
   {
     title: 'جلدية',
-    items: ['الليزر', 'الفيلر والبوتوكس', 'النحت', 'تنظيف البشرة الهيدرافيشل'],
+    items: [...bookingDepartments],
   },
 ] as const;
 

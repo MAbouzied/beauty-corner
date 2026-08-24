@@ -38,6 +38,10 @@ describe('form landing copy', () => {
     assert.equal(arGroups[0]?.label, 'أسنان');
     assert.equal(enGroups[0]?.label, 'Dentistry');
     assert.equal(enGroups[1]?.label, 'Dermatology');
+    assert.deepEqual(
+      arGroups[1]?.services.map((service) => service.value),
+      [...bookingDepartments],
+    );
 
     const arValues = arGroups.flatMap((group) => group.services.map((service) => service.value));
     const serviceTitles = clinicServices.map((service) => service.title);

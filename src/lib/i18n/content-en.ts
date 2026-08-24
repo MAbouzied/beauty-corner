@@ -383,52 +383,10 @@ export const servicesEn: Record<
       },
     ],
   },
-  laser: {
-    title: 'Laser',
-    description: 'Medical laser sessions after skin assessment for hair removal or suitable skin concerns.',
-    heroImageAlt: 'Equipped treatment room at Beauty Corner clinic',
-    sections: [
-      {
-        title: 'Medical laser after assessment',
-        paragraphs: [
-          'We examine the skin first to choose the right laser, then explain the expected number of sessions and aftercare.',
-        ],
-      },
-      {
-        title: 'What’s included',
-        listItems: [
-          'Skin-type assessment and laser suitability.',
-          'A clear session plan based on the treatment goal.',
-          'Before-and-after care guidance to protect results.',
-        ],
-      },
-    ],
-  },
-  'filler-botox': {
-    title: 'Filler & Botox',
-    description: 'Medical filler and Botox injections to refine facial features with a natural look.',
-    heroImageAlt: 'Equipped treatment room at Beauty Corner clinic',
-    sections: [
-      {
-        title: 'Balanced medical aesthetics',
-        paragraphs: [
-          'We assess your facial features and goals first, then decide whether filler, Botox, or both is the right option.',
-        ],
-      },
-      {
-        title: 'Before the session',
-        listItems: [
-          'Consultation to clarify the goal and expected result.',
-          'Choose suitable areas after medical assessment.',
-          'Aftercare steps and follow-up when needed.',
-        ],
-      },
-    ],
-  },
   'body-contouring': {
-    title: 'Body contouring',
+    title: 'Body Contouring & Fat Dissolving',
     description: 'Non-surgical contouring and fat-dissolving sessions after a medical assessment.',
-    heroImageAlt: 'Equipped treatment room at Beauty Corner clinic',
+    heroImageAlt: 'Lumenis NuEra Tight device for skin tightening and body contouring',
     sections: [
       {
         title: 'A clear body-contouring plan',
@@ -446,10 +404,73 @@ export const servicesEn: Record<
       },
     ],
   },
-  hydrafacial: {
-    title: 'HydraFacial skin cleaning',
-    description: 'Deep HydraFacial cleansing to clear pores and refresh the skin.',
+  'filler-botox': {
+    title: 'Filler',
+    description: 'Medical filler injections to refine facial features and restore volume after assessment.',
     heroImageAlt: 'Equipped treatment room at Beauty Corner clinic',
+    sections: [
+      {
+        title: 'Balanced medical filler',
+        paragraphs: [
+          'We assess your facial features and goals first, then decide whether filler is suitable and which areas to treat.',
+        ],
+      },
+      {
+        title: 'Before the session',
+        listItems: [
+          'Consultation to clarify the goal and expected result.',
+          'Choose suitable areas after medical assessment.',
+          'Aftercare steps and follow-up when needed.',
+        ],
+      },
+    ],
+  },
+  botox: {
+    title: 'Botox',
+    description: 'Medical Botox injections to soften expression lines with a natural look after assessment.',
+    heroImageAlt: 'Equipped treatment room at Beauty Corner clinic',
+    sections: [
+      {
+        title: 'Botox after assessment',
+        paragraphs: [
+          'We assess your facial muscles and goals first, then explain the suitable areas and expected result.',
+        ],
+      },
+      {
+        title: 'Before the session',
+        listItems: [
+          'Consultation to clarify the goal and expected result.',
+          'Dose and areas chosen after medical assessment.',
+          'Aftercare steps and follow-up when needed.',
+        ],
+      },
+    ],
+  },
+  'skin-brightening': {
+    title: 'Skin Brightening',
+    description: 'Brightening sessions to even skin tone and improve glow after a skin-type assessment.',
+    heroImageAlt: 'Préime DermaFacial device for skin cleaning and brightening',
+    sections: [
+      {
+        title: 'A brightening plan for your skin',
+        paragraphs: [
+          'We assess skin type, pigmentation, and dullness first, then choose sessions that support a clearer, more natural glow.',
+        ],
+      },
+      {
+        title: 'What’s included',
+        listItems: [
+          'Assessment of skin tone and texture before the plan.',
+          'A technique chosen for your case.',
+          'Home-care guidance after the session.',
+        ],
+      },
+    ],
+  },
+  hydrafacial: {
+    title: 'Hydrafacial',
+    description: 'Deep HydraFacial cleansing to clear pores and refresh the skin.',
+    heroImageAlt: 'Aqua Peel Tera device for skin cleaning at Beauty Corner',
     sections: [
       {
         title: 'Gentle deep cleansing',
@@ -463,6 +484,69 @@ export const servicesEn: Record<
           'Skin-type assessment before cleansing.',
           'Deep cleaning and hydration during the session.',
           'Simple same-day aftercare tips.',
+        ],
+      },
+    ],
+  },
+  'light-therapy': {
+    title: 'Light Therapy',
+    description: 'Light-based sessions to refresh the skin or calm inflammation after a medical assessment.',
+    heroImageAlt: 'CuRAS Q-Switched laser inside the dermatology clinic at Beauty Corner',
+    sections: [
+      {
+        title: 'Light treatment after assessment',
+        paragraphs: [
+          'We choose the suitable light session after examining the skin, then explain the expected number of sessions and aftercare.',
+        ],
+      },
+      {
+        title: 'What’s included',
+        listItems: [
+          'Skin-type assessment and light-therapy suitability.',
+          'A clear session plan based on the treatment goal.',
+          'Before-and-after care guidance to protect results.',
+        ],
+      },
+    ],
+  },
+  'skin-hair-treatment': {
+    title: 'Skin & Hair Treatment',
+    description: 'Medical assessment and treatment for skin and hair concerns such as acne, pigmentation, and hair loss.',
+    heroImageAlt: 'Equipped treatment room at Beauty Corner clinic',
+    sections: [
+      {
+        title: 'A treatment plan after examination',
+        paragraphs: [
+          'We start by assessing the skin or hair to identify the cause, then set a clear plan that fits your case.',
+        ],
+      },
+      {
+        title: 'What we can discuss',
+        listItems: [
+          'Acne, pigmentation, and skin irritation.',
+          'Hair loss and scalp concerns.',
+          'Follow-up and plan adjustments when needed.',
+        ],
+      },
+    ],
+  },
+  laser: {
+    title: 'Laser',
+    description: 'Medical laser sessions after skin assessment for hair removal or suitable skin concerns.',
+    heroImageAlt: 'Candela GentleMax Pro laser hair-removal device inside the clinic',
+    sections: [
+      {
+        title: 'Medical laser after assessment',
+        paragraphs: [
+          'We examine the skin first to choose the right laser, then explain the expected number of sessions and aftercare.',
+        ],
+      },
+      {
+        title: 'What’s included',
+        listItems: [
+          'Skin-type assessment and laser suitability.',
+          'A clear session plan based on the treatment goal.',
+          'Before-and-after care guidance to protect results.',
         ],
       },
     ],
@@ -547,9 +631,9 @@ export const doctorsEn: Record<
       {
         title: 'Focus areas',
         listItems: [
-          'Laser for pigmentation and hair',
-          'Filler and Botox',
-          'Body contouring and skin care such as HydraFacial',
+          'Laser, light therapy, pigmentation, and hair',
+          'Filler, Botox, and body contouring',
+          'Brightening, Hydrafacial, and skin and hair treatment',
         ],
       },
       {
@@ -663,7 +747,7 @@ export const faqEn = [
   {
     question: 'Which services are available at the clinic?',
     answer:
-      'The clinic offers dental services such as implants, prosthetics, veneers, whitening, cleaning, root canal treatment, and extraction, plus dermatology services: laser, filler and Botox, body contouring, and HydraFacial skin cleaning.',
+      'The clinic offers dental services such as implants, prosthetics, veneers, whitening, cleaning, root canal treatment, and extraction, plus dermatology services: body contouring and fat dissolving, filler, Botox, skin brightening, Hydrafacial, light therapy, skin and hair treatment, and laser.',
   },
   {
     question: 'Where is the Hafr Al-Batin branch?',

@@ -336,68 +336,14 @@ export const clinicServices: readonly ClinicService[] = [
     ],
   },
   {
-    id: 'laser',
-    title: 'الليزر',
-    description: 'جلسات ليزر طبية لتقييم البشرة وإزالة الشعر أو علاج المشكلات الجلدية المناسبة.',
-    category: 'تجميل',
-    department: 'جلدية',
-    icon: '/assets/service-laser.svg',
-    heroImage: dermHero,
-    heroImageAlt: dermHeroAlt,
-    doctorSpecialty: 'خدمات الليزر',
-    sections: [
-      {
-        title: 'ليزر طبي بعد تقييم الحالة',
-        paragraphs: [
-          'نبدأ بفحص البشرة لتحديد نوع الليزر المناسب، ثم نشرح عدد الجلسات المتوقع وتعليمات العناية بعدها.',
-        ],
-      },
-      {
-        title: 'ما تشمله الخدمة',
-        listItems: [
-          'تقييم نوع البشرة ومدى ملاءمة الليزر.',
-          'خطة جلسات واضحة حسب الهدف العلاجي.',
-          'إرشادات قبل الجلسة وبعدها للحفاظ على النتيجة.',
-        ],
-      },
-    ],
-  },
-  {
-    id: 'filler-botox',
-    title: 'الفيلر والبوتوكس',
-    description: 'حقن فيلر وبوتوكس طبية لتحسين ملامح الوجه بمظهر طبيعي.',
-    category: 'تجميل',
-    department: 'جلدية',
-    icon: '/assets/service-dermatology.svg',
-    heroImage: dermHero,
-    heroImageAlt: dermHeroAlt,
-    doctorSpecialty: 'الأمراض الجلدية والتجميل',
-    sections: [
-      {
-        title: 'تجميل طبي بمظهر متوازن',
-        paragraphs: [
-          'نقيّم ملامح الوجه واحتياجك أولاً، ثم نحدد إن كان الفيلر أو البوتوكس أو الجمع بينهما هو الأنسب.',
-        ],
-      },
-      {
-        title: 'قبل الجلسة',
-        listItems: [
-          'استشارة لتوضيح الهدف والنتيجة المتوقعة.',
-          'اختيار المناطق المناسبة حسب التقييم الطبي.',
-          'شرح العناية بعد الحقن وموعد المتابعة إن لزم.',
-        ],
-      },
-    ],
-  },
-  {
     id: 'body-contouring',
-    title: 'النحت',
+    title: 'قسم النحت و الاذابة',
     description: 'جلسات نحت وإذابة الدهون غير الجراحية لتحسين شكل الجسم بعد التقييم الطبي.',
     category: 'تجميل',
     department: 'جلدية',
     icon: '/assets/service-dermatology.svg',
-    heroImage: dermHero,
-    heroImageAlt: dermHeroAlt,
+    heroImage: '/assets/devices/nuera-tight.jpg',
+    heroImageAlt: 'جهاز Lumenis NuEra Tight لشد الجلد ونحت الجسم داخل العيادة',
     doctorSpecialty: 'الأمراض الجلدية والتجميل',
     sections: [
       {
@@ -417,14 +363,95 @@ export const clinicServices: readonly ClinicService[] = [
     ],
   },
   {
-    id: 'hydrafacial',
-    title: 'تنظيف البشرة الهيدرافيشل',
-    description: 'تنظيف عميق للبشرة بتقنية الهيدرافيشل لتنقية المسام ونضارة فورية.',
+    id: 'filler-botox',
+    title: 'قسم الفيلر',
+    description: 'حقن فيلر طبية لتحسين ملامح الوجه واستعادة الحجم بمظهر طبيعي بعد التقييم.',
     category: 'تجميل',
     department: 'جلدية',
     icon: '/assets/service-dermatology.svg',
     heroImage: dermHero,
     heroImageAlt: dermHeroAlt,
+    doctorSpecialty: 'الأمراض الجلدية والتجميل',
+    sections: [
+      {
+        title: 'فيلر طبي بمظهر متوازن',
+        paragraphs: [
+          'نقيّم ملامح الوجه واحتياجك أولاً، ثم نحدد إن كان الفيلر مناسبًا والمناطق الأنسب للحقن.',
+        ],
+      },
+      {
+        title: 'قبل الجلسة',
+        listItems: [
+          'استشارة لتوضيح الهدف والنتيجة المتوقعة.',
+          'اختيار المناطق المناسبة حسب التقييم الطبي.',
+          'شرح العناية بعد الحقن وموعد المتابعة إن لزم.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'botox',
+    title: 'قسم البوتكس',
+    description: 'حقن بوتكس طبية لتخفيف ظهور الخطوط وتعابير الوجه بمظهر طبيعي بعد التقييم.',
+    category: 'تجميل',
+    department: 'جلدية',
+    icon: '/assets/service-dermatology.svg',
+    heroImage: dermHero,
+    heroImageAlt: dermHeroAlt,
+    doctorSpecialty: 'الأمراض الجلدية والتجميل',
+    sections: [
+      {
+        title: 'بوتكس بعد تقييم الحالة',
+        paragraphs: [
+          'نبدأ بتقييم عضلات الوجه وهدفك من الجلسة، ثم نشرح المناطق المناسبة والنتيجة المتوقعة.',
+        ],
+      },
+      {
+        title: 'قبل الجلسة',
+        listItems: [
+          'استشارة لتوضيح الهدف والنتيجة المتوقعة.',
+          'تحديد الجرعة والمناطق حسب التقييم الطبي.',
+          'شرح العناية بعد الحقن وموعد المتابعة إن لزم.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'skin-brightening',
+    title: 'قسم النضارة',
+    description: 'جلسات نضارة لتوحيد لون البشرة وتحسين إشراقها بعد تقييم نوع الجلد.',
+    category: 'تجميل',
+    department: 'جلدية',
+    icon: '/assets/service-dermatology.svg',
+    heroImage: '/assets/devices/preime-dermafacial.jpg',
+    heroImageAlt: 'جهاز Préime DermaFacial لتنظيف ونضارة البشرة داخل عيادة الجلدية',
+    doctorSpecialty: 'الأمراض الجلدية والتجميل',
+    sections: [
+      {
+        title: 'نضارة بخطة تناسب بشرتك',
+        paragraphs: [
+          'نقيّم نوع البشرة والتصبغات أو الإرهاق الظاهر، ثم نختار الجلسات المناسبة لإشراق أوضح بمظهر طبيعي.',
+        ],
+      },
+      {
+        title: 'ماذا تشمل الخدمة؟',
+        listItems: [
+          'تقييم لون البشرة وملمسها قبل بدء الخطة.',
+          'اختيار التقنية المناسبة حسب حالتك.',
+          'إرشادات للعناية المنزلية بعد الجلسة.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hydrafacial',
+    title: 'قسم الهيدرافيشل',
+    description: 'تنظيف عميق للبشرة بتقنية الهيدرافيشل لتنقية المسام ونضارة فورية.',
+    category: 'تجميل',
+    department: 'جلدية',
+    icon: '/assets/service-dermatology.svg',
+    heroImage: '/assets/devices/aqua-peel-tera.jpg',
+    heroImageAlt: 'جهاز Aqua Peel Tera لتنظيف البشرة داخل عيادة بيوتي كورنر',
     doctorSpecialty: 'الأمراض الجلدية والتجميل',
     sections: [
       {
@@ -439,6 +466,87 @@ export const clinicServices: readonly ClinicService[] = [
           'تقييم نوع البشرة قبل التنظيف.',
           'تنظيف عميق وترطيب أثناء الجلسة.',
           'إرشادات بسيطة للعناية في اليوم نفسه.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'light-therapy',
+    title: 'قسم اللايت',
+    description: 'جلسات علاج ضوئي لتجديد البشرة أو تهدئة الالتهاب بعد تقييم طبي لنوع الجلد.',
+    category: 'تجميل',
+    department: 'جلدية',
+    icon: '/assets/service-dermatology.svg',
+    heroImage: '/assets/devices/curas-qswitched.jpg',
+    heroImageAlt: 'جهاز CuRAS ليزر Q-Switched داخل عيادة الجلدية في بيوتي كورنر',
+    doctorSpecialty: 'الأمراض الجلدية والتجميل',
+    sections: [
+      {
+        title: 'علاج ضوئي بعد التقييم',
+        paragraphs: [
+          'نحدد نوع الجلسة الضوئية المناسبة بعد فحص البشرة، مع شرح عدد الجلسات المتوقع وتعليمات العناية بعدها.',
+        ],
+      },
+      {
+        title: 'ما تشمله الخدمة',
+        listItems: [
+          'تقييم نوع البشرة ومدى ملاءمة العلاج الضوئي.',
+          'خطة جلسات واضحة حسب الهدف العلاجي.',
+          'إرشادات قبل الجلسة وبعدها للحفاظ على النتيجة.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'skin-hair-treatment',
+    title: 'قسم علاج البشرة و الشعر',
+    description: 'تقييم وعلاج طبي لمشكلات البشرة والشعر مثل حب الشباب والتصبغات وتساقط الشعر.',
+    category: 'تجميل',
+    department: 'جلدية',
+    icon: '/assets/service-dermatology.svg',
+    heroImage: dermHero,
+    heroImageAlt: dermHeroAlt,
+    doctorSpecialty: 'الأمراض الجلدية والتجميل',
+    sections: [
+      {
+        title: 'خطة علاجية بعد الفحص',
+        paragraphs: [
+          'نبدأ بتقييم حالة البشرة أو الشعر لتحديد السبب، ثم نضع خطة علاجية واضحة تناسب حالتك.',
+        ],
+      },
+      {
+        title: 'ما يمكن مناقشته في الزيارة',
+        listItems: [
+          'حب الشباب والتصبغات وتهيج البشرة.',
+          'تساقط الشعر وضعف فروة الرأس.',
+          'متابعة النتائج وتعديل الخطة عند الحاجة.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'laser',
+    title: 'قسم الليزر',
+    description: 'جلسات ليزر طبية لتقييم البشرة وإزالة الشعر أو علاج المشكلات الجلدية المناسبة.',
+    category: 'تجميل',
+    department: 'جلدية',
+    icon: '/assets/service-laser.svg',
+    heroImage: '/assets/devices/candela-gentlemax-pro.jpg',
+    heroImageAlt: 'جهاز Candela GentleMax Pro لإزالة الشعر بالليزر داخل العيادة',
+    doctorSpecialty: 'خدمات الليزر',
+    sections: [
+      {
+        title: 'ليزر طبي بعد تقييم الحالة',
+        paragraphs: [
+          'نبدأ بفحص البشرة لتحديد نوع الليزر المناسب، ثم نشرح عدد الجلسات المتوقع وتعليمات العناية بعدها.',
+        ],
+      },
+      {
+        title: 'ما تشمله الخدمة',
+        listItems: [
+          'تقييم نوع البشرة ومدى ملاءمة الليزر.',
+          'خطة جلسات واضحة حسب الهدف العلاجي.',
+          'إرشادات قبل الجلسة وبعدها للحفاظ على النتيجة.',
         ],
       },
     ],

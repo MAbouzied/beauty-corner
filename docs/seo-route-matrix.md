@@ -137,7 +137,7 @@
 
 ---
 
-## Service Detail Routes (15 pairs · 30 URLs)
+## Service Detail Routes (19 pairs · 38 URLs)
 
 Pattern: **Title** `{service} في حفر الباطن | بيوتي كورنر` (AR) · `{service} in Hafr Al-Batin | Beauty Corner` (EN)
 
@@ -154,10 +154,14 @@ Pattern: **Title** `{service} في حفر الباطن | بيوتي كورنر` 
 | gum-contouring | /services/gum-contouring | /en/services/gum-contouring | قص اللثة (جراحي وليزر) في حفر الباطن \| بيوتي كورنر | Gum Contouring in Hafr Al-Batin \| Beauty Corner | قص اللثة (جراحي وليزر) | Gum contouring (surgical & laser) | Same | /assets/devices/woodpecker-ptb.png | Yes · 0.7 |
 | gum-depigmentation | /services/gum-depigmentation | /en/services/gum-depigmentation | توريد اللثة بالليزر في حفر الباطن \| بيوتي كورنر | Laser Gum Depigmentation in Hafr Al-Batin \| Beauty Corner | توريد اللثة بالليزر | Laser gum depigmentation | Same | /assets/devices/woodpecker-ptb.png | Yes · 0.7 |
 | dental-xray-3d | /services/dental-xray-3d | /en/services/dental-xray-3d | أشعة الأسنان 3D في حفر الباطن \| بيوتي كورنر | 3D Dental X-ray in Hafr Al-Batin \| Beauty Corner | أشعة الأسنان 3D | 3D dental X-ray | Same | /assets/landing-clinic-gallery.jpg | Yes · 0.7 |
-| laser | /services/laser | /en/services/laser | الليزر في حفر الباطن \| بيوتي كورنر | Laser in Hafr Al-Batin \| Beauty Corner | الليزر | Laser | Same | /assets/devices/dental-examination-unit.jpg | Yes · 0.7 |
-| filler-botox | /services/filler-botox | /en/services/filler-botox | الفيلر والبوتوكس في حفر الباطن \| بيوتي كورنر | Filler & Botox in Hafr Al-Batin \| Beauty Corner | الفيلر والبوتوكس | Filler & Botox | Same | /assets/devices/dental-examination-unit.jpg | Yes · 0.7 |
-| body-contouring | /services/body-contouring | /en/services/body-contouring | النحت في حفر الباطن \| بيوتي كورنر | Body Contouring in Hafr Al-Batin \| Beauty Corner | النحت | Body contouring | Same | /assets/devices/dental-examination-unit.jpg | Yes · 0.7 |
-| hydrafacial | /services/hydrafacial | /en/services/hydrafacial | تنظيف البشرة الهيدرافيشل في حفر الباطن \| بيوتي كورنر | HydraFacial Skin Cleaning in Hafr Al-Batin \| Beauty Corner | تنظيف البشرة الهيدرافيشل | HydraFacial skin cleaning | Same | /assets/devices/dental-examination-unit.jpg | Yes · 0.7 |
+| body-contouring | /services/body-contouring | /en/services/body-contouring | قسم النحت و الاذابة في حفر الباطن \| بيوتي كورنر | Body Contouring & Fat Dissolving in Hafr Al-Batin \| Beauty Corner | قسم النحت و الاذابة | Body Contouring & Fat Dissolving | Same | /assets/devices/nuera-tight.jpg | Yes · 0.7 |
+| filler-botox | /services/filler-botox | /en/services/filler-botox | قسم الفيلر في حفر الباطن \| بيوتي كورنر | Filler in Hafr Al-Batin \| Beauty Corner | قسم الفيلر | Filler | Same | /assets/devices/dental-examination-unit.jpg | Yes · 0.7 |
+| botox | /services/botox | /en/services/botox | قسم البوتكس في حفر الباطن \| بيوتي كورنر | Botox in Hafr Al-Batin \| Beauty Corner | قسم البوتكس | Botox | Same | /assets/devices/dental-examination-unit.jpg | Yes · 0.7 |
+| skin-brightening | /services/skin-brightening | /en/services/skin-brightening | قسم النضارة في حفر الباطن \| بيوتي كورنر | Skin Brightening in Hafr Al-Batin \| Beauty Corner | قسم النضارة | Skin Brightening | Same | /assets/devices/preime-dermafacial.jpg | Yes · 0.7 |
+| hydrafacial | /services/hydrafacial | /en/services/hydrafacial | قسم الهيدرافيشل في حفر الباطن \| بيوتي كورنر | Hydrafacial in Hafr Al-Batin \| Beauty Corner | قسم الهيدرافيشل | Hydrafacial | Same | /assets/devices/aqua-peel-tera.jpg | Yes · 0.7 |
+| light-therapy | /services/light-therapy | /en/services/light-therapy | قسم اللايت في حفر الباطن \| بيوتي كورنر | Light Therapy in Hafr Al-Batin \| Beauty Corner | قسم اللايت | Light Therapy | Same | /assets/devices/curas-qswitched.jpg | Yes · 0.7 |
+| skin-hair-treatment | /services/skin-hair-treatment | /en/services/skin-hair-treatment | قسم علاج البشرة و الشعر في حفر الباطن \| بيوتي كورنر | Skin & Hair Treatment in Hafr Al-Batin \| Beauty Corner | قسم علاج البشرة و الشعر | Skin & Hair Treatment | Same | /assets/devices/dental-examination-unit.jpg | Yes · 0.7 |
+| laser | /services/laser | /en/services/laser | قسم الليزر في حفر الباطن \| بيوتي كورنر | Laser in Hafr Al-Batin \| Beauty Corner | قسم الليزر | Laser | Same | /assets/devices/candela-gentlemax-pro.jpg | Yes · 0.7 |
 
 **Shared fields for all service detail URLs:**
 
